@@ -27,10 +27,10 @@ Task list: `docs/phase-1-tasks.md`. Fixtures: `fixtures/ledger/`.
   All four run in one read-only `REPEATABLE READ` transaction. Every run prints
   `reversal check pending task 1.8`, pass or fail. The test was proven by turning each check off in turn:
   each one turned it red (VF1 for the two balance checks, VF2 and VF4 for the other two).
-- **Evidence for 1.9 is local and partial until CI reports.** Local: lint, typecheck, `fixtures:check` and
-  `ledger:verify` green (`loanbook` database, 0 entries); 5 files 112/112 plus the `todo` (money, accounts,
-  entry, ledger-db, ledger-verify). No local full sweep. The CI run on this commit is the first full sweep
-  over task 1.5's code as well: record its number here.
+- **Evidence for 1.9, and the first full sweep over 1.5.** CI run 36628825666 green on 946d2fc: vitest 33
+  files 269/269 plus 1 `todo` (235 at task 1.4, + 27 from 1.5, + 7 from 1.9), Playwright 10/10,
+  `fixtures:check` and `ledger:verify` both passing, both jobs with no failed or skipped step. Local: lint,
+  typecheck and both gates green; 5 files 112/112 plus the `todo`. No local full sweep was run.
 
 - 1.5 is commit 3f24884: `prisma/schema/ledger.prisma`, migration
   `20260929000000_ledger_init`, and `tests/integration/ledger-db.test.ts` (27 tests, raw SQL on its own `pg`
@@ -40,11 +40,8 @@ Task list: `docs/phase-1-tasks.md`. Fixtures: `fixtures/ledger/`.
   transaction. Every rejection carries its code in the error's `constraint` field; append-only uses
   `append_only`. The test was proven against a weakened test database: one CHECK dropped and three triggers
   disabled failed 7 of 27, then restored and green. `prisma migrate diff` against the schema: no difference.
-- **Evidence for 1.5 is local and partial.** Local: the new file plus unit tests and one integration file,
-  7 files 124/124; lint, typecheck and `fixtures:check` green. No local full sweep: load average was 46 on 10
-  cores with another project's sweep running. CI run 36627480484 on 3f24884: lint, typecheck, migrate and
-  `fixtures:check` passed, **`ledger:verify` failed as designed, and vitest and Playwright were skipped**
-  because they sit after the gate. No full sweep has run over 1.5 anywhere yet.
+- Evidence for 1.5: CI run 36628825666 (above) is its full sweep. Run 36627480484 on 3f24884 stopped at the
+  gate as designed, with vitest and Playwright skipped.
 - The migration is applied to both local databases, `loanbook` and `loanbook_test`.
 - 1.4 is commit 0f48b26: `src/ledger/entry.ts` and `tests/unit/entry.test.ts`
   (22 tests). `assertValidEntry(entry)` throws `EntryError` with the code, except `non_integer_amount`, which
