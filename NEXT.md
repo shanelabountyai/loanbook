@@ -1,18 +1,28 @@
 # NEXT
 
-## Pick up here: Phase 1, task 1.6 — posting service
+## Pick up here: Phase 1, task 1.7 — derived balances
 
-Model: **Opus 5.5** (the project pin). Single write path for money.
+Model: **Opus 5.5** (the project pin). Money read path.
 
-Single write path; atomic; no other code inserts lines. Build it on `assertValidEntry` (1.4) and write in
-one transaction at one level (the A3 trigger refuses lines written under a savepoint the entry was not).
-Read back with `readEntry` (1.5b). Failing test first: V1-V3 accepted, I1-I9 refused by the service with
-the fixture's codes.
+Account balances and per-loan balances computed from lines, never stored. Pass TB1 exactly (totals,
+balances, per-loan). Post TB1's entries through `postEntry` (1.6), not raw SQL. Compare in Postgres on the
+exact numeric, or through `centsFromNumeric`; no amount becomes a float.
 
-Then, in order: 1.7, 1.8 (adds the reversal check to verify, and turns VF3 from `todo` to a test), 1.10.
+Then, in order: 1.8 (adds the reversal check to verify, and turns VF3 from `todo` to a test), 1.10.
 Task list: `docs/phase-1-tasks.md`. Fixtures: `fixtures/ledger/`.
 
 ## State at handoff (2026-09-29)
+
+- 1.6 done: `src/ledger/post.ts`, `postEntry(db, { date, loanId, memo, lines })` returns the new id.
+  Validates with `assertValidEntry` before touching the database, then BEGIN, entry, lines in order, COMMIT;
+  ROLLBACK and rethrow on any error. Test `tests/integration/ledger-post.test.ts` (13): V1-V3 posted and read
+  back identically through `readEntry`; I1-I9 refused with the fixture's code and nothing written; a failure
+  on the second line insert rolls the entry back and leaves the connection usable. Mutants killed: no
+  validation (9 red), no ROLLBACK (1), no BEGIN (4), reversed positions (3).
+  `eslint.config.mjs`: a `WRITES` rule refuses `INSERT INTO "Ledger...` literals and Prisma's
+  `ledgerEntry`/`ledgerLine` accessors across `src/**` and `scripts/**`, except `post.ts`. Proven on planted
+  violations in `src/ledger` and `scripts`. Local: lint, typecheck, both gates, ledger + unit files 158/158
+  plus the `todo`. No local full sweep; CI owns it.
 
 - 1.5b done: `src/ledger/read.ts` (`readEntry`, returns `null` for an unknown id) and `centsFromNumeric` in
   `money.ts`, the one read edge: accepts `-?digits` with optional all-zero scale, refuses any fraction,
@@ -70,6 +80,13 @@ Task list: `docs/phase-1-tasks.md`. Fixtures: `fixtures/ledger/`.
   domain code in `src/ledger/`, tests outside `tests/invariants`.
 
 ## Decisions made
+
+- `postEntry` owns its transaction; the caller's connection must not already be in one (a surrounding BEGIN
+  would be committed by it). Composing several entries atomically waits for the task that needs it (payment
+  waterfall, Phase 3).
+- The single-write-path rule lives in `eslint.config.mjs`. Flat config replaces a rule set twice rather than
+  merging it, so `ROUNDING` and `WRITES` are constants and each block carries the full list for its files.
+- Tests stay outside the write rule: tampered books and the 1.5b read test load rows below the service.
 
 - `ledger:verify` reports every finding, not the first, and exits 1 on any (2026-09-29).
 - A ledger that does not balance is `unbalanced_ledger`. The fixture names no code for it; it comes with
