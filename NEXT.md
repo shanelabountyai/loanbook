@@ -1,36 +1,38 @@
 # NEXT
 
-## Pick up here: Phase 1, task 1.9 — `ledger:verify` (pulled forward)
+## Pick up here: Phase 1, task 1.5b — disbursement fixture
 
-Model: **Opus 5.5** (the project pin). This is the gate every later task stands behind; do not drop to Sonnet.
+Model: **Opus 5.5** (the project pin). It writes the read edge, which is money code.
 
-Replace the placeholder in `scripts/ledger-verify.ts` with the real checks, against the tables that now exist.
-Failing test first, from `fixtures/ledger/`: TB1 passes (`ok`), VF1 to VF4 each fail with exit code not 0 and
-the expected code and id.
+V1 (`fixtures/ledger/entry_validation.json`) posts `Dr loans_receivable 100000 / Cr cash 100000` and reads
+back identically (PRD P0-1 bullet 3). Failing test first.
 
-- Checks to build now: every entry balances; system debits = credits; receivable lines carry a loan id;
-  per-loan sub-ledgers sum to the control accounts. **The reversal check (dangling reference) waits for task
-  1.8**, which adds the column it reads. Say so in the script and leave that VF case marked as pending 1.8,
-  not silently skipped.
-- **The database now refuses the tampered data the VF cases need.** Unbalanced entries and a missing loan id
-  are refused by triggers, so the test has to load them below the rules:
-  `SET session_replication_role = replica` on the loading connection turns the triggers off for that session
-  (superuser only; the local and CI roles are). CHECK constraints stay on, which is fine: no VF case needs a
-  float or an unknown account. Confirm that against the fixtures before relying on it.
-- Amounts are `DECIMAL(65,30)` (D12), so `pg` returns `"100000.000000000000000000000000000000"`. Cast in the
-  SQL (`sum("debitCents")::bigint`) and pass the result through `assertCents`. That read edge does not exist
-  yet; this task or 1.5b writes it, once, in `src/ledger/`.
-- `ledger:verify` reads `.env.local` (database `loanbook`) locally and `loanbook_test` in CI. The test needs a
-  way to point the script at the test database.
-- When this lands, CI goes green again and runs vitest and Playwright. Check that run: it is the first full
-  sweep over task 1.5's code.
+- **This task writes the read edge, once, in `src/ledger/`.** Task 1.9 did not need one: `ledger:verify`
+  compares in Postgres and takes amounts back as text. Amounts are `DECIMAL(65,30)` (D12), so `pg` returns
+  `"100000.000000000000000000000000000000"`. Every amount read goes through `assertCents`.
+- **A `::bigint` cast rounds a fraction without saying so** (10.5 becomes 11). The CHECK refuses fractions on
+  the way in, but the read edge should not lean on that: refuse a value where `x <> trunc(x)`, or read
+  `trim_scale(x)::text` and refuse anything that is not digits.
+- `LedgerLine.position` holds line order, for the read-back.
+- There is no posting service yet (1.6). The test writes with raw SQL or a minimal insert; do not build 1.6 here.
 
-Then, in order: 1.5b, 1.6, 1.7, 1.8 (adds the reversal check to verify), 1.10.
+Then, in order: 1.6, 1.7, 1.8 (adds the reversal check to verify, and turns VF3 from `todo` to a test), 1.10.
 Task list: `docs/phase-1-tasks.md`. Fixtures: `fixtures/ledger/`.
 
 ## State at handoff (2026-09-29)
 
-- Tasks 1.1 to 1.5 done. 1.5 is commit 3f24884: `prisma/schema/ledger.prisma`, migration
+- Tasks 1.1 to 1.5 and 1.9 done. 1.9: `src/ledger/verify.ts` (the checks), `scripts/ledger-verify.ts` (prints
+  and exits), `tests/integration/ledger-verify.test.ts` (7 tests and 1 `todo`). Four checks: each entry
+  balances, the ledger balances, per-loan accounts carry a loan id, sub-ledgers sum to the control account.
+  All four run in one read-only `REPEATABLE READ` transaction. Every run prints
+  `reversal check pending task 1.8`, pass or fail. The test was proven by turning each check off in turn:
+  each one turned it red (VF1 for the two balance checks, VF2 and VF4 for the other two).
+- **Evidence for 1.9 is local and partial until CI reports.** Local: lint, typecheck, `fixtures:check` and
+  `ledger:verify` green (`loanbook` database, 0 entries); 5 files 112/112 plus the `todo` (money, accounts,
+  entry, ledger-db, ledger-verify). No local full sweep. The CI run on this commit is the first full sweep
+  over task 1.5's code as well: record its number here.
+
+- 1.5 is commit 3f24884: `prisma/schema/ledger.prisma`, migration
   `20260929000000_ledger_init`, and `tests/integration/ledger-db.test.ts` (27 tests, raw SQL on its own `pg`
   connection). Tables `LedgerEntry` and `LedgerLine`. Per line: four CHECK constraints named for their fixture
   codes. Per entry: a deferred constraint trigger (line count, loan id, balance, in the service's order).
@@ -64,11 +66,21 @@ Task list: `docs/phase-1-tasks.md`. Fixtures: `fixtures/ledger/`.
   build. The sweep took 442s. CI is the full-sweep evidence: run 36595320519 green on 8af7814, vitest 29 files
   195/195, Playwright 10/10, `fixtures:check` and `ledger:verify` both passing.
 - Before the next local sweep, check `sysctl -n vm.loadavg` and `pg_stat_activity` first.
-- `ledger:verify` is still the placeholder, and red since 3f24884 because ledger tables now exist.
 - Where LoanBook code goes: clone-owned paths only. `prisma/schema/ledger.prisma` and its own migrations,
   domain code in `src/ledger/`, tests outside `tests/invariants`.
 
 ## Decisions made
+
+- `ledger:verify` reports every finding, not the first, and exits 1 on any (2026-09-29).
+- A ledger that does not balance is `unbalanced_ledger`. The fixture names no code for it; it comes with
+  `unbalanced_entry` in VF1, and alone only if lines exist whose sums cancel per entry but not overall.
+- **VF2 and VF4 raise the same pair of findings**, `missing_loan_id` and `control_account_mismatch`. The loan
+  id is on the entry (D8), not the line, so the fixture's "drop the tag from a line" is done on the entry,
+  and an entry without a tag is always also a line missing from its sub-ledger. The two checks would come
+  apart only if lines carried their own loan id. The test pins the pair, in `ALSO`.
+- Verify compares in Postgres on the exact numeric and never turns an amount into a JavaScript number.
+- The test loads tampered books with `SET LOCAL session_replication_role = replica`, inside the loading
+  transaction, so the triggers are back on at commit. A test holds that.
 
 - D12 (2026-09-29): ledger line amounts are `numeric` under a CHECK, not `Int`. In `docs/decisions.md`, with
   the measurements. Not to be reopened.

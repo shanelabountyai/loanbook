@@ -1,15 +1,21 @@
 import pg from 'pg';
+import { verifyLedger } from '@/ledger/verify';
 
-// Task 1.1 placeholder. Task 1.9 replaces the body with the real checks (docs/phase-1-tasks.md).
-// It passes only while no ledger table exists, so it cannot stay quietly green once there is a book to verify.
+// The gate (CLAUDE.md non-negotiable 7). Exits 1 on any finding; the checks are in src/ledger/verify.ts.
+// The reversal check is not built: task 1.8 adds the column it reads. Every run says so, so a green
+// gate is never read as covering it.
+const PENDING = 'reversal check pending task 1.8';
+
 const client = new pg.Client({ connectionString: process.env.DATABASE_URL });
 await client.connect();
-const { rows } = await client.query<{ tablename: string }>(
-  `SELECT tablename FROM pg_tables WHERE schemaname = 'public' AND tablename ~* '(ledger|journal)'`,
-);
-await client.end();
-if (rows.length) {
-  console.error(`ledger:verify: not implemented, but ledger tables exist (${rows.map((r) => r.tablename).join(', ')}). Build task 1.9.`);
+const { findings, entries, debits, credits } = await verifyLedger(client).finally(() => client.end());
+
+for (const f of findings) {
+  const where = f.entryId ? ` entry ${f.entryId}` : f.account ? ` account ${f.account}` : '';
+  console.error(`ledger:verify: FAIL ${f.code}${where}: ${f.detail}`);
+}
+if (findings.length) {
+  console.error(`ledger:verify: ${findings.length} finding(s) in ${entries} entries (${PENDING})`);
   process.exit(1);
 }
-console.log('ledger:verify: ok (no ledger tables yet, nothing to verify)');
+console.log(`ledger:verify: ok (${entries} entries, debits ${debits} = credits ${credits}; ${PENDING})`);
