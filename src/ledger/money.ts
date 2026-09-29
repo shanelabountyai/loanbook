@@ -1,0 +1,33 @@
+// The one home for money representation and rounding (decisions D1, D2, D11).
+// Cents and basis points are integer `number`s; nothing else in src/ledger divides or rounds.
+
+export type MoneyErrorCode = 'non_integer_amount' | 'non_integer_rate' | 'invalid_rounding_input';
+
+/** Codes match `fixtures/ledger/entry_validation.json` where the fixture names one. */
+export class MoneyError extends Error {
+  constructor(readonly code: MoneyErrorCode) {
+    super(code);
+  }
+}
+
+function assertInteger(value: unknown, code: MoneyErrorCode): number {
+  if (typeof value !== 'number' || !Number.isSafeInteger(value)) throw new MoneyError(code);
+  return value;
+}
+
+/** Boundary guard for an amount in cents. Sign is the caller's rule, not this one's. */
+export const assertCents = (value: unknown) => assertInteger(value, 'non_integer_amount');
+
+/** Boundary guard for a rate in basis points (1200 = 12.00%). */
+export const assertBps = (value: unknown) => assertInteger(value, 'non_integer_rate');
+
+/**
+ * Round half up to whole cents, once, from an exact quantity given as numerator / denominator.
+ * Non-negative quantities only: "half up" is ambiguous below zero and no rule in D3-D9 rounds a negative.
+ */
+export function roundHalfUp(numerator: bigint, denominator: bigint): number {
+  if (numerator < 0n || denominator <= 0n) throw new MoneyError('invalid_rounding_input');
+  // floor(n/d + 1/2); bigint division truncates, which is floor for a non-negative quantity
+  const cents = Number((2n * numerator + denominator) / (2n * denominator));
+  return assertInteger(cents, 'invalid_rounding_input');
+}
