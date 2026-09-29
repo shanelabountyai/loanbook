@@ -28,7 +28,8 @@ Task list: `docs/phase-1-tasks.md`. Fixtures: `fixtures/ledger/`.
   (22 tests). `assertValidEntry(entry)` throws `EntryError` with the code, except `non_integer_amount`, which
   arrives as the `MoneyError` from `assertCents`; a caller matches on `.code` of either. Input is
   `{ loanId, lines: [{ account, debitCents, creditCents }] }`. Local: entry, accounts and money tests 78/78,
-  lint, typecheck, `fixtures:check` and `ledger:verify` green. No local full sweep was run; CI owns it.
+  lint, typecheck, `fixtures:check` and `ledger:verify` green. No local full sweep was run; CI owns it: run
+  36624990032 green on 68c228e, vitest 31 files 235/235 (213 + the 22 new), Playwright 10/10, both gates passing.
 - 1.3 is commit a098eaf: `src/ledger/accounts.ts` and
   `tests/unit/accounts.test.ts` (18 tests). Local: accounts and money tests 56/56, lint, typecheck,
   `fixtures:check` and `ledger:verify` green. No local full sweep was run; CI owns it: run 36623967561
