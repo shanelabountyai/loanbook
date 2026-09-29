@@ -20,7 +20,9 @@ Task list: `docs/phase-1-tasks.md`. Fixtures: `fixtures/ledger/`.
   `tests/unit/money.test.ts`. Mutants killed: reading a fraction as whole, and `ORDER BY position DESC`.
   **Survived:** dropping `ORDER BY` entirely, because Postgres walks the `(entryId, position)` unique index
   and returns position order anyway. The `ORDER BY` stays; no test can force that plan. Local: lint,
-  typecheck, both gates, 8 ledger/unit files 145/145 plus the `todo`. No local full sweep; CI owns it.
+  typecheck, both gates, 8 ledger/unit files 145/145 plus the `todo`. No local full sweep; CI owns it:
+  run 36630488191 green on b270c35, vitest 34 files 284/284 plus 1 `todo` (269 + 15 new), Playwright 10/10,
+  `fixtures:check` and `ledger:verify` passing, both jobs with no failed or skipped step.
 
 - Tasks 1.1 to 1.5 and 1.9 done. 1.9: `src/ledger/verify.ts` (the checks), `scripts/ledger-verify.ts` (prints
   and exits), `tests/integration/ledger-verify.test.ts` (7 tests and 1 `todo`). Four checks: each entry
