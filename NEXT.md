@@ -1,26 +1,35 @@
 # NEXT
 
-## Pick up here: Phase 1, task 1.4 — Entry validation (domain)
+## Pick up here: Phase 1, task 1.5 — Schema + DB enforcement
 
-Model: **Opus 5.5** (the project pin). This one is rule logic with exact error codes; do not drop to Sonnet.
+Model: **Opus 5.5** (the project pin). Constraint triggers on the money tables; do not drop to Sonnet.
 
-Pass `fixtures/ledger/entry_validation.json`: V1 to V3 accepted, I1 to I9 rejected with the exact code.
-Failing test first, driven by the fixture cases. Pure function in `src/ledger/`, no database (that is 1.5).
-The pieces already exist:
+Tables for entries and lines in `prisma/schema/ledger.prisma`, with the enforcement as hand-written SQL in
+the migration, the way `prisma/migrations/20260923100000_audit_append_only` does it. Failing test first:
+I1 to I9 and A1 to A3 from `fixtures/ledger/entry_validation.json`, sent as raw SQL so nothing in
+`src/ledger/entry.ts` can catch them first.
 
-- `isAccount(name)` in `src/ledger/accounts.ts` gives `unknown_account` (I7).
-- `CHART[name].requiresLoanId` gives `missing_loan_id` (I8). **`loan_id` is on the entry, not the line.**
-- `assertCents` in `src/ledger/money.ts` throws `non_integer_amount` (I9).
-
-Still to write: `unbalanced`, `too_few_lines`, `line_must_have_exactly_one_side`, `non_positive_amount`.
-Read each invalid case for which code it expects before fixing the order of the checks: a case that breaks
-two rules names only one code.
+- Balance and line count are per entry, so they go in a deferred constraint trigger (checked at commit).
+- One positive side and the amount sign are per line: plain `CHECK` constraints.
+- Append-only: triggers rejecting UPDATE, DELETE, and an INSERT of a line into an entry that already exists (A3).
+- **I9 cannot be left to the column type.** Measured on local Postgres 17: `INSERT` of `10.5` into an `integer`
+  column succeeds and stores `11` (and `-10.5` stores `-11`). An `Int` column rounds a float silently, which is
+  the one thing non-negotiable 4 forbids. Decide how the DB layer refuses it, and write the rule into
+  `docs/decisions.md` before the migration.
+- The fixture says "match on error code" at the DB layer too. Decide how a constraint carries the code
+  (constraint name or `RAISE ... USING`) before writing twelve of them.
+- This task turns `ledger:verify` red until 1.9 lands. That is deliberate (see below).
 
 Task list: `docs/phase-1-tasks.md`. Fixtures: `fixtures/ledger/`.
 
 ## State at handoff (2026-09-29)
 
-- Tasks 1.1, 1.2 and 1.3 done. 1.3 is commit a098eaf: `src/ledger/accounts.ts` and
+- Tasks 1.1 to 1.4 done. 1.4 is commit 0f48b26: `src/ledger/entry.ts` and `tests/unit/entry.test.ts`
+  (22 tests). `assertValidEntry(entry)` throws `EntryError` with the code, except `non_integer_amount`, which
+  arrives as the `MoneyError` from `assertCents`; a caller matches on `.code` of either. Input is
+  `{ loanId, lines: [{ account, debitCents, creditCents }] }`. Local: entry, accounts and money tests 78/78,
+  lint, typecheck, `fixtures:check` and `ledger:verify` green. No local full sweep was run; CI owns it.
+- 1.3 is commit a098eaf: `src/ledger/accounts.ts` and
   `tests/unit/accounts.test.ts` (18 tests). Local: accounts and money tests 56/56, lint, typecheck,
   `fixtures:check` and `ledger:verify` green. No local full sweep was run; CI owns it: run 36623967561
   green on 3b1fc47, vitest 30 files 213/213 (195 + the 18 new), Playwright 10/10, both gates passing.
@@ -40,6 +49,11 @@ Task list: `docs/phase-1-tasks.md`. Fixtures: `fixtures/ledger/`.
   domain code in `src/ledger/`, tests outside `tests/invariants`.
 
 ## Decisions made
+
+- Entry validation throws on the first rule broken. Order: line count, then each line in turn (account,
+  integer cents, sides, loan id), then the balance. The fixture fixes only line count before balance (I2).
+  A negative side is `non_positive_amount` whatever the other side holds. Date and memo are not validated
+  in the domain; nothing in the fixture tests them.
 
 - The chart of accounts is a typed table in code, and the test compares it to the fixture. Product code does
   not import from `fixtures/`: the fixture is the oracle, and code that read it would be checked against itself.

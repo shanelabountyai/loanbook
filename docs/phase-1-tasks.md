@@ -5,7 +5,7 @@ Goal: the invariant holds before anything else exists (PRD P0-1). Fixtures: `fix
 - [x] **1.1 Scaffold.** Clone of saas-foundation v1.2.0 on port 4700 (decisions D10), local `loanbook` and `loanbook_test` databases, npm scripts (`test`, `ledger:verify`, `fixtures:check`), CI running all three on every push, README banner verbatim. `ledger:verify` is a placeholder that fails as soon as a ledger table exists; task 1.9 replaces it.
 - [x] **1.2 Money guard.** `money` module: integer-cent type/validator (reject floats, bools, non-ints). Rounding function lands here as the single home, but is only exercised in Phase 2.
 - [x] **1.3 Chart of accounts.** Load `fixtures/ledger/chart_of_accounts.json`; expose normal side and `requires_loan_id`.
-- [ ] **1.4 Entry validation (domain).** Pass `entry_validation.json`: V1–V3 accepted; I1–I9 rejected with the exact error codes.
+- [x] **1.4 Entry validation (domain).** Pass `entry_validation.json`: V1–V3 accepted; I1–I9 rejected with the exact error codes.
 - [ ] **1.5 Schema + DB enforcement.** Tables for entries and lines; deferred constraint enforcing debits = credits per entry; triggers rejecting UPDATE/DELETE/late-INSERT on existing entries (A1–A3). Re-run I1–I9 **directly against the DB** (bypassing the service) and confirm rejection.
 - [ ] **1.5b Disbursement fixture.** V1 posts `Dr loans_receivable 100000 / Cr cash 100000` and reads back identically (PRD P0-1 bullet 3).
 - [ ] **1.6 Posting service.** Single write path; atomic; no other code inserts lines.
