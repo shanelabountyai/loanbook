@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { MoneyError, assertBps, assertCents, roundHalfUp } from '@/ledger/money';
+import { MoneyError, assertBps, assertCents, centsFromNumeric, roundHalfUp } from '@/ledger/money';
 
 const code = (fn: () => unknown) => {
   try {
@@ -31,6 +31,32 @@ describe('assertCents (D1, D11)', () => {
     ['an object', { cents: 100 }],
   ])('rejects %s', (_, v) => {
     expect(code(() => assertCents(v))).toBe('non_integer_amount');
+  });
+});
+
+describe('centsFromNumeric: the read edge (D12)', () => {
+  it.each([
+    ['0', 0],
+    ['100000', 100000],
+    ['-1500', -1500],
+    ['100000.000000000000000000000000000000', 100000],
+    ['9007199254740991', Number.MAX_SAFE_INTEGER],
+  ])('reads %s', (text, cents) => {
+    expect(centsFromNumeric(text)).toBe(cents);
+  });
+
+  // A ::bigint cast would turn 10.5 into 11 without a word; this refuses it.
+  it.each([
+    ['a fraction', '10.5'],
+    ['a fraction below a cent', '100000.000000000000000000000000000001'],
+    ['past the safe range', '9007199254740992'],
+    ['empty', ''],
+    ['exponent notation', '1e5'],
+    ['a lone point', '100.'],
+    ['NaN', 'NaN'],
+    ['whitespace', ' 100'],
+  ])('refuses %s', (_, text) => {
+    expect(code(() => centsFromNumeric(text))).toBe('non_integer_amount');
   });
 });
 

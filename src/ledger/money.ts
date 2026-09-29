@@ -18,6 +18,15 @@ function assertInteger(value: unknown, code: MoneyErrorCode): number {
 /** Boundary guard for an amount in cents. Sign is the caller's rule, not this one's. */
 export const assertCents = (value: unknown) => assertInteger(value, 'non_integer_amount');
 
+/**
+ * The read edge: a Postgres numeric, as the text `pg` returns, to whole cents (D12). Trailing zero
+ * scale is fine ("100000.000..."); any fraction is refused, never rounded as a ::bigint cast would.
+ */
+export function centsFromNumeric(text: string): number {
+  const whole = /^(-?\d+)(?:\.0+)?$/.exec(text)?.[1];
+  return assertCents(whole === undefined ? NaN : Number(whole));
+}
+
 /** Boundary guard for a rate in basis points (1200 = 12.00%). */
 export const assertBps = (value: unknown) => assertInteger(value, 'non_integer_rate');
 

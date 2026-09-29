@@ -1,25 +1,26 @@
 # NEXT
 
-## Pick up here: Phase 1, task 1.5b — disbursement fixture
+## Pick up here: Phase 1, task 1.6 — posting service
 
-Model: **Opus 5.5** (the project pin). It writes the read edge, which is money code.
+Model: **Opus 5.5** (the project pin). Single write path for money.
 
-V1 (`fixtures/ledger/entry_validation.json`) posts `Dr loans_receivable 100000 / Cr cash 100000` and reads
-back identically (PRD P0-1 bullet 3). Failing test first.
+Single write path; atomic; no other code inserts lines. Build it on `assertValidEntry` (1.4) and write in
+one transaction at one level (the A3 trigger refuses lines written under a savepoint the entry was not).
+Read back with `readEntry` (1.5b). Failing test first: V1-V3 accepted, I1-I9 refused by the service with
+the fixture's codes.
 
-- **This task writes the read edge, once, in `src/ledger/`.** Task 1.9 did not need one: `ledger:verify`
-  compares in Postgres and takes amounts back as text. Amounts are `DECIMAL(65,30)` (D12), so `pg` returns
-  `"100000.000000000000000000000000000000"`. Every amount read goes through `assertCents`.
-- **A `::bigint` cast rounds a fraction without saying so** (10.5 becomes 11). The CHECK refuses fractions on
-  the way in, but the read edge should not lean on that: refuse a value where `x <> trunc(x)`, or read
-  `trim_scale(x)::text` and refuse anything that is not digits.
-- `LedgerLine.position` holds line order, for the read-back.
-- There is no posting service yet (1.6). The test writes with raw SQL or a minimal insert; do not build 1.6 here.
-
-Then, in order: 1.6, 1.7, 1.8 (adds the reversal check to verify, and turns VF3 from `todo` to a test), 1.10.
+Then, in order: 1.7, 1.8 (adds the reversal check to verify, and turns VF3 from `todo` to a test), 1.10.
 Task list: `docs/phase-1-tasks.md`. Fixtures: `fixtures/ledger/`.
 
 ## State at handoff (2026-09-29)
+
+- 1.5b done: `src/ledger/read.ts` (`readEntry`, returns `null` for an unknown id) and `centsFromNumeric` in
+  `money.ts`, the one read edge: accepts `-?digits` with optional all-zero scale, refuses any fraction,
+  exponent or whitespace, then `assertCents`. Tests: `tests/integration/ledger-read.test.ts` (2) and 13 new in
+  `tests/unit/money.test.ts`. Mutants killed: reading a fraction as whole, and `ORDER BY position DESC`.
+  **Survived:** dropping `ORDER BY` entirely, because Postgres walks the `(entryId, position)` unique index
+  and returns position order anyway. The `ORDER BY` stays; no test can force that plan. Local: lint,
+  typecheck, both gates, 8 ledger/unit files 145/145 plus the `todo`. No local full sweep; CI owns it.
 
 - Tasks 1.1 to 1.5 and 1.9 done. 1.9: `src/ledger/verify.ts` (the checks), `scripts/ledger-verify.ts` (prints
   and exits), `tests/integration/ledger-verify.test.ts` (7 tests and 1 `todo`). Four checks: each entry

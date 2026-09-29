@@ -7,7 +7,7 @@ Goal: the invariant holds before anything else exists (PRD P0-1). Fixtures: `fix
 - [x] **1.3 Chart of accounts.** Load `fixtures/ledger/chart_of_accounts.json`; expose normal side and `requires_loan_id`.
 - [x] **1.4 Entry validation (domain).** Pass `entry_validation.json`: V1–V3 accepted; I1–I9 rejected with the exact error codes.
 - [x] **1.5 Schema + DB enforcement.** Tables for entries and lines; deferred constraint enforcing debits = credits per entry; triggers rejecting UPDATE/DELETE/late-INSERT on existing entries (A1–A3). Re-run I1–I9 **directly against the DB** (bypassing the service) and confirm rejection.
-- [ ] **1.5b Disbursement fixture.** V1 posts `Dr loans_receivable 100000 / Cr cash 100000` and reads back identically (PRD P0-1 bullet 3).
+- [x] **1.5b Disbursement fixture.** V1 posts `Dr loans_receivable 100000 / Cr cash 100000` and reads back identically (PRD P0-1 bullet 3). *Done 2026-09-29: `readEntry` in `src/ledger/read.ts`; every amount read goes through `centsFromNumeric` in `money.ts`.*
 - [ ] **1.6 Posting service.** Single write path; atomic; no other code inserts lines.
 - [ ] **1.7 Derived balances.** Account balances and per-loan balances computed from lines. Pass TB1 exactly (totals, balances, per-loan).
 - [ ] **1.8 Reversals.** Reversing entry swaps sides, references original; nets to zero; second reversal rejected (`already_reversed`). Pass the `reversal` block.
