@@ -22,7 +22,8 @@ Task list: `docs/phase-1-tasks.md`. Fixtures: `fixtures/ledger/`.
 
 - Tasks 1.1, 1.2 and 1.3 done. 1.3 is commit a098eaf: `src/ledger/accounts.ts` and
   `tests/unit/accounts.test.ts` (18 tests). Local: accounts and money tests 56/56, lint, typecheck,
-  `fixtures:check` and `ledger:verify` green. No local full sweep was run; CI owns it.
+  `fixtures:check` and `ledger:verify` green. No local full sweep was run; CI owns it: run 36623967561
+  green on 3b1fc47, vitest 30 files 213/213 (195 + the 18 new), Playwright 10/10, both gates passing.
 - 1.2 is commit 8af7814: `src/ledger/money.ts`, `tests/unit/money.test.ts` (38 tests),
   and a lint rule in `eslint.config.mjs` that makes `/`, `Math.round`, `toFixed` and `parseFloat` errors in
   `src/ledger/**` outside `money.ts`. The rule was proven against a deliberate violation.
