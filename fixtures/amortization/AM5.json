@@ -1,0 +1,27 @@
+{
+  "id": "AM5",
+  "description": "Single installment: $500 @ 12%, 1 month",
+  "input": {
+    "principal_cents": 50000,
+    "apr_bps": 1200,
+    "term_months": 1,
+    "disbursement_date": "2026-02-27"
+  },
+  "expected": {
+    "installment_cents": 50500,
+    "final_payment_cents": 50500,
+    "final_payment_adjustment_cents": 0,
+    "total_interest_cents": 500,
+    "total_paid_cents": 50500,
+    "schedule": [
+      {
+        "n": 1,
+        "due_date": "2026-03-27",
+        "payment_cents": 50500,
+        "interest_cents": 500,
+        "principal_cents": 50000,
+        "remaining_balance_cents": 0
+      }
+    ]
+  }
+}

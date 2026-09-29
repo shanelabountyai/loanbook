@@ -1,0 +1,54 @@
+{
+  "id": "WF7",
+  "description": "Payment equals payoff exactly: closes the loan",
+  "config": {
+    "waterfall_order": [
+      "fees",
+      "interest",
+      "principal"
+    ]
+  },
+  "input": {
+    "owed_before": {
+      "fees": 1500,
+      "interest": 1019,
+      "principal": 100000
+    },
+    "payment_cents": 102519
+  },
+  "expected": {
+    "allocation": {
+      "fees": 1500,
+      "interest": 1019,
+      "principal": 100000
+    },
+    "remaining": {
+      "fees": 0,
+      "interest": 0,
+      "principal": 0
+    },
+    "journal_lines": [
+      {
+        "account": "cash",
+        "debit": 102519,
+        "credit": 0
+      },
+      {
+        "account": "fees_receivable",
+        "debit": 0,
+        "credit": 1500
+      },
+      {
+        "account": "interest_receivable",
+        "debit": 0,
+        "credit": 1019
+      },
+      {
+        "account": "loans_receivable",
+        "debit": 0,
+        "credit": 100000
+      }
+    ],
+    "loan_closed": true
+  }
+}

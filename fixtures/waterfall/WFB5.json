@@ -1,0 +1,44 @@
+{
+  "id": "WFB5",
+  "description": "CONFIG B: same input as WF5 -- interest now absorbs the short payment",
+  "config": {
+    "waterfall_order": [
+      "interest",
+      "fees",
+      "principal"
+    ]
+  },
+  "input": {
+    "owed_before": {
+      "fees": 1500,
+      "interest": 1019,
+      "principal": 100000
+    },
+    "payment_cents": 1000
+  },
+  "expected": {
+    "allocation": {
+      "interest": 1000,
+      "fees": 0,
+      "principal": 0
+    },
+    "remaining": {
+      "fees": 1500,
+      "interest": 19,
+      "principal": 100000
+    },
+    "journal_lines": [
+      {
+        "account": "cash",
+        "debit": 1000,
+        "credit": 0
+      },
+      {
+        "account": "interest_receivable",
+        "debit": 0,
+        "credit": 1000
+      }
+    ],
+    "loan_closed": false
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "id": "WF1",
+  "description": "Exact scheduled payment, no fees",
+  "config": {
+    "waterfall_order": [
+      "fees",
+      "interest",
+      "principal"
+    ]
+  },
+  "input": {
+    "owed_before": {
+      "fees": 0,
+      "interest": 1019,
+      "principal": 100000
+    },
+    "payment_cents": 17255
+  },
+  "expected": {
+    "allocation": {
+      "fees": 0,
+      "interest": 1019,
+      "principal": 16236
+    },
+    "remaining": {
+      "fees": 0,
+      "interest": 0,
+      "principal": 83764
+    },
+    "journal_lines": [
+      {
+        "account": "cash",
+        "debit": 17255,
+        "credit": 0
+      },
+      {
+        "account": "interest_receivable",
+        "debit": 0,
+        "credit": 1019
+      },
+      {
+        "account": "loans_receivable",
+        "debit": 0,
+        "credit": 16236
+      }
+    ],
+    "loan_closed": false
+  }
+}

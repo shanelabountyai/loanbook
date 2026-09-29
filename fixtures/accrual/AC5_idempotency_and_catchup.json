@@ -1,0 +1,44 @@
+{
+  "id": "AC5",
+  "description": "Same run date twice writes nothing the 2nd time; a run after a skipped day posts every missing day through run date",
+  "input": {
+    "principal_cents": 100000,
+    "apr_bps": 1200,
+    "principal_effective_date": "2026-01-15"
+  },
+  "runs": [
+    {
+      "run_date": "2026-01-16",
+      "expected_entries": [
+        {
+          "date": "2026-01-16",
+          "day_number": 1,
+          "cumulative_cents": 33,
+          "entry_cents": 33
+        }
+      ]
+    },
+    {
+      "run_date": "2026-01-16",
+      "expected_entries": []
+    },
+    {
+      "run_date": "2026-01-18",
+      "expected_entries": [
+        {
+          "date": "2026-01-17",
+          "day_number": 2,
+          "cumulative_cents": 66,
+          "entry_cents": 33
+        },
+        {
+          "date": "2026-01-18",
+          "day_number": 3,
+          "cumulative_cents": 99,
+          "entry_cents": 33
+        }
+      ]
+    }
+  ],
+  "expected_cumulative_after_all_runs_cents": 99
+}

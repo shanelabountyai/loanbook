@@ -1,0 +1,75 @@
+{
+  "id": "AM3",
+  "description": "Zero-interest edge: $500 / 7 does not divide evenly; final payment absorbs the rounding",
+  "input": {
+    "principal_cents": 50000,
+    "apr_bps": 0,
+    "term_months": 7,
+    "disbursement_date": "2026-06-01"
+  },
+  "expected": {
+    "installment_cents": 7143,
+    "final_payment_cents": 7142,
+    "final_payment_adjustment_cents": -1,
+    "total_interest_cents": 0,
+    "total_paid_cents": 50000,
+    "schedule": [
+      {
+        "n": 1,
+        "due_date": "2026-07-01",
+        "payment_cents": 7143,
+        "interest_cents": 0,
+        "principal_cents": 7143,
+        "remaining_balance_cents": 42857
+      },
+      {
+        "n": 2,
+        "due_date": "2026-08-01",
+        "payment_cents": 7143,
+        "interest_cents": 0,
+        "principal_cents": 7143,
+        "remaining_balance_cents": 35714
+      },
+      {
+        "n": 3,
+        "due_date": "2026-09-01",
+        "payment_cents": 7143,
+        "interest_cents": 0,
+        "principal_cents": 7143,
+        "remaining_balance_cents": 28571
+      },
+      {
+        "n": 4,
+        "due_date": "2026-10-01",
+        "payment_cents": 7143,
+        "interest_cents": 0,
+        "principal_cents": 7143,
+        "remaining_balance_cents": 21428
+      },
+      {
+        "n": 5,
+        "due_date": "2026-11-01",
+        "payment_cents": 7143,
+        "interest_cents": 0,
+        "principal_cents": 7143,
+        "remaining_balance_cents": 14285
+      },
+      {
+        "n": 6,
+        "due_date": "2026-12-01",
+        "payment_cents": 7143,
+        "interest_cents": 0,
+        "principal_cents": 7143,
+        "remaining_balance_cents": 7142
+      },
+      {
+        "n": 7,
+        "due_date": "2027-01-01",
+        "payment_cents": 7142,
+        "interest_cents": 0,
+        "principal_cents": 7142,
+        "remaining_balance_cents": 0
+      }
+    ]
+  }
+}

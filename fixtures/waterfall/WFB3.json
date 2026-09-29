@@ -1,0 +1,54 @@
+{
+  "id": "WFB3",
+  "description": "CONFIG B (interest -> fees -> principal): same input as WF3",
+  "config": {
+    "waterfall_order": [
+      "interest",
+      "fees",
+      "principal"
+    ]
+  },
+  "input": {
+    "owed_before": {
+      "fees": 1500,
+      "interest": 1019,
+      "principal": 100000
+    },
+    "payment_cents": 17255
+  },
+  "expected": {
+    "allocation": {
+      "interest": 1019,
+      "fees": 1500,
+      "principal": 14736
+    },
+    "remaining": {
+      "fees": 0,
+      "interest": 0,
+      "principal": 85264
+    },
+    "journal_lines": [
+      {
+        "account": "cash",
+        "debit": 17255,
+        "credit": 0
+      },
+      {
+        "account": "interest_receivable",
+        "debit": 0,
+        "credit": 1019
+      },
+      {
+        "account": "fees_receivable",
+        "debit": 0,
+        "credit": 1500
+      },
+      {
+        "account": "loans_receivable",
+        "debit": 0,
+        "credit": 14736
+      }
+    ],
+    "loan_closed": false
+  }
+}

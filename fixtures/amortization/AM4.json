@@ -1,0 +1,163 @@
+{
+  "id": "AM4",
+  "description": "Month-end clamping: disbursed Jan 31, due dates clamp to last day of shorter months ($2,500 @ 24%, 18 mo)",
+  "input": {
+    "principal_cents": 250000,
+    "apr_bps": 2400,
+    "term_months": 18,
+    "disbursement_date": "2026-01-31"
+  },
+  "expected": {
+    "installment_cents": 16676,
+    "final_payment_cents": 16666,
+    "final_payment_adjustment_cents": -10,
+    "total_interest_cents": 50158,
+    "total_paid_cents": 300158,
+    "schedule": [
+      {
+        "n": 1,
+        "due_date": "2026-02-28",
+        "payment_cents": 16676,
+        "interest_cents": 5000,
+        "principal_cents": 11676,
+        "remaining_balance_cents": 238324
+      },
+      {
+        "n": 2,
+        "due_date": "2026-03-31",
+        "payment_cents": 16676,
+        "interest_cents": 4766,
+        "principal_cents": 11910,
+        "remaining_balance_cents": 226414
+      },
+      {
+        "n": 3,
+        "due_date": "2026-04-30",
+        "payment_cents": 16676,
+        "interest_cents": 4528,
+        "principal_cents": 12148,
+        "remaining_balance_cents": 214266
+      },
+      {
+        "n": 4,
+        "due_date": "2026-05-31",
+        "payment_cents": 16676,
+        "interest_cents": 4285,
+        "principal_cents": 12391,
+        "remaining_balance_cents": 201875
+      },
+      {
+        "n": 5,
+        "due_date": "2026-06-30",
+        "payment_cents": 16676,
+        "interest_cents": 4038,
+        "principal_cents": 12638,
+        "remaining_balance_cents": 189237
+      },
+      {
+        "n": 6,
+        "due_date": "2026-07-31",
+        "payment_cents": 16676,
+        "interest_cents": 3785,
+        "principal_cents": 12891,
+        "remaining_balance_cents": 176346
+      },
+      {
+        "n": 7,
+        "due_date": "2026-08-31",
+        "payment_cents": 16676,
+        "interest_cents": 3527,
+        "principal_cents": 13149,
+        "remaining_balance_cents": 163197
+      },
+      {
+        "n": 8,
+        "due_date": "2026-09-30",
+        "payment_cents": 16676,
+        "interest_cents": 3264,
+        "principal_cents": 13412,
+        "remaining_balance_cents": 149785
+      },
+      {
+        "n": 9,
+        "due_date": "2026-10-31",
+        "payment_cents": 16676,
+        "interest_cents": 2996,
+        "principal_cents": 13680,
+        "remaining_balance_cents": 136105
+      },
+      {
+        "n": 10,
+        "due_date": "2026-11-30",
+        "payment_cents": 16676,
+        "interest_cents": 2722,
+        "principal_cents": 13954,
+        "remaining_balance_cents": 122151
+      },
+      {
+        "n": 11,
+        "due_date": "2026-12-31",
+        "payment_cents": 16676,
+        "interest_cents": 2443,
+        "principal_cents": 14233,
+        "remaining_balance_cents": 107918
+      },
+      {
+        "n": 12,
+        "due_date": "2027-01-31",
+        "payment_cents": 16676,
+        "interest_cents": 2158,
+        "principal_cents": 14518,
+        "remaining_balance_cents": 93400
+      },
+      {
+        "n": 13,
+        "due_date": "2027-02-28",
+        "payment_cents": 16676,
+        "interest_cents": 1868,
+        "principal_cents": 14808,
+        "remaining_balance_cents": 78592
+      },
+      {
+        "n": 14,
+        "due_date": "2027-03-31",
+        "payment_cents": 16676,
+        "interest_cents": 1572,
+        "principal_cents": 15104,
+        "remaining_balance_cents": 63488
+      },
+      {
+        "n": 15,
+        "due_date": "2027-04-30",
+        "payment_cents": 16676,
+        "interest_cents": 1270,
+        "principal_cents": 15406,
+        "remaining_balance_cents": 48082
+      },
+      {
+        "n": 16,
+        "due_date": "2027-05-31",
+        "payment_cents": 16676,
+        "interest_cents": 962,
+        "principal_cents": 15714,
+        "remaining_balance_cents": 32368
+      },
+      {
+        "n": 17,
+        "due_date": "2027-06-30",
+        "payment_cents": 16676,
+        "interest_cents": 647,
+        "principal_cents": 16029,
+        "remaining_balance_cents": 16339
+      },
+      {
+        "n": 18,
+        "due_date": "2027-07-31",
+        "payment_cents": 16666,
+        "interest_cents": 327,
+        "principal_cents": 16339,
+        "remaining_balance_cents": 0
+      }
+    ]
+  }
+}

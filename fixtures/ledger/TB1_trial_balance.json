@@ -1,0 +1,645 @@
+{
+  "id": "TB1",
+  "description": "L1 from funding through first payment. Debits must equal credits; per-loan sub-ledger must reconcile to control accounts.",
+  "entries": [
+    {
+      "id": "E001",
+      "date": "2026-01-01",
+      "loan_id": null,
+      "memo": "Fund lender cash",
+      "lines": [
+        {
+          "account": "cash",
+          "debit": 500000,
+          "credit": 0
+        },
+        {
+          "account": "lender_capital",
+          "debit": 0,
+          "credit": 500000
+        }
+      ]
+    },
+    {
+      "id": "E002",
+      "date": "2026-01-15",
+      "loan_id": "L1",
+      "memo": "Disburse L1 $1,000",
+      "lines": [
+        {
+          "account": "loans_receivable",
+          "debit": 100000,
+          "credit": 0
+        },
+        {
+          "account": "cash",
+          "debit": 0,
+          "credit": 100000
+        }
+      ]
+    },
+    {
+      "id": "E003",
+      "date": "2026-01-16",
+      "loan_id": "L1",
+      "memo": "Accrue day 1",
+      "lines": [
+        {
+          "account": "interest_receivable",
+          "debit": 33,
+          "credit": 0
+        },
+        {
+          "account": "interest_income",
+          "debit": 0,
+          "credit": 33
+        }
+      ]
+    },
+    {
+      "id": "E004",
+      "date": "2026-01-17",
+      "loan_id": "L1",
+      "memo": "Accrue day 2",
+      "lines": [
+        {
+          "account": "interest_receivable",
+          "debit": 33,
+          "credit": 0
+        },
+        {
+          "account": "interest_income",
+          "debit": 0,
+          "credit": 33
+        }
+      ]
+    },
+    {
+      "id": "E005",
+      "date": "2026-01-18",
+      "loan_id": "L1",
+      "memo": "Accrue day 3",
+      "lines": [
+        {
+          "account": "interest_receivable",
+          "debit": 33,
+          "credit": 0
+        },
+        {
+          "account": "interest_income",
+          "debit": 0,
+          "credit": 33
+        }
+      ]
+    },
+    {
+      "id": "E006",
+      "date": "2026-01-19",
+      "loan_id": "L1",
+      "memo": "Accrue day 4",
+      "lines": [
+        {
+          "account": "interest_receivable",
+          "debit": 33,
+          "credit": 0
+        },
+        {
+          "account": "interest_income",
+          "debit": 0,
+          "credit": 33
+        }
+      ]
+    },
+    {
+      "id": "E007",
+      "date": "2026-01-20",
+      "loan_id": "L1",
+      "memo": "Accrue day 5",
+      "lines": [
+        {
+          "account": "interest_receivable",
+          "debit": 32,
+          "credit": 0
+        },
+        {
+          "account": "interest_income",
+          "debit": 0,
+          "credit": 32
+        }
+      ]
+    },
+    {
+      "id": "E008",
+      "date": "2026-01-21",
+      "loan_id": "L1",
+      "memo": "Accrue day 6",
+      "lines": [
+        {
+          "account": "interest_receivable",
+          "debit": 33,
+          "credit": 0
+        },
+        {
+          "account": "interest_income",
+          "debit": 0,
+          "credit": 33
+        }
+      ]
+    },
+    {
+      "id": "E009",
+      "date": "2026-01-22",
+      "loan_id": "L1",
+      "memo": "Accrue day 7",
+      "lines": [
+        {
+          "account": "interest_receivable",
+          "debit": 33,
+          "credit": 0
+        },
+        {
+          "account": "interest_income",
+          "debit": 0,
+          "credit": 33
+        }
+      ]
+    },
+    {
+      "id": "E010",
+      "date": "2026-01-23",
+      "loan_id": "L1",
+      "memo": "Accrue day 8",
+      "lines": [
+        {
+          "account": "interest_receivable",
+          "debit": 33,
+          "credit": 0
+        },
+        {
+          "account": "interest_income",
+          "debit": 0,
+          "credit": 33
+        }
+      ]
+    },
+    {
+      "id": "E011",
+      "date": "2026-01-24",
+      "loan_id": "L1",
+      "memo": "Accrue day 9",
+      "lines": [
+        {
+          "account": "interest_receivable",
+          "debit": 33,
+          "credit": 0
+        },
+        {
+          "account": "interest_income",
+          "debit": 0,
+          "credit": 33
+        }
+      ]
+    },
+    {
+      "id": "E012",
+      "date": "2026-01-25",
+      "loan_id": "L1",
+      "memo": "Accrue day 10",
+      "lines": [
+        {
+          "account": "interest_receivable",
+          "debit": 33,
+          "credit": 0
+        },
+        {
+          "account": "interest_income",
+          "debit": 0,
+          "credit": 33
+        }
+      ]
+    },
+    {
+      "id": "E013",
+      "date": "2026-01-26",
+      "loan_id": "L1",
+      "memo": "Accrue day 11",
+      "lines": [
+        {
+          "account": "interest_receivable",
+          "debit": 33,
+          "credit": 0
+        },
+        {
+          "account": "interest_income",
+          "debit": 0,
+          "credit": 33
+        }
+      ]
+    },
+    {
+      "id": "E014",
+      "date": "2026-01-27",
+      "loan_id": "L1",
+      "memo": "Accrue day 12",
+      "lines": [
+        {
+          "account": "interest_receivable",
+          "debit": 33,
+          "credit": 0
+        },
+        {
+          "account": "interest_income",
+          "debit": 0,
+          "credit": 33
+        }
+      ]
+    },
+    {
+      "id": "E015",
+      "date": "2026-01-28",
+      "loan_id": "L1",
+      "memo": "Accrue day 13",
+      "lines": [
+        {
+          "account": "interest_receivable",
+          "debit": 32,
+          "credit": 0
+        },
+        {
+          "account": "interest_income",
+          "debit": 0,
+          "credit": 32
+        }
+      ]
+    },
+    {
+      "id": "E016",
+      "date": "2026-01-29",
+      "loan_id": "L1",
+      "memo": "Accrue day 14",
+      "lines": [
+        {
+          "account": "interest_receivable",
+          "debit": 33,
+          "credit": 0
+        },
+        {
+          "account": "interest_income",
+          "debit": 0,
+          "credit": 33
+        }
+      ]
+    },
+    {
+      "id": "E017",
+      "date": "2026-01-30",
+      "loan_id": "L1",
+      "memo": "Accrue day 15",
+      "lines": [
+        {
+          "account": "interest_receivable",
+          "debit": 33,
+          "credit": 0
+        },
+        {
+          "account": "interest_income",
+          "debit": 0,
+          "credit": 33
+        }
+      ]
+    },
+    {
+      "id": "E018",
+      "date": "2026-01-31",
+      "loan_id": "L1",
+      "memo": "Accrue day 16",
+      "lines": [
+        {
+          "account": "interest_receivable",
+          "debit": 33,
+          "credit": 0
+        },
+        {
+          "account": "interest_income",
+          "debit": 0,
+          "credit": 33
+        }
+      ]
+    },
+    {
+      "id": "E019",
+      "date": "2026-02-01",
+      "loan_id": "L1",
+      "memo": "Accrue day 17",
+      "lines": [
+        {
+          "account": "interest_receivable",
+          "debit": 33,
+          "credit": 0
+        },
+        {
+          "account": "interest_income",
+          "debit": 0,
+          "credit": 33
+        }
+      ]
+    },
+    {
+      "id": "E020",
+      "date": "2026-02-02",
+      "loan_id": "L1",
+      "memo": "Accrue day 18",
+      "lines": [
+        {
+          "account": "interest_receivable",
+          "debit": 33,
+          "credit": 0
+        },
+        {
+          "account": "interest_income",
+          "debit": 0,
+          "credit": 33
+        }
+      ]
+    },
+    {
+      "id": "E021",
+      "date": "2026-02-03",
+      "loan_id": "L1",
+      "memo": "Accrue day 19",
+      "lines": [
+        {
+          "account": "interest_receivable",
+          "debit": 33,
+          "credit": 0
+        },
+        {
+          "account": "interest_income",
+          "debit": 0,
+          "credit": 33
+        }
+      ]
+    },
+    {
+      "id": "E022",
+      "date": "2026-02-04",
+      "loan_id": "L1",
+      "memo": "Accrue day 20",
+      "lines": [
+        {
+          "account": "interest_receivable",
+          "debit": 33,
+          "credit": 0
+        },
+        {
+          "account": "interest_income",
+          "debit": 0,
+          "credit": 33
+        }
+      ]
+    },
+    {
+      "id": "E023",
+      "date": "2026-02-05",
+      "loan_id": "L1",
+      "memo": "Accrue day 21",
+      "lines": [
+        {
+          "account": "interest_receivable",
+          "debit": 32,
+          "credit": 0
+        },
+        {
+          "account": "interest_income",
+          "debit": 0,
+          "credit": 32
+        }
+      ]
+    },
+    {
+      "id": "E024",
+      "date": "2026-02-06",
+      "loan_id": "L1",
+      "memo": "Accrue day 22",
+      "lines": [
+        {
+          "account": "interest_receivable",
+          "debit": 33,
+          "credit": 0
+        },
+        {
+          "account": "interest_income",
+          "debit": 0,
+          "credit": 33
+        }
+      ]
+    },
+    {
+      "id": "E025",
+      "date": "2026-02-07",
+      "loan_id": "L1",
+      "memo": "Accrue day 23",
+      "lines": [
+        {
+          "account": "interest_receivable",
+          "debit": 33,
+          "credit": 0
+        },
+        {
+          "account": "interest_income",
+          "debit": 0,
+          "credit": 33
+        }
+      ]
+    },
+    {
+      "id": "E026",
+      "date": "2026-02-08",
+      "loan_id": "L1",
+      "memo": "Accrue day 24",
+      "lines": [
+        {
+          "account": "interest_receivable",
+          "debit": 33,
+          "credit": 0
+        },
+        {
+          "account": "interest_income",
+          "debit": 0,
+          "credit": 33
+        }
+      ]
+    },
+    {
+      "id": "E027",
+      "date": "2026-02-09",
+      "loan_id": "L1",
+      "memo": "Accrue day 25",
+      "lines": [
+        {
+          "account": "interest_receivable",
+          "debit": 33,
+          "credit": 0
+        },
+        {
+          "account": "interest_income",
+          "debit": 0,
+          "credit": 33
+        }
+      ]
+    },
+    {
+      "id": "E028",
+      "date": "2026-02-10",
+      "loan_id": "L1",
+      "memo": "Accrue day 26",
+      "lines": [
+        {
+          "account": "interest_receivable",
+          "debit": 33,
+          "credit": 0
+        },
+        {
+          "account": "interest_income",
+          "debit": 0,
+          "credit": 33
+        }
+      ]
+    },
+    {
+      "id": "E029",
+      "date": "2026-02-11",
+      "loan_id": "L1",
+      "memo": "Accrue day 27",
+      "lines": [
+        {
+          "account": "interest_receivable",
+          "debit": 33,
+          "credit": 0
+        },
+        {
+          "account": "interest_income",
+          "debit": 0,
+          "credit": 33
+        }
+      ]
+    },
+    {
+      "id": "E030",
+      "date": "2026-02-12",
+      "loan_id": "L1",
+      "memo": "Accrue day 28",
+      "lines": [
+        {
+          "account": "interest_receivable",
+          "debit": 33,
+          "credit": 0
+        },
+        {
+          "account": "interest_income",
+          "debit": 0,
+          "credit": 33
+        }
+      ]
+    },
+    {
+      "id": "E031",
+      "date": "2026-02-13",
+      "loan_id": "L1",
+      "memo": "Accrue day 29",
+      "lines": [
+        {
+          "account": "interest_receivable",
+          "debit": 32,
+          "credit": 0
+        },
+        {
+          "account": "interest_income",
+          "debit": 0,
+          "credit": 32
+        }
+      ]
+    },
+    {
+      "id": "E032",
+      "date": "2026-02-14",
+      "loan_id": "L1",
+      "memo": "Accrue day 30",
+      "lines": [
+        {
+          "account": "interest_receivable",
+          "debit": 33,
+          "credit": 0
+        },
+        {
+          "account": "interest_income",
+          "debit": 0,
+          "credit": 33
+        }
+      ]
+    },
+    {
+      "id": "E033",
+      "date": "2026-02-15",
+      "loan_id": "L1",
+      "memo": "Accrue day 31",
+      "lines": [
+        {
+          "account": "interest_receivable",
+          "debit": 33,
+          "credit": 0
+        },
+        {
+          "account": "interest_income",
+          "debit": 0,
+          "credit": 33
+        }
+      ]
+    },
+    {
+      "id": "E034",
+      "date": "2026-02-15",
+      "loan_id": "L1",
+      "memo": "Payment 1 (WF1 split)",
+      "lines": [
+        {
+          "account": "cash",
+          "debit": 17255,
+          "credit": 0
+        },
+        {
+          "account": "interest_receivable",
+          "debit": 0,
+          "credit": 1019
+        },
+        {
+          "account": "loans_receivable",
+          "debit": 0,
+          "credit": 16236
+        }
+      ]
+    }
+  ],
+  "expected": {
+    "total_debits_cents": 618274,
+    "total_credits_cents": 618274,
+    "balances_cents": {
+      "cash": 417255,
+      "loans_receivable": 83764,
+      "interest_receivable": 0,
+      "fees_receivable": 0,
+      "lender_capital": 500000,
+      "interest_income": 1019,
+      "fees_income": 0,
+      "write_offs": 0
+    },
+    "per_loan_cents": {
+      "L1": {
+        "loans_receivable": 83764,
+        "interest_receivable": 0,
+        "fees_receivable": 0
+      }
+    },
+    "verify_result": "ok"
+  }
+}

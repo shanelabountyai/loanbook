@@ -1,0 +1,49 @@
+{
+  "id": "WF6",
+  "description": "Payment exactly covers fees + interest; principal untouched (no principal line)",
+  "config": {
+    "waterfall_order": [
+      "fees",
+      "interest",
+      "principal"
+    ]
+  },
+  "input": {
+    "owed_before": {
+      "fees": 1500,
+      "interest": 1019,
+      "principal": 100000
+    },
+    "payment_cents": 2519
+  },
+  "expected": {
+    "allocation": {
+      "fees": 1500,
+      "interest": 1019,
+      "principal": 0
+    },
+    "remaining": {
+      "fees": 0,
+      "interest": 0,
+      "principal": 100000
+    },
+    "journal_lines": [
+      {
+        "account": "cash",
+        "debit": 2519,
+        "credit": 0
+      },
+      {
+        "account": "fees_receivable",
+        "debit": 0,
+        "credit": 1500
+      },
+      {
+        "account": "interest_receivable",
+        "debit": 0,
+        "credit": 1019
+      }
+    ],
+    "loan_closed": false
+  }
+}

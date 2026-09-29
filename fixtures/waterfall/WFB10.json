@@ -1,0 +1,49 @@
+{
+  "id": "WFB10",
+  "description": "CONFIG B: same input as WF10 -- interest cleared first, fee partly paid",
+  "config": {
+    "waterfall_order": [
+      "interest",
+      "fees",
+      "principal"
+    ]
+  },
+  "input": {
+    "owed_before": {
+      "fees": 1500,
+      "interest": 1019,
+      "principal": 100000
+    },
+    "payment_cents": 2000
+  },
+  "expected": {
+    "allocation": {
+      "interest": 1019,
+      "fees": 981,
+      "principal": 0
+    },
+    "remaining": {
+      "fees": 519,
+      "interest": 0,
+      "principal": 100000
+    },
+    "journal_lines": [
+      {
+        "account": "cash",
+        "debit": 2000,
+        "credit": 0
+      },
+      {
+        "account": "interest_receivable",
+        "debit": 0,
+        "credit": 1019
+      },
+      {
+        "account": "fees_receivable",
+        "debit": 0,
+        "credit": 981
+      }
+    ],
+    "loan_closed": false
+  }
+}

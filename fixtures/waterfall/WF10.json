@@ -1,0 +1,49 @@
+{
+  "id": "WF10",
+  "description": "Boundary: fee cleared, interest partly paid",
+  "config": {
+    "waterfall_order": [
+      "fees",
+      "interest",
+      "principal"
+    ]
+  },
+  "input": {
+    "owed_before": {
+      "fees": 1500,
+      "interest": 1019,
+      "principal": 100000
+    },
+    "payment_cents": 2000
+  },
+  "expected": {
+    "allocation": {
+      "fees": 1500,
+      "interest": 500,
+      "principal": 0
+    },
+    "remaining": {
+      "fees": 0,
+      "interest": 519,
+      "principal": 100000
+    },
+    "journal_lines": [
+      {
+        "account": "cash",
+        "debit": 2000,
+        "credit": 0
+      },
+      {
+        "account": "fees_receivable",
+        "debit": 0,
+        "credit": 1500
+      },
+      {
+        "account": "interest_receivable",
+        "debit": 0,
+        "credit": 500
+      }
+    ],
+    "loan_closed": false
+  }
+}

@@ -1,0 +1,115 @@
+{
+  "description": "Tampered ledgers injected BELOW the API (direct DB write / fixture load). `ledger:verify` must exit non-zero and report the code + entry id.",
+  "cases": [
+    {
+      "id": "VF1",
+      "expect": {
+        "code": "unbalanced_entry",
+        "entry_id": "E900"
+      },
+      "entries": [
+        {
+          "id": "E900",
+          "date": "2026-01-15",
+          "loan_id": "L1",
+          "lines": [
+            {
+              "account": "loans_receivable",
+              "debit": 100,
+              "credit": 0
+            },
+            {
+              "account": "cash",
+              "debit": 0,
+              "credit": 99
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "VF2",
+      "expect": {
+        "code": "missing_loan_id",
+        "entry_id": "E901"
+      },
+      "entries": [
+        {
+          "id": "E901",
+          "date": "2026-01-15",
+          "loan_id": null,
+          "lines": [
+            {
+              "account": "loans_receivable",
+              "debit": 100,
+              "credit": 0
+            },
+            {
+              "account": "cash",
+              "debit": 0,
+              "credit": 100
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "VF3",
+      "expect": {
+        "code": "dangling_reversal",
+        "entry_id": "E902"
+      },
+      "entries": [
+        {
+          "id": "E902",
+          "date": "2026-01-15",
+          "loan_id": "L1",
+          "reverses_entry_id": "E404",
+          "lines": [
+            {
+              "account": "cash",
+              "debit": 100,
+              "credit": 0
+            },
+            {
+              "account": "loans_receivable",
+              "debit": 0,
+              "credit": 100
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "VF4",
+      "expect": {
+        "code": "control_account_mismatch",
+        "account": "loans_receivable"
+      },
+      "note": "Per-loan sub-ledger sum != GL control balance (simulated by dropping loan tag on a stored line)",
+      "entries": [
+        {
+          "id": "E903",
+          "date": "2026-01-15",
+          "loan_id": "L1",
+          "lines": [
+            {
+              "account": "loans_receivable",
+              "debit": 100,
+              "credit": 0
+            },
+            {
+              "account": "cash",
+              "debit": 0,
+              "credit": 100
+            }
+          ]
+        }
+      ],
+      "tamper": {
+        "entry_id": "E903",
+        "set_line_loan_id_null": 0
+      }
+    }
+  ]
+}

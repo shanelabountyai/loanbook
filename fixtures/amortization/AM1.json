@@ -1,0 +1,67 @@
+{
+  "id": "AM1",
+  "description": "Baseline: $1,000 @ 12.00% APR, 6 months (also the capstone loan L1)",
+  "input": {
+    "principal_cents": 100000,
+    "apr_bps": 1200,
+    "term_months": 6,
+    "disbursement_date": "2026-01-15"
+  },
+  "expected": {
+    "installment_cents": 17255,
+    "final_payment_cents": 17253,
+    "final_payment_adjustment_cents": -2,
+    "total_interest_cents": 3528,
+    "total_paid_cents": 103528,
+    "schedule": [
+      {
+        "n": 1,
+        "due_date": "2026-02-15",
+        "payment_cents": 17255,
+        "interest_cents": 1000,
+        "principal_cents": 16255,
+        "remaining_balance_cents": 83745
+      },
+      {
+        "n": 2,
+        "due_date": "2026-03-15",
+        "payment_cents": 17255,
+        "interest_cents": 837,
+        "principal_cents": 16418,
+        "remaining_balance_cents": 67327
+      },
+      {
+        "n": 3,
+        "due_date": "2026-04-15",
+        "payment_cents": 17255,
+        "interest_cents": 673,
+        "principal_cents": 16582,
+        "remaining_balance_cents": 50745
+      },
+      {
+        "n": 4,
+        "due_date": "2026-05-15",
+        "payment_cents": 17255,
+        "interest_cents": 507,
+        "principal_cents": 16748,
+        "remaining_balance_cents": 33997
+      },
+      {
+        "n": 5,
+        "due_date": "2026-06-15",
+        "payment_cents": 17255,
+        "interest_cents": 340,
+        "principal_cents": 16915,
+        "remaining_balance_cents": 17082
+      },
+      {
+        "n": 6,
+        "due_date": "2026-07-15",
+        "payment_cents": 17253,
+        "interest_cents": 171,
+        "principal_cents": 17082,
+        "remaining_balance_cents": 0
+      }
+    ]
+  }
+}

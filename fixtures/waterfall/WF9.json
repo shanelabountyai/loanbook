@@ -1,0 +1,22 @@
+{
+  "id": "WF9",
+  "description": "Zero payment: rejected",
+  "config": {
+    "waterfall_order": [
+      "fees",
+      "interest",
+      "principal"
+    ]
+  },
+  "input": {
+    "owed_before": {
+      "fees": 0,
+      "interest": 1019,
+      "principal": 100000
+    },
+    "payment_cents": 0
+  },
+  "expected": {
+    "error": "non_positive_payment"
+  }
+}

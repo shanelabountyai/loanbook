@@ -1,0 +1,44 @@
+{
+  "id": "WF5",
+  "description": "Short payment that only reaches part of the fee",
+  "config": {
+    "waterfall_order": [
+      "fees",
+      "interest",
+      "principal"
+    ]
+  },
+  "input": {
+    "owed_before": {
+      "fees": 1500,
+      "interest": 1019,
+      "principal": 100000
+    },
+    "payment_cents": 1000
+  },
+  "expected": {
+    "allocation": {
+      "fees": 1000,
+      "interest": 0,
+      "principal": 0
+    },
+    "remaining": {
+      "fees": 500,
+      "interest": 1019,
+      "principal": 100000
+    },
+    "journal_lines": [
+      {
+        "account": "cash",
+        "debit": 1000,
+        "credit": 0
+      },
+      {
+        "account": "fees_receivable",
+        "debit": 0,
+        "credit": 1000
+      }
+    ],
+    "loan_closed": false
+  }
+}

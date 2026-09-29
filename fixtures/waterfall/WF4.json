@@ -1,0 +1,49 @@
+{
+  "id": "WF4",
+  "description": "Overpayment: extra $200 reduces principal",
+  "config": {
+    "waterfall_order": [
+      "fees",
+      "interest",
+      "principal"
+    ]
+  },
+  "input": {
+    "owed_before": {
+      "fees": 0,
+      "interest": 1019,
+      "principal": 100000
+    },
+    "payment_cents": 37255
+  },
+  "expected": {
+    "allocation": {
+      "fees": 0,
+      "interest": 1019,
+      "principal": 36236
+    },
+    "remaining": {
+      "fees": 0,
+      "interest": 0,
+      "principal": 63764
+    },
+    "journal_lines": [
+      {
+        "account": "cash",
+        "debit": 37255,
+        "credit": 0
+      },
+      {
+        "account": "interest_receivable",
+        "debit": 0,
+        "credit": 1019
+      },
+      {
+        "account": "loans_receivable",
+        "debit": 0,
+        "credit": 36236
+      }
+    ],
+    "loan_closed": false
+  }
+}

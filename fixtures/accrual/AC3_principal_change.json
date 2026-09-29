@@ -1,0 +1,208 @@
+{
+  "id": "AC3",
+  "description": "Principal drops 100000 -> 90000 on 2026-01-25 (payment applied AFTER that day's accrual; new principal effective 01-26). Each principal segment rounds independently.",
+  "input": {
+    "segments": [
+      {
+        "principal_cents": 100000,
+        "principal_effective_date": "2026-01-15",
+        "through": "2026-01-25"
+      },
+      {
+        "principal_cents": 90000,
+        "principal_effective_date": "2026-01-25",
+        "through": "2026-02-14"
+      }
+    ],
+    "apr_bps": 1200
+  },
+  "expected": {
+    "segment_totals_cents": [
+      329,
+      592
+    ],
+    "total_cents": 921,
+    "entries": [
+      {
+        "date": "2026-01-16",
+        "day_number": 1,
+        "cumulative_cents": 33,
+        "entry_cents": 33
+      },
+      {
+        "date": "2026-01-17",
+        "day_number": 2,
+        "cumulative_cents": 66,
+        "entry_cents": 33
+      },
+      {
+        "date": "2026-01-18",
+        "day_number": 3,
+        "cumulative_cents": 99,
+        "entry_cents": 33
+      },
+      {
+        "date": "2026-01-19",
+        "day_number": 4,
+        "cumulative_cents": 132,
+        "entry_cents": 33
+      },
+      {
+        "date": "2026-01-20",
+        "day_number": 5,
+        "cumulative_cents": 164,
+        "entry_cents": 32
+      },
+      {
+        "date": "2026-01-21",
+        "day_number": 6,
+        "cumulative_cents": 197,
+        "entry_cents": 33
+      },
+      {
+        "date": "2026-01-22",
+        "day_number": 7,
+        "cumulative_cents": 230,
+        "entry_cents": 33
+      },
+      {
+        "date": "2026-01-23",
+        "day_number": 8,
+        "cumulative_cents": 263,
+        "entry_cents": 33
+      },
+      {
+        "date": "2026-01-24",
+        "day_number": 9,
+        "cumulative_cents": 296,
+        "entry_cents": 33
+      },
+      {
+        "date": "2026-01-25",
+        "day_number": 10,
+        "cumulative_cents": 329,
+        "entry_cents": 33
+      },
+      {
+        "date": "2026-01-26",
+        "day_number": 1,
+        "cumulative_cents": 30,
+        "entry_cents": 30
+      },
+      {
+        "date": "2026-01-27",
+        "day_number": 2,
+        "cumulative_cents": 59,
+        "entry_cents": 29
+      },
+      {
+        "date": "2026-01-28",
+        "day_number": 3,
+        "cumulative_cents": 89,
+        "entry_cents": 30
+      },
+      {
+        "date": "2026-01-29",
+        "day_number": 4,
+        "cumulative_cents": 118,
+        "entry_cents": 29
+      },
+      {
+        "date": "2026-01-30",
+        "day_number": 5,
+        "cumulative_cents": 148,
+        "entry_cents": 30
+      },
+      {
+        "date": "2026-01-31",
+        "day_number": 6,
+        "cumulative_cents": 178,
+        "entry_cents": 30
+      },
+      {
+        "date": "2026-02-01",
+        "day_number": 7,
+        "cumulative_cents": 207,
+        "entry_cents": 29
+      },
+      {
+        "date": "2026-02-02",
+        "day_number": 8,
+        "cumulative_cents": 237,
+        "entry_cents": 30
+      },
+      {
+        "date": "2026-02-03",
+        "day_number": 9,
+        "cumulative_cents": 266,
+        "entry_cents": 29
+      },
+      {
+        "date": "2026-02-04",
+        "day_number": 10,
+        "cumulative_cents": 296,
+        "entry_cents": 30
+      },
+      {
+        "date": "2026-02-05",
+        "day_number": 11,
+        "cumulative_cents": 325,
+        "entry_cents": 29
+      },
+      {
+        "date": "2026-02-06",
+        "day_number": 12,
+        "cumulative_cents": 355,
+        "entry_cents": 30
+      },
+      {
+        "date": "2026-02-07",
+        "day_number": 13,
+        "cumulative_cents": 385,
+        "entry_cents": 30
+      },
+      {
+        "date": "2026-02-08",
+        "day_number": 14,
+        "cumulative_cents": 414,
+        "entry_cents": 29
+      },
+      {
+        "date": "2026-02-09",
+        "day_number": 15,
+        "cumulative_cents": 444,
+        "entry_cents": 30
+      },
+      {
+        "date": "2026-02-10",
+        "day_number": 16,
+        "cumulative_cents": 473,
+        "entry_cents": 29
+      },
+      {
+        "date": "2026-02-11",
+        "day_number": 17,
+        "cumulative_cents": 503,
+        "entry_cents": 30
+      },
+      {
+        "date": "2026-02-12",
+        "day_number": 18,
+        "cumulative_cents": 533,
+        "entry_cents": 30
+      },
+      {
+        "date": "2026-02-13",
+        "day_number": 19,
+        "cumulative_cents": 562,
+        "entry_cents": 29
+      },
+      {
+        "date": "2026-02-14",
+        "day_number": 20,
+        "cumulative_cents": 592,
+        "entry_cents": 30
+      }
+    ]
+  }
+}

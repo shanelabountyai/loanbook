@@ -1,0 +1,48 @@
+{
+  "accounts": [
+    {
+      "account": "cash",
+      "type": "asset",
+      "normal": "debit"
+    },
+    {
+      "account": "loans_receivable",
+      "type": "asset",
+      "normal": "debit",
+      "requires_loan_id": true
+    },
+    {
+      "account": "interest_receivable",
+      "type": "asset",
+      "normal": "debit",
+      "requires_loan_id": true
+    },
+    {
+      "account": "fees_receivable",
+      "type": "asset",
+      "normal": "debit",
+      "requires_loan_id": true
+    },
+    {
+      "account": "lender_capital",
+      "type": "equity",
+      "normal": "credit"
+    },
+    {
+      "account": "interest_income",
+      "type": "income",
+      "normal": "credit"
+    },
+    {
+      "account": "fees_income",
+      "type": "income",
+      "normal": "credit"
+    },
+    {
+      "account": "write_offs",
+      "type": "expense",
+      "normal": "debit",
+      "requires_loan_id": true
+    }
+  ]
+}

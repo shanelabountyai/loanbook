@@ -1,0 +1,44 @@
+{
+  "id": "WF2",
+  "description": "Short payment: does not even cover accrued interest",
+  "config": {
+    "waterfall_order": [
+      "fees",
+      "interest",
+      "principal"
+    ]
+  },
+  "input": {
+    "owed_before": {
+      "fees": 0,
+      "interest": 1019,
+      "principal": 100000
+    },
+    "payment_cents": 800
+  },
+  "expected": {
+    "allocation": {
+      "fees": 0,
+      "interest": 800,
+      "principal": 0
+    },
+    "remaining": {
+      "fees": 0,
+      "interest": 219,
+      "principal": 100000
+    },
+    "journal_lines": [
+      {
+        "account": "cash",
+        "debit": 800,
+        "credit": 0
+      },
+      {
+        "account": "interest_receivable",
+        "debit": 0,
+        "credit": 800
+      }
+    ],
+    "loan_closed": false
+  }
+}

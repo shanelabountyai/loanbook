@@ -1,0 +1,54 @@
+{
+  "id": "WF3",
+  "description": "Scheduled payment with a $15 late fee outstanding",
+  "config": {
+    "waterfall_order": [
+      "fees",
+      "interest",
+      "principal"
+    ]
+  },
+  "input": {
+    "owed_before": {
+      "fees": 1500,
+      "interest": 1019,
+      "principal": 100000
+    },
+    "payment_cents": 17255
+  },
+  "expected": {
+    "allocation": {
+      "fees": 1500,
+      "interest": 1019,
+      "principal": 14736
+    },
+    "remaining": {
+      "fees": 0,
+      "interest": 0,
+      "principal": 85264
+    },
+    "journal_lines": [
+      {
+        "account": "cash",
+        "debit": 17255,
+        "credit": 0
+      },
+      {
+        "account": "fees_receivable",
+        "debit": 0,
+        "credit": 1500
+      },
+      {
+        "account": "interest_receivable",
+        "debit": 0,
+        "credit": 1019
+      },
+      {
+        "account": "loans_receivable",
+        "debit": 0,
+        "credit": 14736
+      }
+    ],
+    "loan_closed": false
+  }
+}

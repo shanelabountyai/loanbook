@@ -1,0 +1,23 @@
+{
+  "id": "WF8",
+  "description": "Payment $0.01 over payoff: rejected (no credit balances)",
+  "config": {
+    "waterfall_order": [
+      "fees",
+      "interest",
+      "principal"
+    ]
+  },
+  "input": {
+    "owed_before": {
+      "fees": 1500,
+      "interest": 1019,
+      "principal": 100000
+    },
+    "payment_cents": 102520
+  },
+  "expected": {
+    "error": "exceeds_payoff",
+    "payoff_cents": 102519
+  }
+}

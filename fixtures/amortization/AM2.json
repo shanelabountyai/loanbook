@@ -1,0 +1,115 @@
+{
+  "id": "AM2",
+  "description": "Max principal $5,000 @ 18.50%, 12 months: penny-problem drift lands in the final payment",
+  "input": {
+    "principal_cents": 500000,
+    "apr_bps": 1850,
+    "term_months": 12,
+    "disbursement_date": "2026-03-10"
+  },
+  "expected": {
+    "installment_cents": 45959,
+    "final_payment_cents": 45961,
+    "final_payment_adjustment_cents": 2,
+    "total_interest_cents": 51510,
+    "total_paid_cents": 551510,
+    "schedule": [
+      {
+        "n": 1,
+        "due_date": "2026-04-10",
+        "payment_cents": 45959,
+        "interest_cents": 7708,
+        "principal_cents": 38251,
+        "remaining_balance_cents": 461749
+      },
+      {
+        "n": 2,
+        "due_date": "2026-05-10",
+        "payment_cents": 45959,
+        "interest_cents": 7119,
+        "principal_cents": 38840,
+        "remaining_balance_cents": 422909
+      },
+      {
+        "n": 3,
+        "due_date": "2026-06-10",
+        "payment_cents": 45959,
+        "interest_cents": 6520,
+        "principal_cents": 39439,
+        "remaining_balance_cents": 383470
+      },
+      {
+        "n": 4,
+        "due_date": "2026-07-10",
+        "payment_cents": 45959,
+        "interest_cents": 5912,
+        "principal_cents": 40047,
+        "remaining_balance_cents": 343423
+      },
+      {
+        "n": 5,
+        "due_date": "2026-08-10",
+        "payment_cents": 45959,
+        "interest_cents": 5294,
+        "principal_cents": 40665,
+        "remaining_balance_cents": 302758
+      },
+      {
+        "n": 6,
+        "due_date": "2026-09-10",
+        "payment_cents": 45959,
+        "interest_cents": 4668,
+        "principal_cents": 41291,
+        "remaining_balance_cents": 261467
+      },
+      {
+        "n": 7,
+        "due_date": "2026-10-10",
+        "payment_cents": 45959,
+        "interest_cents": 4031,
+        "principal_cents": 41928,
+        "remaining_balance_cents": 219539
+      },
+      {
+        "n": 8,
+        "due_date": "2026-11-10",
+        "payment_cents": 45959,
+        "interest_cents": 3385,
+        "principal_cents": 42574,
+        "remaining_balance_cents": 176965
+      },
+      {
+        "n": 9,
+        "due_date": "2026-12-10",
+        "payment_cents": 45959,
+        "interest_cents": 2728,
+        "principal_cents": 43231,
+        "remaining_balance_cents": 133734
+      },
+      {
+        "n": 10,
+        "due_date": "2027-01-10",
+        "payment_cents": 45959,
+        "interest_cents": 2062,
+        "principal_cents": 43897,
+        "remaining_balance_cents": 89837
+      },
+      {
+        "n": 11,
+        "due_date": "2027-02-10",
+        "payment_cents": 45959,
+        "interest_cents": 1385,
+        "principal_cents": 44574,
+        "remaining_balance_cents": 45263
+      },
+      {
+        "n": 12,
+        "due_date": "2027-03-10",
+        "payment_cents": 45961,
+        "interest_cents": 698,
+        "principal_cents": 45263,
+        "remaining_balance_cents": 0
+      }
+    ]
+  }
+}

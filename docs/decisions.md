@@ -1,0 +1,26 @@
+# LoanBook — Resolved Decisions & Open Items
+
+The PRD leaves several rules open. The frozen fixtures in `fixtures/` encode the answers below.
+If you change a decision, change the fixtures deliberately (see `fixtures/README.md`), not the tests.
+
+## Resolved (encoded in fixtures)
+
+| # | Decision | Why |
+|---|----------|-----|
+| D1 | All money is integer cents. Rates are integer basis points (1200 = 12.00%). No floats anywhere in money paths. | PRD P0-2 |
+| D2 | One rounding rule: **round half up to whole cents**, implemented in exactly one module. Every rounded value is rounded once from an exact quantity. | PRD P0-2 |
+| D3 | **Schedule basis:** monthly rate = APR/12; installment = half-up of the standard annuity formula; each row's interest = half-up(balance × APR/12); the **final row** pays off the remaining balance (absorbs drift). Due date k = disbursement date + k months, same day-of-month, clamped to month end (Jan 31 → Feb 28 → Mar 31). | Standard; AM1–AM5 |
+| D4 | **Accrual basis:** actual/365 simple interest on outstanding principal only (no compounding). This intentionally differs from the schedule's APR/12 interest (L1 period 1: schedule 1000¢ vs accrued 1019¢). **The schedule is the plan; the ledger is the truth.** Payments allocate against *accrued* interest. | PRD P0-3 vs P0-2; AC4, WF1 |
+| D5 | **Accrual rounding:** cumulative, not per-day. Within a principal segment, day *d*'s entry = round(exact interest for *d* days) − round(exact for *d−1* days). A 30-day month = 986¢, not 30 × 33¢ = 990¢. A principal change starts a new segment that rounds independently. | AC1, AC3 |
+| D6 | **Accrual timing:** the run for date D posts day D's interest (balance as of start of D). Disbursement day accrues nothing. A payment on D applies after D's accrual; reduced principal takes effect D+1. A run posts every missing day through D (catch-up); re-running a date posts nothing. | AC3, AC5 |
+| D7 | **Waterfall:** buckets = fees, interest, principal. Order is config (`["fees","interest","principal"]` default). Each bucket takes min(remaining payment, owed). A payment above total payoff (fees + interest + principal) is **rejected** — no credit balances. Zero/negative payments are rejected. Overpayment needs no special path: it simply reaches principal. | WF1–WF10, WFB* |
+| D8 | **Chart of accounts:** the PRD's list plus `fees_receivable` (fee assessed: Dr fees_receivable / Cr fees_income) and `lender_capital` (equity, so cash has a source). Receivable and write-off accounts require a `loan_id` on the entry. | ledger fixtures |
+| D9 | **Final installment amount due = payoff quote as of its due date**, not the schedule's last row, so the loan closes to exactly zero despite D4. | consequence of D4 |
+| D10 | **Stack:** TypeScript on a clone of saas-foundation v1.2.0 (Next.js 16, Prisma 7, Postgres 17, vitest, Playwright), port 4700. Reference projects for conventions are storage business and rental business: money is `Int` cents with a `Cents` suffix, rates are basis points with a `Bps` suffix. Commands are npm scripts, not a Makefile. DB enforcement (balance check, append-only) is hand-written SQL inside Prisma migrations, as the foundation's `audit_append_only` migration does. Python stays only in `tools/` (the fixture oracle, stdlib only). | Decided 2026-09-29: match the house stack and reuse the foundation's auth, roles, audit and CI rather than rebuild them for Phase 4. Supersedes the Python 3.12 + pytest proposal. |
+
+## Open items (need your call; not encoded in fixtures)
+
+1. **Integer money in TypeScript (decide at task 1.2).** A JS `number` is a double, so D1's "no floats" needs a concrete rule. Proposal: cents and bps are `number` guarded by `Number.isSafeInteger` at every boundary (matches Prisma `Int` and the reference projects); exact intermediate quantities (annuity formula, actual/365) are `bigint` rationals inside the single rounding module; `/` on money is banned outside that module.
+2. **Late fee amount.** Fixtures use a flat $15 (1500¢) as a parameter. Confirm or change; it must live in config.
+3. **Delinquency gap (Phase 4).** PRD defines grace = 1–10 days past due, then delinquent_30/60/90, leaving days 11–29 undefined. Proposal: delinquent_30 = 11–59, delinquent_60 = 60–89, delinquent_90 = 90–119, default_recommended = 120+. Also define how a short payment counts (proposal: an installment is satisfied when cumulative payments ≥ cumulative scheduled installments due).
+4. **Payoff quote & capstone fixtures** (Phase 3–4) and delinquency day-by-day fixtures are not yet built.

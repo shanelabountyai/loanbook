@@ -1,0 +1,335 @@
+{
+  "description": "Write-time validation. Each case must be rejected at the API AND at the DB layer (or accepted, where noted). Match on error code.",
+  "valid": [
+    {
+      "id": "V1",
+      "note": "PRD disbursement fixture: $1,000",
+      "entry": {
+        "id": "E002",
+        "date": "2026-01-15",
+        "loan_id": "L1",
+        "memo": "Disburse L1 $1,000",
+        "lines": [
+          {
+            "account": "loans_receivable",
+            "debit": 100000,
+            "credit": 0
+          },
+          {
+            "account": "cash",
+            "debit": 0,
+            "credit": 100000
+          }
+        ]
+      }
+    },
+    {
+      "id": "V2",
+      "note": "Fee assessed ($15 late fee)",
+      "entry": {
+        "id": "X",
+        "date": "2026-03-27",
+        "loan_id": "L1",
+        "memo": "Late fee",
+        "lines": [
+          {
+            "account": "fees_receivable",
+            "debit": 1500,
+            "credit": 0
+          },
+          {
+            "account": "fees_income",
+            "debit": 0,
+            "credit": 1500
+          }
+        ]
+      }
+    },
+    {
+      "id": "V3",
+      "note": "Multi-line entry: payment split into 3 credits",
+      "entry": {
+        "id": "X",
+        "date": "2026-03-15",
+        "loan_id": "L1",
+        "memo": "Payment",
+        "lines": [
+          {
+            "account": "cash",
+            "debit": 17255,
+            "credit": 0
+          },
+          {
+            "account": "fees_receivable",
+            "debit": 0,
+            "credit": 1500
+          },
+          {
+            "account": "interest_receivable",
+            "debit": 0,
+            "credit": 1019
+          },
+          {
+            "account": "loans_receivable",
+            "debit": 0,
+            "credit": 14736
+          }
+        ]
+      }
+    }
+  ],
+  "invalid": [
+    {
+      "id": "I1",
+      "error": "unbalanced",
+      "note": "debit 100 vs credit 99",
+      "entry": {
+        "id": "X",
+        "date": "2026-01-15",
+        "loan_id": "L1",
+        "lines": [
+          {
+            "account": "loans_receivable",
+            "debit": 100,
+            "credit": 0
+          },
+          {
+            "account": "cash",
+            "debit": 0,
+            "credit": 99
+          }
+        ]
+      }
+    },
+    {
+      "id": "I2",
+      "error": "too_few_lines",
+      "note": "single line",
+      "entry": {
+        "id": "X",
+        "date": "2026-01-15",
+        "loan_id": "L1",
+        "lines": [
+          {
+            "account": "cash",
+            "debit": 100,
+            "credit": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "I3",
+      "error": "too_few_lines",
+      "note": "no lines",
+      "entry": {
+        "id": "X",
+        "date": "2026-01-15",
+        "loan_id": "L1",
+        "lines": []
+      }
+    },
+    {
+      "id": "I4",
+      "error": "line_must_have_exactly_one_side",
+      "note": "both debit and credit on one line",
+      "entry": {
+        "id": "X",
+        "date": "2026-01-15",
+        "loan_id": "L1",
+        "lines": [
+          {
+            "account": "cash",
+            "debit": 100,
+            "credit": 100
+          },
+          {
+            "account": "loans_receivable",
+            "debit": 100,
+            "credit": 0
+          },
+          {
+            "account": "lender_capital",
+            "debit": 0,
+            "credit": 100
+          }
+        ]
+      }
+    },
+    {
+      "id": "I5",
+      "error": "non_positive_amount",
+      "note": "zero-value line",
+      "entry": {
+        "id": "X",
+        "date": "2026-01-15",
+        "loan_id": "L1",
+        "lines": [
+          {
+            "account": "cash",
+            "debit": 0,
+            "credit": 0
+          },
+          {
+            "account": "loans_receivable",
+            "debit": 0,
+            "credit": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "I6",
+      "error": "non_positive_amount",
+      "note": "negative amount",
+      "entry": {
+        "id": "X",
+        "date": "2026-01-15",
+        "loan_id": "L1",
+        "lines": [
+          {
+            "account": "cash",
+            "debit": -100,
+            "credit": 0
+          },
+          {
+            "account": "loans_receivable",
+            "debit": 0,
+            "credit": -100
+          }
+        ]
+      }
+    },
+    {
+      "id": "I7",
+      "error": "unknown_account",
+      "note": "account not in chart",
+      "entry": {
+        "id": "X",
+        "date": "2026-01-15",
+        "loan_id": "L1",
+        "lines": [
+          {
+            "account": "petty_cash",
+            "debit": 100,
+            "credit": 0
+          },
+          {
+            "account": "cash",
+            "debit": 0,
+            "credit": 100
+          }
+        ]
+      }
+    },
+    {
+      "id": "I8",
+      "error": "missing_loan_id",
+      "note": "receivable account without loan_id",
+      "entry": {
+        "id": "X",
+        "date": "2026-01-15",
+        "loan_id": null,
+        "lines": [
+          {
+            "account": "loans_receivable",
+            "debit": 100,
+            "credit": 0
+          },
+          {
+            "account": "cash",
+            "debit": 0,
+            "credit": 100
+          }
+        ]
+      }
+    },
+    {
+      "id": "I9",
+      "error": "non_integer_amount",
+      "note": "floats never allowed",
+      "entry": {
+        "id": "X",
+        "date": "2026-01-15",
+        "loan_id": "L1",
+        "lines": [
+          {
+            "account": "cash",
+            "debit": 10.5,
+            "credit": 0
+          },
+          {
+            "account": "lender_capital",
+            "debit": 0,
+            "credit": 10.5
+          }
+        ]
+      }
+    }
+  ],
+  "append_only": [
+    {
+      "id": "A1",
+      "action": "update_entry_line",
+      "expect": "rejected"
+    },
+    {
+      "id": "A2",
+      "action": "delete_entry",
+      "expect": "rejected"
+    },
+    {
+      "id": "A3",
+      "action": "insert_line_into_existing_entry",
+      "expect": "rejected"
+    }
+  ],
+  "reversal": {
+    "note": "A correction is a new entry with debits/credits swapped, referencing the original; net effect zero",
+    "original": {
+      "id": "E002",
+      "date": "2026-01-15",
+      "loan_id": "L1",
+      "memo": "Disburse L1 $1,000",
+      "lines": [
+        {
+          "account": "loans_receivable",
+          "debit": 100000,
+          "credit": 0
+        },
+        {
+          "account": "cash",
+          "debit": 0,
+          "credit": 100000
+        }
+      ]
+    },
+    "reversing_entry": {
+      "id": "X2",
+      "date": "2026-01-16",
+      "loan_id": "L1",
+      "memo": "Reverse E002",
+      "reverses_entry_id": "E002",
+      "lines": [
+        {
+          "account": "loans_receivable",
+          "debit": 0,
+          "credit": 100000
+        },
+        {
+          "account": "cash",
+          "debit": 100000,
+          "credit": 0
+        }
+      ]
+    },
+    "expected_balances_after_both": {
+      "loans_receivable": 0,
+      "cash": 0
+    }
+  },
+  "duplicate_reversal_rejected": {
+    "note": "A second reversal of the same entry_id must be rejected",
+    "error": "already_reversed"
+  }
+}
