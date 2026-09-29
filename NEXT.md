@@ -22,7 +22,9 @@ Task list: `docs/phase-1-tasks.md`. Fixtures: `fixtures/ledger/`.
   `eslint.config.mjs`: a `WRITES` rule refuses `INSERT INTO "Ledger...` literals and Prisma's
   `ledgerEntry`/`ledgerLine` accessors across `src/**` and `scripts/**`, except `post.ts`. Proven on planted
   violations in `src/ledger` and `scripts`. Local: lint, typecheck, both gates, ledger + unit files 158/158
-  plus the `todo`. No local full sweep; CI owns it.
+  plus the `todo`. No local full sweep; CI owns it: run 36631656561 green on 4be6765, vitest 35 files
+  297/297 plus 1 `todo` (284 + 13 new), Playwright 10/10, `fixtures:check` and `ledger:verify` passing, both
+  jobs with no failed or skipped step.
 
 - 1.5b done: `src/ledger/read.ts` (`readEntry`, returns `null` for an unknown id) and `centsFromNumeric` in
   `money.ts`, the one read edge: accepts `-?digits` with optional all-zero scale, refuses any fraction,
