@@ -1,12 +1,24 @@
 # NEXT
 
-## Pick up here: Phase 1, task 1.10 — CI gate
+## Pick up here: Phase 2 — amortization + accrual
 
-Model: **Opus 5.5** (the project pin), or Sonnet: no new money logic, but it is the gate's own proof.
+**Phase 1 is closed (2026-09-30).** All ten tasks done; exit criteria checked: every `fixtures/ledger/*` case
+passes at service and DB layers, `ledger:verify` clean on TB1 and failing on VF1-VF4, CI enforces it, no
+balance column anywhere.
 
-Pipeline fails if `ledger:verify` or `fixtures:check` fails. Prove it by pushing a deliberately unbalanced
-fixture on a throwaway branch, see the run go red at the gate, then delete the branch. Last Phase 1 task:
-after it, check the Phase 1 exit criteria before starting Phase 2.
+**Blocking, and it is Shane's, not the agent's:** before Phase 2, recompute `fixtures/amortization/AM1.csv` by
+hand in a spreadsheet and match it to the cent (`docs/phase-1-tasks.md`, last line). It is an independent
+check of the oracle, so the agent must not do it. Say "AM1 matches" (or what didn't) to unblock.
+
+Then: write `docs/phase-2-tasks.md` (no file yet) from the PRD and `docs/decisions.md`, same shape as
+Phase 1, TDD order amortization then accrual. Model: **Opus 5.5** (new money logic).
+
+- 1.10 done: the gate proven on throwaway PR #1 (closed, branch deleted). Run 36733144653: TB1 cash debit
+  +1 cent, red at `fixtures:check` (the diff shows `500001` rebuilt as `500000`). Run 36733495180: fixture
+  restored, an unbalanced entry (Dr loans_receivable 100 / Cr cash 99) planted by psql under
+  `session_replication_role = replica` just before the gate, red at `ledger:verify` with `unbalanced_entry`
+  and `unbalanced_ledger`, exit 1. Both runs skipped vitest and Playwright. Nothing changed on `main`'s
+  `ci.yml`: the gate steps were already in place; CI only runs on `main` pushes and PRs, hence the draft PR.
 
 ## State at handoff (2026-09-30)
 
