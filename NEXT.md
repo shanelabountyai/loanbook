@@ -1,6 +1,15 @@
 # NEXT
 
-## Pick up here: Phase 2, task 2.6 (accrual command)
+## Pick up here: Phase 2 exit check, then Phase 3
+
+2.6 done (2026-09-30): `scripts/accrue.ts` + `npm run accrue -- --as-of YYYY-MM-DD` (`--as-of` required, never
+defaults to today; per-loan `entries, cents` lines plus a total; exit 1 on missing/invalid date or any error).
+Test `tests/integration/accrue-script.test.ts` (2) runs the script as a person does: two loans five days apart, 31-day
+run, totals against `cumulativeInterestCents`, `verifyLedger` clean, re-run posts 0; missing and bad `--as-of` exit 1 and
+write nothing. Local: lint, typecheck, both gates, unit + integration 23 files 294/294. CI run: see below.
+Next: verify Phase 2 exit criteria (docs/phase-2-tasks.md) against CI, then Phase 3 (waterfall + payoff); model **Opus 5.5**.
+
+## Earlier: task 2.6 brief (done above)
 
 2.5 done (2026-09-30, D15): migration `20260930200000_ledger_accrual_kind` (`LedgerEntry.kind`, CHECK `invalid_kind`,
 partial unique index `already_accrued` on (`loanId`, `date`) where `kind = 'accrual'`), applied to both local
