@@ -6,7 +6,7 @@
 defaults to today; per-loan `entries, cents` lines plus a total; exit 1 on missing/invalid date or any error).
 Test `tests/integration/accrue-script.test.ts` (2) runs the script as a person does: two loans five days apart, 31-day
 run, totals against `cumulativeInterestCents`, `verifyLedger` clean, re-run posts 0; missing and bad `--as-of` exit 1 and
-write nothing. Local: lint, typecheck, both gates, unit + integration 23 files 294/294. CI run: see below.
+write nothing. Local: lint, typecheck, both gates, unit + integration 23 files 294/294. CI run 36764692631 green on a2c9e41: vitest 43 files 392/392 (390 + 2), Playwright 10/10, both gates passing.
 Next: verify Phase 2 exit criteria (docs/phase-2-tasks.md) against CI, then Phase 3 (waterfall + payoff); model **Opus 5.5**.
 
 ## Earlier: task 2.6 brief (done above)
