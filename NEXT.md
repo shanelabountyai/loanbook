@@ -1,6 +1,17 @@
 # NEXT
 
-## Pick up here: Phase 2, task 2.4 (accrual math, pure)
+## Pick up here: Phase 2, task 2.5 (accrual run)
+
+2.4 done (2026-09-30): `src/ledger/accrual.ts`, pure. `cumulativeInterestCents(principalCents, aprBps, days)` =
+`roundHalfUp(P·a·d, 3650000)`, one exact fraction rounded once (D4, 365 in leap years too).
+`accrueSegment({ principalCents, aprBps, effectiveDate, days })` returns the fixture's rows (`date` = effective + d,
+`dayNumber`, `cumulativeCents`, `entryCents` = cumulative(d) − cumulative(d−1), D5). Inputs refused up front:
+`non_integer_amount`, `non_integer_rate`, `invalid_rounding_input` (negative principal or rate), `invalid_count`
+(negative or fractional days), `invalid_date`. Test `tests/unit/accrual.test.ts` (16): AC1, AC2, AC4 every entry
+and total; AC3's two segments 329 + 592, every entry; 986 not 990; 1019 against 1000; 366 days = 12033. Mutants
+killed: per-day rounding (4 red), 366 denominator (7 red). Local: lint, typecheck, both gates, unit 173/173.
+For 2.5: the run needs only `cumulativeInterestCents` (entry = cumulative(day) − accrual already posted in the
+segment); `accrueSegment` is the fixture-shaped view. Model: **Opus 5.5** (idempotency, DB index, D6).
 
 2.3 done (2026-09-30): `prisma/schema/loan.prisma`, migration `20260930100000_loan_init` (applied to both local
 databases, schema diff empty). `Loan` holds terms only (id TEXT, `principalCents`, `aprBps`, `termMonths`,
