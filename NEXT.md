@@ -1,18 +1,24 @@
 # NEXT
 
-## Pick up here: Phase 2, task 2.2 (amortization schedule)
+## Pick up here: Phase 2, task 2.3 (loan record + disbursement)
 
-2.1 done (2026-09-30): `src/ledger/calendar.ts` — `assertDate`, `addDays`, `daysBetween`, `addMonthsClamped`,
-`CalendarError` (`invalid_date`, `invalid_count`). Strict `YYYY-MM-DD`, round-tripped so 02-30 is refused.
-`tests/unit/calendar.test.ts` (32): every AM1–AM5 due date, the no-chaining case, leap clamps, AC1/AC2 day
-numbers both ways, AC2's 29 days. Mutants killed: no clamp, no round-trip, month overflow without the day-1
-anchor (3 red each). Lint: a `calendar.ts` block lifts only the division selector (ms → whole UTC days, exact);
-`Math.round` there still errors, proven. Local: lint, typecheck, both gates, unit 141/141. CI run 36734894305 green on 7bb13d1: vitest 38 files 339/339 (307 + 32), Playwright 10/10, both gates passing.
-Next: 2.2 `buildSchedule`, uses `addMonthsClamped` for due dates. Model: **Opus 5.5**.
+2.2 done (2026-09-30): `src/ledger/schedule.ts`, `buildSchedule({ principalCents, aprBps, termMonths,
+disbursementDate })`, `ScheduleError` (`invalid_principal`, `invalid_rate`, `invalid_term`,
+`degenerate_schedule`). Installment = one `roundHalfUp` of P·a·(120000+a)^n / (120000·((120000+a)^n − 120000^n));
+APR 0 = P / n. `finalPaymentCents` = total paid − installment × (n−1). D14 (new): a row before the last must pay
+principal > 0 and leave some behind, otherwise refused (7¢ over 12 months at 0% would run negative). Accrual's
+decision is now **D15** (plan updated). `tests/unit/schedule.test.ts` (16): AM1–AM5 every field + totals, 11
+boundary cases. Mutants killed: final row not absorbing (4 red), APR 0 path removed (2), numerator rounded before
+dividing (3), growth factor rounded each month (3), D14 guard removed (1). **Survived, equivalent on these
+fixtures:** the monthly rate rounded to 6 decimals first; too fine to move a cent on AM1–AM5. Local: lint,
+typecheck, both gates, unit 157/157. CI run 36742772162 green on 4033b02: vitest 39 files 355/355 (339 + 16), Playwright 10/10, both gates passing.
+Next: 2.3 `Loan` table + `createLoan`. Model: **Opus 5.5** (migration + append-only trigger + posting).
 
 Proposed in the plan, not yet recorded as a decision: accrual idempotency via `LedgerEntry.kind` plus a partial
-unique index on (`loanId`, `date`) where `kind = 'accrual'`. D14 gets written at task 2.5.
+unique index on (`loanId`, `date`) where `kind = 'accrual'`. D15 gets written at task 2.5.
 
+- 2.1 done: `src/ledger/calendar.ts` (`assertDate`, `addDays`, `daysBetween`, `addMonthsClamped`). CI run
+  36734894305 green on 7bb13d1.
 - 1.10 done: the gate proven on throwaway PR #1 (closed, branch deleted). Run 36733144653: TB1 cash debit
   +1 cent, red at `fixtures:check` (the diff shows `500001` rebuilt as `500000`). Run 36733495180: fixture
   restored, an unbalanced entry (Dr loans_receivable 100 / Cr cash 99) planted by psql under
