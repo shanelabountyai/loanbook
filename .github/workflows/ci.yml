@@ -44,6 +44,19 @@ jobs:
       - run: npx prisma migrate deploy
       # The gate: if either fails, nothing after it runs (CLAUDE.md non-negotiable 7).
       - run: npm run fixtures:check
+      - name: THROWAWAY plant an unbalanced entry
+        run: |
+          psql -d loanbook_test -v ON_ERROR_STOP=1 <<'SQL'
+          BEGIN;
+          SET LOCAL session_replication_role = replica;
+          WITH e AS (
+            INSERT INTO "LedgerEntry" ("id", "date", "loanId", "memo")
+            VALUES (gen_random_uuid(), '2026-01-01', 'L1', 'THROWAWAY unbalanced') RETURNING "id")
+          INSERT INTO "LedgerLine" ("id", "entryId", "position", "account", "debitCents", "creditCents")
+          SELECT gen_random_uuid(), e."id", v.p, v.a, v.d, v.c
+          FROM e, (VALUES (0, 'loans_receivable', 100, 0), (1, 'cash', 0, 99)) AS v(p, a, d, c);
+          COMMIT;
+          SQL
       - run: npm run ledger:verify
       - run: npx vitest run
       # Production build, served — the way it ships. login.spec.ts drives a real page.
