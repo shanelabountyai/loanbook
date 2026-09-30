@@ -4,13 +4,16 @@
 // Every comparison is made by Postgres, on the exact numeric. No amount becomes a JavaScript number
 // here: amounts come back as text, for the message only. It trusts no trigger and no constraint,
 // and reads lines first, so a line whose entry is gone is still counted.
-//
-// Not here yet: the reversal check (`dangling_reversal`, fixture VF3). Task 1.8 adds the column it reads.
 
 import type { ClientBase } from 'pg';
 import { CHART } from './accounts';
 
-export type VerifyCode = 'unbalanced_entry' | 'unbalanced_ledger' | 'missing_loan_id' | 'control_account_mismatch';
+export type VerifyCode =
+  | 'unbalanced_entry'
+  | 'unbalanced_ledger'
+  | 'missing_loan_id'
+  | 'control_account_mismatch'
+  | 'dangling_reversal';
 export type Finding = { code: VerifyCode; entryId?: string; account?: string; detail: string };
 export type VerifyResult = { findings: Finding[]; entries: number; debits: string; credits: string };
 
@@ -22,7 +25,7 @@ const TAGGED = `coalesce(e."loanId", '') <> ''`;
 const NET = `l."debitCents" - l."creditCents"`;
 
 export async function verifyLedger(db: Pick<ClientBase, 'query'>): Promise<VerifyResult> {
-  // One snapshot for all four checks, so a book being written to cannot fail against itself.
+  // One snapshot for all five checks, so a book being written to cannot fail against itself.
   await db.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
   try {
     const findings: Finding[] = [];
@@ -73,6 +76,15 @@ export async function verifyLedger(db: Pick<ClientBase, 'query'>): Promise<Verif
         account: r.account,
         detail: `control balance ${r.control}, per-loan sub-ledgers sum to ${r.loans}`,
       });
+    }
+
+    const dangling = await db.query<{ id: string; reverses: string }>(
+      `SELECT e."id", e."reversesEntryId" AS reverses FROM "LedgerEntry" e
+        WHERE e."reversesEntryId" IS NOT NULL
+          AND NOT EXISTS (SELECT 1 FROM "LedgerEntry" o WHERE o."id" = e."reversesEntryId") ORDER BY 1`,
+    );
+    for (const r of dangling.rows) {
+      findings.push({ code: 'dangling_reversal', entryId: r.id, detail: `reverses ${r.reverses}, which does not exist` });
     }
 
     return { findings, entries, debits, credits };

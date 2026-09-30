@@ -8,6 +8,7 @@ export type StoredEntry = {
   date: string; // YYYY-MM-DD, read as text so no time zone touches it
   loanId: string | null;
   memo: string | null;
+  reversesEntryId: string | null;
   lines: { account: string; debitCents: number; creditCents: number }[];
 };
 
@@ -16,11 +17,12 @@ export async function readEntry(db: Pick<ClientBase, 'query'>, id: string): Prom
     date: string;
     loanId: string | null;
     memo: string | null;
+    reversesEntryId: string | null;
     account: string | null;
     debit: string | null;
     credit: string | null;
   }>(
-    `SELECT e."date"::text AS date, e."loanId", e."memo", l."account", l."debitCents"::text AS debit, l."creditCents"::text AS credit
+    `SELECT e."date"::text AS date, e."loanId", e."memo", e."reversesEntryId", l."account", l."debitCents"::text AS debit, l."creditCents"::text AS credit
        FROM "LedgerEntry" e LEFT JOIN "LedgerLine" l ON l."entryId" = e."id"
       WHERE e."id" = $1 ORDER BY l."position"`,
     [id],
@@ -32,6 +34,7 @@ export async function readEntry(db: Pick<ClientBase, 'query'>, id: string): Prom
     date: first.date,
     loanId: first.loanId,
     memo: first.memo,
+    reversesEntryId: first.reversesEntryId,
     lines: rows
       .filter((r) => r.account !== null)
       .map((r) => ({ account: r.account!, debitCents: centsFromNumeric(r.debit!), creditCents: centsFromNumeric(r.credit!) })),

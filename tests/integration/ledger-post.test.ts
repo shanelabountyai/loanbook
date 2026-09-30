@@ -27,7 +27,7 @@ const count = async () =>
 
 it.each(fixture.valid.map((c) => [c.id, c.entry] as const))('%s is posted and reads back identically', async (_, e) => {
   const id = await postEntry(client, input(e));
-  expect(await readEntry(client, id)).toStrictEqual({ id, ...input(e) });
+  expect(await readEntry(client, id)).toStrictEqual({ id, ...input(e), reversesEntryId: null });
 });
 
 it.each(fixture.invalid.map((c) => [c.id, c.error, c.entry] as const))('%s is refused as %s and writes nothing', async (_, code, e) => {

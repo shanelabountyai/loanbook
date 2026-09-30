@@ -1,15 +1,26 @@
 # NEXT
 
-## Pick up here: Phase 1, task 1.8 — reversals
+## Pick up here: Phase 1, task 1.10 — CI gate
 
-Model: **Opus 5.5** (the project pin). Adds a reversal column, a DB rule and a service path.
+Model: **Opus 5.5** (the project pin), or Sonnet: no new money logic, but it is the gate's own proof.
 
-A reversing entry swaps sides and references the original. The pair nets to zero. A second reversal is refused
-as `already_reversed`. Pass the `reversal` block in `fixtures/ledger/entry_validation.json`, add the
-`dangling_reversal` check to `verify.ts`, and turn VF3 in `ledger-verify.test.ts` from `todo` into a test.
-Drop the `reversal check pending task 1.8` line from the verify output. Then 1.10.
+Pipeline fails if `ledger:verify` or `fixtures:check` fails. Prove it by pushing a deliberately unbalanced
+fixture on a throwaway branch, see the run go red at the gate, then delete the branch. Last Phase 1 task:
+after it, check the Phase 1 exit criteria before starting Phase 2.
 
 ## State at handoff (2026-09-30)
+
+- 1.8 done (D13): column `LedgerEntry.reversesEntryId`, migration `20260930000000_ledger_reversal` (unique index
+  `already_reversed`, self foreign key `dangling_reversal`), applied to both local databases, schema diff empty.
+  `reverseEntry(db, { entryId, date, memo })` in `post.ts` reads the original, swaps each line's sides, keeps
+  its loan id, and maps the unique violation to `EntryError('already_reversed')`; unknown id is
+  `dangling_reversal`. `postEntry` and it share one private `write`. `readEntry` returns `reversesEntryId`.
+  `verify.ts` has a fifth check, `dangling_reversal`; the script's `pending task 1.8` line is gone.
+  Tests: `tests/integration/ledger-reversal.test.ts` (7: the fixture's reversal, net zero, second refused,
+  a race leaves one, unknown refused, and both DB rules by raw SQL). VF3 in `ledger-verify.test.ts` is
+  now a test, no `todo` left. Mutants killed: no swap (2 red), no code mapping (2), no verify check (1),
+  unique index dropped from the test DB (3). Local: lint, typecheck, `fixtures:check`, `ledger:verify`,
+  9 ledger and unit files 150/150. No local full sweep (load average 43); CI owns it: CI_RUN_PENDING.
 
 - 1.7 done: `src/ledger/balances.ts`, `trialBalance(db)` returns `{ totalDebitsCents, totalCreditsCents,
   balancesCents, perLoanCents }`. It is one statement with `GROUPING SETS ((), (account), (account, loanId))`,

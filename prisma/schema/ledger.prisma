@@ -3,14 +3,18 @@
 // CHECK constraints per line, a deferred constraint trigger per entry, append-only triggers.
 
 /// Journal entry. Append-only. Checked at commit: at least two lines, debits equal credits, and a
-/// loan id wherever an account requires one (D8).
+/// loan id wherever an account requires one (D8). A reversal names the entry it reverses; each entry
+/// is reversed at most once, and only an entry that exists (task 1.8).
 model LedgerEntry {
-  id        String       @id @default(uuid()) @db.Uuid
-  date      DateTime     @db.Date
-  loanId    String?
-  memo      String?
-  createdAt DateTime     @default(now()) @db.Timestamptz(6)
-  lines     LedgerLine[]
+  id              String       @id @default(uuid()) @db.Uuid
+  date            DateTime     @db.Date
+  loanId          String?
+  memo            String?
+  createdAt       DateTime     @default(now()) @db.Timestamptz(6)
+  lines           LedgerLine[]
+  reversesEntryId String?      @unique(map: "already_reversed") @db.Uuid
+  reverses        LedgerEntry? @relation("Reversal", fields: [reversesEntryId], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "dangling_reversal")
+  reversedBy      LedgerEntry? @relation("Reversal")
 }
 
 /// One side of an entry. Append-only, and insertable only in the transaction that created its entry.

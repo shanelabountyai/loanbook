@@ -11,7 +11,9 @@ export type EntryErrorCode =
   | 'line_must_have_exactly_one_side'
   | 'non_positive_amount'
   | 'missing_loan_id'
-  | 'unbalanced';
+  | 'unbalanced'
+  | 'already_reversed'
+  | 'dangling_reversal';
 
 /** Codes match `fixtures/ledger/entry_validation.json`. `non_integer_amount` arrives as a MoneyError. */
 export class EntryError extends Error {

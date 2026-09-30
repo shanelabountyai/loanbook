@@ -5,9 +5,11 @@
 // transaction at one level, which the A3 trigger requires (see migration 20260929000000_ledger_init).
 // The database's own checks run again at COMMIT. Date and memo go to the database unvalidated.
 
-import type { ClientBase } from 'pg';
-import { assertValidEntry, type EntryInput } from './entry';
+import type { ClientBase, DatabaseError } from 'pg';
+import { assertValidEntry, EntryError, type EntryInput } from './entry';
+import { readEntry } from './read';
 
+type Db = Pick<ClientBase, 'query'>;
 export type PostInput = EntryInput & { date: string; memo?: string | null };
 
 /**
@@ -15,14 +17,37 @@ export type PostInput = EntryInput & { date: string; memo?: string | null };
  * in one: a surrounding BEGIN would be committed here. Throws EntryError or MoneyError (match on
  * `.code`) before touching the database, or the database's error after rolling back.
  */
-export async function postEntry(db: Pick<ClientBase, 'query'>, entry: PostInput): Promise<string> {
+export function postEntry(db: Db, entry: PostInput): Promise<string> {
+  return write(db, entry, null);
+}
+
+/**
+ * Reverses a posted entry (task 1.8): a new entry on the given date, same loan, each line's sides
+ * swapped, naming the original. The pair nets to zero. Throws EntryError `dangling_reversal` for an
+ * unknown entry and `already_reversed` for a second reversal; the unique index decides the second,
+ * so two reversals racing still leave one.
+ */
+export async function reverseEntry(db: Db, { entryId, date, memo }: { entryId: string; date: string; memo?: string | null }) {
+  const original = await readEntry(db, entryId);
+  if (!original) throw new EntryError('dangling_reversal');
+  const lines = original.lines.map((l) => ({ account: l.account, debitCents: l.creditCents, creditCents: l.debitCents }));
+  try {
+    return await write(db, { date, memo, loanId: original.loanId, lines }, entryId);
+  } catch (err) {
+    if ((err as DatabaseError).constraint === 'already_reversed') throw new EntryError('already_reversed');
+    throw err;
+  }
+}
+
+async function write(db: Db, entry: PostInput, reversesEntryId: string | null): Promise<string> {
   assertValidEntry(entry);
 
   await db.query('BEGIN');
   try {
     const { rows } = await db.query<{ id: string }>(
-      'INSERT INTO "LedgerEntry" ("id", "date", "loanId", "memo") VALUES (gen_random_uuid(), $1, $2, $3) RETURNING "id"',
-      [entry.date, entry.loanId ?? null, entry.memo ?? null],
+      `INSERT INTO "LedgerEntry" ("id", "date", "loanId", "memo", "reversesEntryId")
+       VALUES (gen_random_uuid(), $1, $2, $3, $4) RETURNING "id"`,
+      [entry.date, entry.loanId ?? null, entry.memo ?? null, reversesEntryId],
     );
     const id = rows[0]!.id;
     for (const [position, l] of entry.lines.entries()) {

@@ -25,13 +25,14 @@ type Entry = {
   date: string;
   loan_id: string | null;
   memo?: string;
+  reverses_entry_id?: string;
   lines: { account: string; debit: number; credit: number }[];
 };
 
 /** Turns the triggers off for the rest of the transaction (superuser only; the local and CI roles are). */
 const belowTheRules = () => client.query('SET LOCAL session_replication_role = replica');
 
-/** One transaction. Returns the database id given to each fixture id. */
+/** One transaction. Returns the database id given to each fixture id; a reversal of an id not loaded gets a fresh one. */
 const load = async (entries: Entry[], { tampered }: { tampered: boolean }) => {
   const ids = new Map<string, string>();
   await client.query('BEGIN');
@@ -39,12 +40,11 @@ const load = async (entries: Entry[], { tampered }: { tampered: boolean }) => {
   for (const e of entries) {
     const id = randomUUID();
     ids.set(e.id, id);
-    await client.query('INSERT INTO "LedgerEntry" ("id", "date", "loanId", "memo") VALUES ($1, $2, $3, $4)', [
-      id,
-      e.date,
-      e.loan_id,
-      e.memo ?? null,
-    ]);
+    const reverses = e.reverses_entry_id && (ids.get(e.reverses_entry_id) ?? randomUUID());
+    await client.query(
+      'INSERT INTO "LedgerEntry" ("id", "date", "loanId", "memo", "reversesEntryId") VALUES ($1, $2, $3, $4, $5)',
+      [id, e.date, e.loan_id, e.memo ?? null, reverses ?? null],
+    );
     for (const [position, l] of e.lines.entries()) {
       await client.query(
         `INSERT INTO "LedgerLine" ("id", "entryId", "position", "account", "debitCents", "creditCents")
@@ -88,6 +88,7 @@ describe('ledger:verify passes a sound book', () => {
 const ALSO: Record<string, string[]> = {
   VF1: ['unbalanced_ledger'],
   VF2: ['control_account_mismatch'],
+  VF3: [],
   VF4: ['missing_loan_id'],
 };
 
@@ -101,9 +102,7 @@ describe('ledger:verify fails a tampered book (verify_failures.json)', () => {
     ]);
   });
 
-  it.todo('VF3 dangling_reversal: waits for task 1.8, which adds the column the check reads');
-
-  it.each(fixture.cases.filter((c) => c.id !== 'VF3').map((c) => [c.id, c.expect.code, c] as const))(
+  it.each(fixture.cases.map((c) => [c.id, c.expect.code, c] as const))(
     '%s: %s',
     async (caseId, code, c) => {
       const ids = await load(c.entries, { tampered: true });

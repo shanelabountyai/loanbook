@@ -38,6 +38,7 @@ it('V1 disbursement reads back identically', async () => {
     date: V1.date,
     loanId: V1.loan_id,
     memo: V1.memo,
+    reversesEntryId: null,
     lines: V1.lines.map((l) => ({ account: l.account, debitCents: l.debit, creditCents: l.credit })),
   });
 });
