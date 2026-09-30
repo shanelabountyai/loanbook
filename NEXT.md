@@ -1,17 +1,24 @@
 # NEXT
 
-## Pick up here: Phase 1, task 1.7 — derived balances
+## Pick up here: Phase 1, task 1.8 — reversals
 
-Model: **Opus 5.5** (the project pin). Money read path.
+Model: **Opus 5.5** (the project pin). Adds a reversal column, a DB rule and a service path.
 
-Account balances and per-loan balances computed from lines, never stored. Pass TB1 exactly (totals,
-balances, per-loan). Post TB1's entries through `postEntry` (1.6), not raw SQL. Compare in Postgres on the
-exact numeric, or through `centsFromNumeric`; no amount becomes a float.
+A reversing entry swaps sides and references the original. The pair nets to zero. A second reversal is refused
+as `already_reversed`. Pass the `reversal` block in `fixtures/ledger/entry_validation.json`, add the
+`dangling_reversal` check to `verify.ts`, and turn VF3 in `ledger-verify.test.ts` from `todo` into a test.
+Drop the `reversal check pending task 1.8` line from the verify output. Then 1.10.
 
-Then, in order: 1.8 (adds the reversal check to verify, and turns VF3 from `todo` to a test), 1.10.
-Task list: `docs/phase-1-tasks.md`. Fixtures: `fixtures/ledger/`.
+## State at handoff (2026-09-30)
 
-## State at handoff (2026-09-29)
+- 1.7 done: `src/ledger/balances.ts`, `trialBalance(db)` returns `{ totalDebitsCents, totalCreditsCents,
+  balancesCents, perLoanCents }`. It is one statement with `GROUPING SETS ((), (account), (account, loanId))`,
+  so all three views come from one snapshot. The balance is signed by normal side in Postgres, and every amount
+  goes through `centsFromNumeric`. Every chart account appears, zero if it has no lines. Test
+  `tests/integration/ledger-balances.test.ts` (2): TB1 is posted through `postEntry` and matches `expected`
+  exactly, and an empty ledger gives all zeros and no loans. Mutants killed: normal side ignored, write_offs in
+  the per-loan view, wrong grouping set, credit side dropped. Local: lint, typecheck, both gates, 8 ledger
+  and unit files 142/142 plus the `todo`. CI evidence: pending (fill in the run id).
 
 - 1.6 done: `src/ledger/post.ts`, `postEntry(db, { date, loanId, memo, lines })` returns the new id.
   Validates with `assertValidEntry` before touching the database, then BEGIN, entry, lines in order, COMMIT;
@@ -82,6 +89,10 @@ Task list: `docs/phase-1-tasks.md`. Fixtures: `fixtures/ledger/`.
   domain code in `src/ledger/`, tests outside `tests/invariants`.
 
 ## Decisions made
+
+- Per-loan balances (1.7) are the receivables only (asset accounts that require a loan id): loans, interest,
+  fees. `write_offs` carries a loan id but is an expense, not what the borrower owes. It is left out, as TB1's
+  `per_loan_cents` does. A loan appears once it has a line on a receivable. Untagged lines are left to verify.
 
 - `postEntry` owns its transaction; the caller's connection must not already be in one (a surrounding BEGIN
   would be committed by it). Composing several entries atomically waits for the task that needs it (payment
