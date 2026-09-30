@@ -18,7 +18,9 @@ Drop the `reversal check pending task 1.8` line from the verify output. Then 1.1
   `tests/integration/ledger-balances.test.ts` (2): TB1 is posted through `postEntry` and matches `expected`
   exactly, and an empty ledger gives all zeros and no loans. Mutants killed: normal side ignored, write_offs in
   the per-loan view, wrong grouping set, credit side dropped. Local: lint, typecheck, both gates, 8 ledger
-  and unit files 142/142 plus the `todo`. CI evidence: pending (fill in the run id).
+  and unit files 142/142 plus the `todo`. No local full sweep; CI owns it:
+  run 36730676698 green on 68ba958, vitest 36 files 299/299 plus 1 `todo` (297 + 2 new), Playwright 10/10,
+  `fixtures:check` and `ledger:verify` passing, both jobs successful.
 
 - 1.6 done: `src/ledger/post.ts`, `postEntry(db, { date, loanId, memo, lines })` returns the new id.
   Validates with `assertValidEntry` before touching the database, then BEGIN, entry, lines in order, COMMIT;
