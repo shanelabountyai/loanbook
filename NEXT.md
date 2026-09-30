@@ -9,7 +9,7 @@
 `non_integer_amount`, `non_integer_rate`, `invalid_rounding_input` (negative principal or rate), `invalid_count`
 (negative or fractional days), `invalid_date`. Test `tests/unit/accrual.test.ts` (16): AC1, AC2, AC4 every entry
 and total; AC3's two segments 329 + 592, every entry; 986 not 990; 1019 against 1000; 366 days = 12033. Mutants
-killed: per-day rounding (4 red), 366 denominator (7 red). Local: lint, typecheck, both gates, unit 173/173.
+killed: per-day rounding (4 red), 366 denominator (7 red). Local: lint, typecheck, both gates, unit 173/173. CI run 36747934484 green on 3d7302b: vitest 41 files 381/381 (365 + 16), Playwright 10/10, both gates passing.
 For 2.5: the run needs only `cumulativeInterestCents` (entry = cumulative(day) − accrual already posted in the
 segment); `accrueSegment` is the fixture-shaped view. Model: **Opus 5.5** (idempotency, DB index, D6).
 
