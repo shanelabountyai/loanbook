@@ -16,4 +16,4 @@ Goal: the invariant holds before anything else exists (PRD P0-1). Fixtures: `fix
 
 **Exit criteria:** all `fixtures/ledger/*` cases pass at both service and DB layers; `ledger:verify` clean on TB1 and correctly failing on VF1–VF4; CI enforces it; no balance stored anywhere.
 
-**Before Phase 2:** recompute `fixtures/amortization/AM1.csv` by hand in a spreadsheet and match it to the cent.
+**Before Phase 2:** recompute `fixtures/amortization/AM1.csv` by hand in a spreadsheet and match it to the cent. *Done 2026-09-30: Shane's spreadsheet matched AM1 to the cent.*

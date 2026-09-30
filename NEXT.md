@@ -1,17 +1,14 @@
 # NEXT
 
-## Pick up here: Phase 2 — amortization + accrual
+## Pick up here: Phase 2, task 2.1 (calendar)
 
-**Phase 1 is closed (2026-09-30).** All ten tasks done; exit criteria checked: every `fixtures/ledger/*` case
-passes at service and DB layers, `ledger:verify` clean on TB1 and failing on VF1-VF4, CI enforces it, no
-balance column anywhere.
+**Phase 1 is closed (2026-09-30).** AM1 hand check done on 2026-09-30: Shane's spreadsheet matched to the cent,
+so the gate is open. `docs/phase-2-tasks.md` is written (2.1 calendar → 2.2 schedule → 2.3 loan record →
+2.4 accrual math → 2.5 accrual run → 2.6 command). Start 2.1 with a failing test against AM1–AM5 due dates.
+Model: **Opus 5.5** (new money logic).
 
-**Blocking, and it is Shane's, not the agent's:** before Phase 2, recompute `fixtures/amortization/AM1.csv` by
-hand in a spreadsheet and match it to the cent (`docs/phase-1-tasks.md`, last line). It is an independent
-check of the oracle, so the agent must not do it. Say "AM1 matches" (or what didn't) to unblock.
-
-Then: write `docs/phase-2-tasks.md` (no file yet) from the PRD and `docs/decisions.md`, same shape as
-Phase 1, TDD order amortization then accrual. Model: **Opus 5.5** (new money logic).
+Proposed in the plan, not yet recorded as a decision: accrual idempotency via `LedgerEntry.kind` plus a partial
+unique index on (`loanId`, `date`) where `kind = 'accrual'`. D14 gets written at task 2.5.
 
 - 1.10 done: the gate proven on throwaway PR #1 (closed, branch deleted). Run 36733144653: TB1 cash debit
   +1 cent, red at `fixtures:check` (the diff shows `500001` rebuilt as `500000`). Run 36733495180: fixture
