@@ -1,6 +1,19 @@
 # NEXT
 
-## Pick up here: Phase 2, task 2.5 (accrual run)
+## Pick up here: Phase 2, task 2.6 (accrual command)
+
+2.5 done (2026-09-30, D15): migration `20260930200000_ledger_accrual_kind` (`LedgerEntry.kind`, CHECK `invalid_kind`,
+partial unique index `already_accrued` on (`loanId`, `date`) where `kind = 'accrual'`), applied to both local
+databases, schema diff empty. `postEntry` takes optional `kind`. `runAccrual(db, { asOf })` in `src/ledger/accrue.ts`
+returns `{ loanId, date, amountCents, entryId }[]`; on `already_accrued` it stops that loan (the racing winner owns it).
+Test `tests/integration/accrual-run.test.ts` (9): AC5 three runs, AC3 in two runs and in one, AC4 1019 via
+`trialBalance`, DB refusal (`already_accrued`, `invalid_kind`), two racing runs, a 0-cent day carried, disbursement
+day and an undisbursed loan accrue nothing, bad `asOf`. Mutants killed: D6 same-day effect (2 red), no segment reset
+(2), per-day rounding (5), no posted-day skip (2), index dropped from the test DB (2). Survived, equivalent: the SQL
+`< asOf` as `<=` (the loop never consumes a line dated `asOf`). Local: lint, typecheck, both gates, unit + ledger +
+loan + accrual 16 files 251/251. CI: pending.
+For 2.6: `scripts/accrue.ts` wrapping `runAccrual`, `--as-of` required, print per-loan counts, exit non-zero on error;
+model **Sonnet** is defensible (wiring, no new money logic), Opus if the two-loan test grows logic.
 
 2.4 done (2026-09-30): `src/ledger/accrual.ts`, pure. `cumulativeInterestCents(principalCents, aprBps, days)` =
 `roundHalfUp(P·a·d, 3650000)`, one exact fraction rounded once (D4, 365 in leap years too).
@@ -24,9 +37,6 @@ writing nothing; the DB CHECKs and append-only by raw SQL. Mutants killed: valid
 swapped (1), trigger dropped (1), rate CHECK dropped (1 more). Local: lint, typecheck, both gates, unit + ledger +
 loan 14 files 226/226. CI run 36746080606 green on 8b175ee: vitest 40 files 365/365 (355 + 10), Playwright 10/10, both gates passing.
 Next: 2.4 accrual math, pure. Model: **Opus 5.5** (money rounding, D4/D5).
-
-Proposed in the plan, not yet recorded as a decision: accrual idempotency via `LedgerEntry.kind` plus a partial
-unique index on (`loanId`, `date`) where `kind = 'accrual'`. D15 gets written at task 2.5.
 
 - 2.1 done: `src/ledger/calendar.ts` (`assertDate`, `addDays`, `daysBetween`, `addMonthsClamped`). CI run
   36734894305 green on 7bb13d1.
