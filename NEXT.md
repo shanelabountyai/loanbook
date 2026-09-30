@@ -11,7 +11,7 @@ then posts the disbursement through `postEntry`; returns `{ loanId, entryId }`. 
 (10): L1 stored and disbursed as V1, per-loan receivable 100000, verify clean; no balance column; six refusals
 writing nothing; the DB CHECKs and append-only by raw SQL. Mutants killed: validation removed (6 red), sides
 swapped (1), trigger dropped (1), rate CHECK dropped (1 more). Local: lint, typecheck, both gates, unit + ledger +
-loan 14 files 226/226. CI: pending on this commit.
+loan 14 files 226/226. CI run 36746080606 green on 8b175ee: vitest 40 files 365/365 (355 + 10), Playwright 10/10, both gates passing.
 Next: 2.4 accrual math, pure. Model: **Opus 5.5** (money rounding, D4/D5).
 
 Proposed in the plan, not yet recorded as a decision: accrual idempotency via `LedgerEntry.kind` plus a partial
