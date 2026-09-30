@@ -44,6 +44,12 @@ const config = [
     files: ['src/ledger/post.ts'],
     rules: { 'no-restricted-syntax': ['error', ...ROUNDING] },
   },
+  // Task 2.1: the calendar divides once, milliseconds into whole UTC days, which is exact. No money
+  // passes through it, so only the division selector is lifted; rounding stays refused.
+  {
+    files: ['src/ledger/calendar.ts'],
+    rules: { 'no-restricted-syntax': ['error', ROUNDING[1], ...WRITES] },
+  },
 ];
 
 export default config;

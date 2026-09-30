@@ -1,11 +1,14 @@
 # NEXT
 
-## Pick up here: Phase 2, task 2.1 (calendar)
+## Pick up here: Phase 2, task 2.2 (amortization schedule)
 
-**Phase 1 is closed (2026-09-30).** AM1 hand check done on 2026-09-30: Shane's spreadsheet matched to the cent,
-so the gate is open. `docs/phase-2-tasks.md` is written (2.1 calendar → 2.2 schedule → 2.3 loan record →
-2.4 accrual math → 2.5 accrual run → 2.6 command). Start 2.1 with a failing test against AM1–AM5 due dates.
-Model: **Opus 5.5** (new money logic).
+2.1 done (2026-09-30): `src/ledger/calendar.ts` — `assertDate`, `addDays`, `daysBetween`, `addMonthsClamped`,
+`CalendarError` (`invalid_date`, `invalid_count`). Strict `YYYY-MM-DD`, round-tripped so 02-30 is refused.
+`tests/unit/calendar.test.ts` (32): every AM1–AM5 due date, the no-chaining case, leap clamps, AC1/AC2 day
+numbers both ways, AC2's 29 days. Mutants killed: no clamp, no round-trip, month overflow without the day-1
+anchor (3 red each). Lint: a `calendar.ts` block lifts only the division selector (ms → whole UTC days, exact);
+`Math.round` there still errors, proven. Local: lint, typecheck, both gates, unit 141/141. CI owns the sweep.
+Next: 2.2 `buildSchedule`, uses `addMonthsClamped` for due dates. Model: **Opus 5.5**.
 
 Proposed in the plan, not yet recorded as a decision: accrual idempotency via `LedgerEntry.kind` plus a partial
 unique index on (`loanId`, `date`) where `kind = 'accrual'`. D14 gets written at task 2.5.
