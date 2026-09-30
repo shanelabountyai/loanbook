@@ -10,7 +10,7 @@
       "lines": [
         {
           "account": "cash",
-          "debit": 500000,
+          "debit": 500001,
           "credit": 0
         },
         {
