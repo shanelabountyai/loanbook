@@ -1,18 +1,18 @@
 # NEXT
 
-## Pick up here: Phase 2, task 2.3 (loan record + disbursement)
+## Pick up here: Phase 2, task 2.4 (accrual math, pure)
 
-2.2 done (2026-09-30): `src/ledger/schedule.ts`, `buildSchedule({ principalCents, aprBps, termMonths,
-disbursementDate })`, `ScheduleError` (`invalid_principal`, `invalid_rate`, `invalid_term`,
-`degenerate_schedule`). Installment = one `roundHalfUp` of P·a·(120000+a)^n / (120000·((120000+a)^n − 120000^n));
-APR 0 = P / n. `finalPaymentCents` = total paid − installment × (n−1). D14 (new): a row before the last must pay
-principal > 0 and leave some behind, otherwise refused (7¢ over 12 months at 0% would run negative). Accrual's
-decision is now **D15** (plan updated). `tests/unit/schedule.test.ts` (16): AM1–AM5 every field + totals, 11
-boundary cases. Mutants killed: final row not absorbing (4 red), APR 0 path removed (2), numerator rounded before
-dividing (3), growth factor rounded each month (3), D14 guard removed (1). **Survived, equivalent on these
-fixtures:** the monthly rate rounded to 6 decimals first; too fine to move a cent on AM1–AM5. Local: lint,
-typecheck, both gates, unit 157/157. CI run 36742772162 green on 4033b02: vitest 39 files 355/355 (339 + 16), Playwright 10/10, both gates passing.
-Next: 2.3 `Loan` table + `createLoan`. Model: **Opus 5.5** (migration + append-only trigger + posting).
+2.3 done (2026-09-30): `prisma/schema/loan.prisma`, migration `20260930100000_loan_init` (applied to both local
+databases, schema diff empty). `Loan` holds terms only (id TEXT, `principalCents`, `aprBps`, `termMonths`,
+`disbursementDate`, `createdAt`); CHECKs `invalid_principal`, `invalid_rate`, `invalid_term`; UPDATE/DELETE refused
+by `Loan_append_only`, which reuses `ledger_append_only()` (code `append_only`). `createLoan(db, terms)` in
+`src/ledger/loan.ts` calls `buildSchedule` first (so D14 and every input rule refuse before any write), inserts,
+then posts the disbursement through `postEntry`; returns `{ loanId, entryId }`. Test `tests/integration/loan.test.ts`
+(10): L1 stored and disbursed as V1, per-loan receivable 100000, verify clean; no balance column; six refusals
+writing nothing; the DB CHECKs and append-only by raw SQL. Mutants killed: validation removed (6 red), sides
+swapped (1), trigger dropped (1), rate CHECK dropped (1 more). Local: lint, typecheck, both gates, unit + ledger +
+loan 14 files 226/226. CI: pending on this commit.
+Next: 2.4 accrual math, pure. Model: **Opus 5.5** (money rounding, D4/D5).
 
 Proposed in the plan, not yet recorded as a decision: accrual idempotency via `LedgerEntry.kind` plus a partial
 unique index on (`loanId`, `date`) where `kind = 'accrual'`. D15 gets written at task 2.5.
@@ -120,6 +120,10 @@ unique index on (`loanId`, `date`) where `kind = 'accrual'`. D15 gets written at
   domain code in `src/ledger/`, tests outside `tests/invariants`.
 
 ## Decisions made
+
+- 2.3: `LedgerEntry.loanId` is not a foreign key to `Loan` — ledger fixtures and tests post for loans with no
+  row. Revisit if a check "every loan id in the ledger has a Loan row" is wanted; that belongs in `ledger:verify`,
+  not a FK. Refinancing seam: a new terms row naming the one it supersedes, never an UPDATE.
 
 - Per-loan balances (1.7) are the receivables only (asset accounts that require a loan id): loans, interest,
   fees. `write_offs` carries a loan id but is an expense, not what the borrower owes. It is left out, as TB1's

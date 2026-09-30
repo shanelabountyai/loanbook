@@ -1,0 +1,15 @@
+// LoanBook's loans (task 2.3, clone-owned). Terms only: what the borrower owes is derived from the
+// ledger, and the schedule from these terms on read (D3). Hand-written SQL in migration
+// 20260930100000_loan_init adds the CHECKs (D14) and makes the table append-only.
+
+/// A loan's terms, written once. Append-only: no refinancing or rate change in place (non-goal).
+/// Seam: a new terms version would be a new row naming the one it supersedes, never an UPDATE.
+/// LedgerEntry.loanId is not a foreign key to this table; ledger fixtures post for loans with no row.
+model Loan {
+  id               String   @id
+  principalCents   Int
+  aprBps           Int
+  termMonths       Int
+  disbursementDate DateTime @db.Date
+  createdAt        DateTime @default(now()) @db.Timestamptz(6)
+}
