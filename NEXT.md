@@ -7,7 +7,7 @@
 `tests/unit/calendar.test.ts` (32): every AM1–AM5 due date, the no-chaining case, leap clamps, AC1/AC2 day
 numbers both ways, AC2's 29 days. Mutants killed: no clamp, no round-trip, month overflow without the day-1
 anchor (3 red each). Lint: a `calendar.ts` block lifts only the division selector (ms → whole UTC days, exact);
-`Math.round` there still errors, proven. Local: lint, typecheck, both gates, unit 141/141. CI owns the sweep.
+`Math.round` there still errors, proven. Local: lint, typecheck, both gates, unit 141/141. CI run 36734894305 green on 7bb13d1: vitest 38 files 339/339 (307 + 32), Playwright 10/10, both gates passing.
 Next: 2.2 `buildSchedule`, uses `addMonthsClamped` for due dates. Model: **Opus 5.5**.
 
 Proposed in the plan, not yet recorded as a decision: accrual idempotency via `LedgerEntry.kind` plus a partial
