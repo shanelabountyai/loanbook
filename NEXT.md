@@ -20,7 +20,7 @@ after it, check the Phase 1 exit criteria before starting Phase 2.
   a race leaves one, unknown refused, and both DB rules by raw SQL). VF3 in `ledger-verify.test.ts` is
   now a test, no `todo` left. Mutants killed: no swap (2 red), no code mapping (2), no verify check (1),
   unique index dropped from the test DB (3). Local: lint, typecheck, `fixtures:check`, `ledger:verify`,
-  9 ledger and unit files 150/150. No local full sweep (load average 43); CI owns it: CI_RUN_PENDING.
+  9 ledger and unit files 150/150. No local full sweep (load average 43); CI owns it: run 36732044338 green on b350246, vitest 37 files 307/307 and no `todo` (299 + 7 new + VF3), Playwright 10/10, `fixtures:check` and `ledger:verify` passing, both jobs successful.
 
 - 1.7 done: `src/ledger/balances.ts`, `trialBalance(db)` returns `{ totalDebitsCents, totalCreditsCents,
   balancesCents, perLoanCents }`. It is one statement with `GROUPING SETS ((), (account), (account, loanId))`,
