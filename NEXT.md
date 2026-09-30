@@ -11,7 +11,7 @@ Test `tests/integration/accrual-run.test.ts` (9): AC5 three runs, AC3 in two run
 day and an undisbursed loan accrue nothing, bad `asOf`. Mutants killed: D6 same-day effect (2 red), no segment reset
 (2), per-day rounding (5), no posted-day skip (2), index dropped from the test DB (2). Survived, equivalent: the SQL
 `< asOf` as `<=` (the loop never consumes a line dated `asOf`). Local: lint, typecheck, both gates, unit + ledger +
-loan + accrual 16 files 251/251. CI: pending.
+loan + accrual 16 files 251/251. CI run 36760869177 green on f84782e: vitest 42 files 390/390 (381 + 9), Playwright 10/10, both gates passing.
 For 2.6: `scripts/accrue.ts` wrapping `runAccrual`, `--as-of` required, print per-loan counts, exit non-zero on error;
 model **Sonnet** is defensible (wiring, no new money logic), Opus if the two-loan test grows logic.
 
