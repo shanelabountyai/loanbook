@@ -8,7 +8,7 @@
 2026-03-20 with pending accrual > 0. D9 on L1: five installments of 17255 on the due dates, then the quote on 2026-07-15 is
 17215 (interest 168), not the last row's 17253 (interest 171); paying it closes to zero. Mutants killed: pending accrual
 dropped from the quote (4 red), quote 1 cent short (2 red). Local: lint (1 pre-existing template warning, e2e/billing.spec.ts),
-typecheck, both gates, vitest 47 files 437/437. CI: check `gh run list` with the full SHA.
+typecheck, both gates, vitest 47 files 437/437. CI run 36890904011 green on 1736d6b: vitest 47 files 437/437, Playwright 10/10, both gates passing.
 Then: Phase 3 exit check (docs/phase-3-tasks.md).
 
 ## Earlier: 3.4
