@@ -1,8 +1,12 @@
 # NEXT
 
-## Pick up here: Phase 3 (waterfall + payoff)
+## Pick up here: task 3.2 (owed from the ledger)
 
-Phase 2 exit verified 2026-10-01: AM1-5 and AC1-5 each asserted in tests; `already_accrued` partial unique index; no stored schedule/balance/accrual column (loan.prisma holds terms only); `ledger:verify` clean after the 31-day two-loan run (accrue-script test); CI run on db2345a green. Phase 3 starts with D9 (final installment due = payoff quote), composing postings in one transaction, and the waterfall allocating against accrued interest (D4). Model Opus 5.5.
+Phase 3 plan is `docs/phase-3-tasks.md` (3.1 to 3.6). 3.1 done (2026-10-01, c7daa00): `src/ledger/waterfall.ts`,
+`allocate({ owed, paymentCents, order })` pure, order is an argument; `tests/unit/waterfall.test.ts` (21: all 13 waterfall
+fixtures + guards). Mutants killed: order hard-coded (3 red), `>=` at exact payoff (2), `min` dropped (11); `closed >=` survives, equivalent
+(payment never exceeds payoff past the guard). Local: lint, typecheck, both gates, 21/21. CI run: check `gh run list` with the full SHA.
+Next: 3.2 `owedCents(db, loanId)` from `trialBalance` per-loan view; then 3.3 needs D16 (transaction composition, `accrual_pending`). Model Opus 5.5.
 
 ## Phase 2 exit check (done above)
 
