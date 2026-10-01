@@ -1,12 +1,13 @@
 # NEXT
 
-## Pick up here: task 3.2 (owed from the ledger)
+## Pick up here: task 3.3 (payment posting, needs D16)
 
-Phase 3 plan is `docs/phase-3-tasks.md` (3.1 to 3.6). 3.1 done (2026-10-01, c7daa00): `src/ledger/waterfall.ts`,
-`allocate({ owed, paymentCents, order })` pure, order is an argument; `tests/unit/waterfall.test.ts` (21: all 13 waterfall
-fixtures + guards). Mutants killed: order hard-coded (3 red), `>=` at exact payoff (2), `min` dropped (11); `closed >=` survives, equivalent
-(payment never exceeds payoff past the guard). Local: lint, typecheck, both gates, 21/21. CI run: check `gh run list` with the full SHA.
-Next: 3.2 `owedCents(db, loanId)` from `trialBalance` per-loan view; then 3.3 needs D16 (transaction composition, `accrual_pending`). Model Opus 5.5.
+3.2 done (2026-10-01): `owedCents(db, loanId)` in `src/ledger/owed.ts` returns `{ fees, interest, principal }` from `trialBalance`'s
+per-loan view (fees_receivable / interest_receivable / loans_receivable); unknown loan = zeros. Test `tests/integration/owed.test.ts` (2):
+L1 + AC4 accrual reads 100000 / 1019 / 0 and other loans are not mixed in; fees and a principal payment move the figures.
+Mutant killed: interest read from fees (2 red). Local: lint, typecheck, both gates. CI: check `gh run list` with the full SHA.
+Next: 3.3 `postPayment`; first decide D16 (caller-owned transaction in `postEntry` vs loan-row lock; `accrual_pending`). Model Opus 5.5.
+3.1 done (c7daa00): `src/ledger/waterfall.ts`, `allocate` pure, 21 tests.
 
 ## Phase 2 exit check (done above)
 
