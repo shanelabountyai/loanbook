@@ -1,6 +1,12 @@
 # NEXT
 
-## Pick up here: task 4.2 (status: pure `dpd`/`stateFromDpd` + `loanStatus`), see docs/phase-4-tasks.md; model Opus 5.5
+## Pick up here: task 4.3 (late-fee job `runStatus` + `npm run status`), see docs/phase-4-tasks.md; model Opus 5.5
+
+4.2 done (2026-10-01): `dpd`/`stateFromDpd`/`loanStatus` in `src/ledger/delinquency.ts`, `DELINQUENCY_BANDS` + `LoanState` in config.ts.
+Tests: `tests/unit/delinquency.test.ts` (7), `tests/integration/status.test.ts` (6): DQ1-DQ5 every day, pure and from the ledger. Mutants killed: boundary, newest-installment, per-payment reset;
+`<` to `<=` on the due day survives and is equivalent (DPD 0 either way). Payments = Dr cash lines for the loan (reversed payments not netted: note for 4.7/4.3 if reversals matter).
+Local: lint, typecheck, both gates, vitest 51 files 454/454. CI: check `gh run list` with the full SHA.
+4.3 reads fees from the fixtures' `fees` (DQ1 none, DQ2 4, DQ3 1, DQ4 2, DQ5 2); fee on the day DPD reaches 11 per missed installment; LATE_FEE_CENTS from config.
 
 4.1 done (2026-10-01): fixtures/delinquency/DQ1-DQ5 (per-day DPD + state + fee events, AM1 schedule, bands and fee in the fixture input), oracle in build_fixtures.py,
 independent bisect re-derivation in verify_fixtures.py (36 files OK, fixtures:check clean). Fees: DQ1 none, DQ2 4 (02-26, 03-26, 04-26, 05-26), DQ3 1, DQ4 2, DQ5 2.
