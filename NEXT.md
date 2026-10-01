@@ -1,6 +1,8 @@
 # NEXT
 
-## Pick up here: Phase 4 (delinquency + views + P1), start with docs/phase-4-tasks.md; model Opus 5.5
+## Pick up here: task 4.1 (delinquency fixtures, gate first), see docs/phase-4-tasks.md; model Opus 5.5
+
+D18 (bands) and D19 (cumulative cover, late fee 1500¢ at DPD 11) decided 2026-10-01 and written to decisions.md; phase-4-tasks.md written. Next: extend tools/build_fixtures.py + verify_fixtures.py with fixtures/delinquency/ DQ1-DQ5.
 
 Phase 3 exit check PASSED (2026-10-01): CI run 36892445665 green on dd29979, vitest 49 files 441/441, Playwright 10/10, both gates passing.
 Criteria map: WF1-10/WFB via payment.test.ts (3.3); round-trip, exceeds_payoff, D9 on L1 via payoff round-trip (3.5); racing payments via the
