@@ -6,7 +6,7 @@ arithmetic (fractions.Fraction) so the product implementation can be tested agai
 numbers it did not produce. Do not import it from the product; do not port it line by
 line -- write the product test-first against the frozen fixtures instead.
 
-Rules encoded here are defined in docs/decisions.md (D1-D9). Stdlib only, Python >= 3.9.
+Rules encoded here are defined in docs/decisions.md (D1-D9, D17). Stdlib only, Python >= 3.9.
 """
 import calendar, csv, datetime as dt, json, os
 from fractions import Fraction
@@ -179,6 +179,55 @@ for fid, desc, order, state, pay in W:
     dump(f"waterfall/{fid}.json", dict(id=fid, description=desc,
          config=dict(waterfall_order=order), input=dict(owed_before=state, payment_cents=pay),
          expected=WF_OUT[fid]))
+
+# ---------------------------------------------------------------- payoff (D17)
+def accrued(P0, apr, disb, payments, through):
+    """Interest accrued through `through` (inclusive): one cumulative-rounded segment per
+    principal level; a segment starts on the date of the payment that reduced principal (D5, D6)."""
+    segs, P, start = [], P0, disb
+    for pd, pc in payments:
+        if pc["principal"] > 0:
+            segs.append((P, start, pd)); P -= pc["principal"]; start = pd
+    segs.append((P, start, None))
+    total = 0
+    for sp, s, e in segs:
+        end = min(e, through) if e else through
+        days = max((end - s).days, 0)
+        total += cum_interest(sp, apr, days)
+    return total, P
+
+
+def payoff(P0, apr, disb, payments, fees_assessed, posted_through, as_of):
+    paid = lambda k: sum(pc[k] for _, pc in payments)
+    acc_q, P = accrued(P0, apr, disb, payments, as_of)
+    acc_p, _ = accrued(P0, apr, disb, payments, posted_through)
+    interest, posted = acc_q - paid("interest"), acc_p - paid("interest")
+    fees = fees_assessed - paid("fees")
+    return dict(principal_cents=P, interest_cents=interest, fees_cents=fees, total_cents=P + interest + fees,
+                posted_interest_cents=posted, pending_accrual_cents=interest - posted)
+
+
+L1D = dt.date(2026, 1, 15)
+ac3_pay = allocate(st(0, 329, 100000), 10329, CFG_A)["allocation"]   # AC3: 329 interest + 10000 principal on 01-25
+PO = [
+    ("PO1", "Quote on an accrual day: L1 on 2026-02-15 (31 days), accrual posted through 02-14; the quote includes the 02-15 day, so it equals the 01-15 -> 02-15 accrual of AC4 (1019)",
+     dict(payments=[], fees=0, posted="2026-02-14", as_of="2026-02-15")),
+    ("PO2", "Quote mid-segment after a principal reduction: the AC3 payment (01-25: 329 interest + 10000 principal) leaves 90000; quote on 02-05 is 11 days into segment 2, posted through 02-04",
+     dict(payments=[("2026-01-25", ac3_pay)], fees=0, posted="2026-02-04", as_of="2026-02-05")),
+    ("PO3", "Quote with a fee outstanding: PO1 plus the 1500 late fee; total equals the WF7 payment that closes the loan",
+     dict(payments=[], fees=1500, posted="2026-02-15", as_of="2026-02-15")),
+    ("PO4", "Quote on the disbursement day: nothing accrues (D6), so the quote is the principal alone",
+     dict(payments=[], fees=0, posted="2026-01-15", as_of="2026-01-15")),
+]
+for fid, desc, s in PO:
+    pays = [(dt.date.fromisoformat(d), pc) for d, pc in s["payments"]]
+    pays = [(d, dict(fees=pc.get("fees", 0), interest=pc.get("interest", 0), principal=pc.get("principal", 0))) for d, pc in pays]
+    out = payoff(100000, 1200, L1D, pays, s["fees"], dt.date.fromisoformat(s["posted"]), dt.date.fromisoformat(s["as_of"]))
+    dump(f"payoff/{fid}.json", dict(id=fid, description=desc,
+         input=dict(principal_cents=100000, apr_bps=1200, disbursement_date=L1D.isoformat(),
+                    payments=[dict(date=d.isoformat(), allocation=pc) for d, pc in pays],
+                    fees_assessed_cents=s["fees"], accrual_posted_through=s["posted"], as_of=s["as_of"]),
+         expected=out))
 
 # ---------------------------------------------------------------- ledger
 COA = [

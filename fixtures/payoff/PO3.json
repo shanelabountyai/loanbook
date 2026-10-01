@@ -1,0 +1,21 @@
+{
+  "id": "PO3",
+  "description": "Quote with a fee outstanding: PO1 plus the 1500 late fee; total equals the WF7 payment that closes the loan",
+  "input": {
+    "principal_cents": 100000,
+    "apr_bps": 1200,
+    "disbursement_date": "2026-01-15",
+    "payments": [],
+    "fees_assessed_cents": 1500,
+    "accrual_posted_through": "2026-02-15",
+    "as_of": "2026-02-15"
+  },
+  "expected": {
+    "principal_cents": 100000,
+    "interest_cents": 1019,
+    "fees_cents": 1500,
+    "total_cents": 102519,
+    "posted_interest_cents": 1019,
+    "pending_accrual_cents": 0
+  }
+}

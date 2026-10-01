@@ -91,6 +91,38 @@ for p in sorted(glob.glob(os.path.join(ROOT, "waterfall", "*.json"))):
     chk(sum(l["debit"] for l in L) == sum(l["credit"] for l in L) == pay, f"{f['id']} journal balance")
     chk(len(L) == 1 + sum(1 for v in got.values() if v > 0), f"{f['id']} one line per bucket touched")
 
+# ---- payoff (independent: day-by-day simulation of the cumulative rule, not the segment formula)
+def sim_interest(P0, apr, disb, pays, through):
+    P, start, total, prev = P0, disb, 0, 0
+    day = disb
+    while day < through:
+        day += dt.timedelta(days=1)
+        n = (day - start).days
+        c = cum(P, apr, n)
+        total += c - prev; prev = c
+        for pd, pa in pays:                       # payment applies after the day's accrual; reduced principal from D+1
+            if pd == day and pa["principal"] > 0:
+                P -= pa["principal"]; start, prev = day, 0
+    return total, P
+for p in sorted(glob.glob(os.path.join(ROOT, "payoff", "*.json"))):
+    f = json.load(open(p)); i, e = f["input"], f["expected"]
+    pays = [(dt.date.fromisoformat(x["date"]), x["allocation"]) for x in i["payments"]]
+    d0 = dt.date.fromisoformat(i["disbursement_date"])
+    paid = lambda k: sum(a[k] for _, a in pays)
+    accq, P = sim_interest(i["principal_cents"], i["apr_bps"], d0, pays, dt.date.fromisoformat(i["as_of"]))
+    accp, _ = sim_interest(i["principal_cents"], i["apr_bps"], d0, pays, dt.date.fromisoformat(i["accrual_posted_through"]))
+    fees = i["fees_assessed_cents"] - paid("fees")
+    chk(e["principal_cents"] == P, f"{f['id']} principal")
+    chk(e["interest_cents"] == accq - paid("interest"), f"{f['id']} interest")
+    chk(e["posted_interest_cents"] == accp - paid("interest"), f"{f['id']} posted interest")
+    chk(e["pending_accrual_cents"] == e["interest_cents"] - e["posted_interest_cents"], f"{f['id']} pending")
+    chk(e["fees_cents"] == fees, f"{f['id']} fees")
+    chk(e["total_cents"] == P + e["interest_cents"] + fees, f"{f['id']} total")
+po = {x["id"]: x for x in (load(f"payoff/PO{k}.json") for k in range(1, 5))}
+chk(po["PO1"]["expected"]["interest_cents"] == load("accrual/AC4_first_installment_period.json")["expected"]["entries"][-1]["cumulative_cents"], "PO1 interest == AC4 total")
+chk(po["PO3"]["expected"]["total_cents"] == load("waterfall/WF7.json")["input"]["payment_cents"], "PO3 total == WF7 payment")
+chk(po["PO4"]["expected"]["total_cents"] == 100000, "PO4 principal only")
+
 # ---- ledger
 coa = {a["account"]: a for a in load("ledger/chart_of_accounts.json")["accounts"]}
 def entry_err(en):

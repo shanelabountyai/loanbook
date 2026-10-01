@@ -1,6 +1,15 @@
 # NEXT
 
-## Pick up here: task 3.4 (payoff quote; fixtures PO1-PO4 first)
+## Pick up here: task 3.5 (payoff round-trip; model Opus 5.5)
+
+3.4 done (2026-10-01, D17): fixtures PO1-PO4 (`fixtures/payoff/`, oracle + independent verifier, 31 files OK). `payoffQuote(db, { loanId, asOf })`
+in `src/ledger/payoff.ts` = `owedCents` + `accrualDue` through `asOf` (inclusive), one repeatable-read read-only snapshot, posts nothing;
+returns `{ loanId, asOf, principalCents, interestCents, feesCents, totalCents, postedInterestCents, pendingAccrualCents }`; `unknown_loan` code.
+Test `tests/integration/payoff.test.ts` (5). Mutant killed: pending accrual dropped (2 red). Local: lint, typecheck, both gates, vitest 47 files 435/435.
+Next: 3.5 quote for D, `runAccrual` through D, `postPayment` of the quote on D: all three sub-accounts zero, `loanClosed`; +1 cent is `exceeds_payoff`;
+D9 on L1 (pay the schedule to the final due date, final payment = quote on that date). CI: check `gh run list` with the full SHA.
+
+## Earlier: 3.3
 
 3.3 done (2026-10-01, D16): `postPayment(db, { loanId, date, paymentCents, order })` in `src/ledger/payment.ts`: BEGIN, `FOR UPDATE`
 on the Loan row, `accrualDue` (accrue.ts dry mode) must be empty else `accrual_pending`, `owedCents`, `allocate`, `postEntryInTx`

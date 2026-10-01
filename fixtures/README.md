@@ -8,6 +8,7 @@ Frozen expected values. Tests **read** these; product code must never generate t
 | `amortization/` | AM1–AM5 (`.json` + `.csv` for spreadsheet comparison) | P0-2 |
 | `accrual/` | AC1–AC5 | P0-3 |
 | `waterfall/` | WF1–WF10 (default order), WFB3/5/10 (second order) | P0-4 |
+| `payoff/` | PO1–PO4 (accrual-day quote, quote after a principal reduction, quote with a fee, disbursement-day quote) | P0-6 |
 
 Conventions: amounts are integer cents; rates are basis points; dates are ISO `YYYY-MM-DD`. Journal lines in waterfall fixtures should be compared as an unordered set (plus the cash line).
 

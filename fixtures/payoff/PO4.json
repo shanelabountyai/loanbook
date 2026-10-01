@@ -1,0 +1,21 @@
+{
+  "id": "PO4",
+  "description": "Quote on the disbursement day: nothing accrues (D6), so the quote is the principal alone",
+  "input": {
+    "principal_cents": 100000,
+    "apr_bps": 1200,
+    "disbursement_date": "2026-01-15",
+    "payments": [],
+    "fees_assessed_cents": 0,
+    "accrual_posted_through": "2026-01-15",
+    "as_of": "2026-01-15"
+  },
+  "expected": {
+    "principal_cents": 100000,
+    "interest_cents": 0,
+    "fees_cents": 0,
+    "total_cents": 100000,
+    "posted_interest_cents": 0,
+    "pending_accrual_cents": 0
+  }
+}

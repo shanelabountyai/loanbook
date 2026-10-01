@@ -1,0 +1,30 @@
+{
+  "id": "PO2",
+  "description": "Quote mid-segment after a principal reduction: the AC3 payment (01-25: 329 interest + 10000 principal) leaves 90000; quote on 02-05 is 11 days into segment 2, posted through 02-04",
+  "input": {
+    "principal_cents": 100000,
+    "apr_bps": 1200,
+    "disbursement_date": "2026-01-15",
+    "payments": [
+      {
+        "date": "2026-01-25",
+        "allocation": {
+          "fees": 0,
+          "interest": 329,
+          "principal": 10000
+        }
+      }
+    ],
+    "fees_assessed_cents": 0,
+    "accrual_posted_through": "2026-02-04",
+    "as_of": "2026-02-05"
+  },
+  "expected": {
+    "principal_cents": 90000,
+    "interest_cents": 325,
+    "fees_cents": 0,
+    "total_cents": 90325,
+    "posted_interest_cents": 296,
+    "pending_accrual_cents": 29
+  }
+}

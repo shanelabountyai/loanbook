@@ -1,0 +1,21 @@
+{
+  "id": "PO1",
+  "description": "Quote on an accrual day: L1 on 2026-02-15 (31 days), accrual posted through 02-14; the quote includes the 02-15 day, so it equals the 01-15 -> 02-15 accrual of AC4 (1019)",
+  "input": {
+    "principal_cents": 100000,
+    "apr_bps": 1200,
+    "disbursement_date": "2026-01-15",
+    "payments": [],
+    "fees_assessed_cents": 0,
+    "accrual_posted_through": "2026-02-14",
+    "as_of": "2026-02-15"
+  },
+  "expected": {
+    "principal_cents": 100000,
+    "interest_cents": 1019,
+    "fees_cents": 0,
+    "total_cents": 101019,
+    "posted_interest_cents": 986,
+    "pending_accrual_cents": 33
+  }
+}
