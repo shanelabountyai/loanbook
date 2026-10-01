@@ -229,6 +229,60 @@ for fid, desc, s in PO:
                     fees_assessed_cents=s["fees"], accrual_posted_through=s["posted"], as_of=s["as_of"]),
          expected=out))
 
+# ---------------------------------------------------------------- delinquency (D18, D19)
+BANDS = [(120, "default_recommended"), (90, "delinquent_90"), (60, "delinquent_60"), (11, "delinquent_30"), (1, "grace"), (0, "current")]
+LATE_FEE, GRACE_EXIT = 1500, 11
+AM1_ROWS = AM_OUT["AM1"][1]
+
+
+def band(dpd):
+    return next(s for lo, s in BANDS if dpd >= lo)
+
+
+def dq_day(rows, pays, D):
+    """D19: oldest installment past due on D whose cumulative scheduled amount exceeds cumulative cash received."""
+    paid, cum = sum(c for d, c in pays if d <= D), 0
+    for r in rows:
+        cum += r["payment_cents"]
+        if dt.date.fromisoformat(r["due_date"]) < D and paid < cum:
+            return (D - dt.date.fromisoformat(r["due_date"])).days
+    return 0
+
+
+def dq_fees(rows, pays, last):
+    """One fee per installment, on the day its DPD reaches 11, if still unsatisfied by cash received through that day."""
+    out, cum = [], 0
+    for r in rows:
+        cum += r["payment_cents"]
+        D = dt.date.fromisoformat(r["due_date"]) + dt.timedelta(days=GRACE_EXIT)
+        if D <= last and sum(c for d, c in pays if d <= D) < cum:
+            out.append(dict(installment=r["n"], date=D.isoformat(), cents=LATE_FEE))
+    return out
+
+
+DQ = [
+    ("DQ1", "On time: every installment paid in full on its due date; current every day, no fees",
+     [(r["due_date"], r["payment_cents"]) for r in AM1_ROWS], "2026-01-15", "2026-07-20"),
+    ("DQ2", "Nothing ever paid, day by day to day 125 of installment 1: every band boundary (DPD 0/1/10/11/59/60/89/90/119/120); the clock runs from the oldest installment while later ones fall due; a fee at each grace exit",
+     [], "2026-02-10", "2026-06-20"),
+    ("DQ3", "Short payment: 10000 of 17255 on the due date does not reset the clock (DPD 1 the next day); 7255 on 03-01 (DPD 14, fee already posted on 02-26) completes the cumulative cover and recomputes to current",
+     [("2026-02-15", 10000), ("2026-03-01", 7255)], "2026-02-10", "2026-03-20"),
+    ("DQ4", "Catch-up: nothing paid until 04-20 (DPD 64, delinquent_60), then 3 installments (51765) in one payment recompute to current the same day; installment 3 is covered before its grace exit so it never takes a fee",
+     [("2026-04-20", 51765)], "2026-02-10", "2026-04-30"),
+    ("DQ5", "Two missed installments: DPD from the oldest, a fee for each (02-26, 03-26); one installment paid on 04-10 moves the oldest to installment 2 (DPD 26), not to current and not to the newest",
+     [("2026-04-10", 17255)], "2026-02-10", "2026-04-20"),
+]
+for fid, desc, pays, first, last in DQ:
+    pays = [(dt.date.fromisoformat(d), c) for d, c in pays]
+    d0, d1 = dt.date.fromisoformat(first), dt.date.fromisoformat(last)
+    days = [dict(date=(d0 + dt.timedelta(days=k)).isoformat(), dpd=dq_day(AM1_ROWS, pays, d0 + dt.timedelta(days=k)),
+                 state=band(dq_day(AM1_ROWS, pays, d0 + dt.timedelta(days=k)))) for k in range((d1 - d0).days + 1)]
+    dump(f"delinquency/{fid}.json", dict(id=fid, description=desc,
+         input=dict(loan="AM1", schedule=[dict(n=r["n"], due_date=r["due_date"], payment_cents=r["payment_cents"]) for r in AM1_ROWS],
+                    payments=[dict(date=d.isoformat(), cents=c) for d, c in pays], late_fee_cents=LATE_FEE,
+                    bands=[dict(min_dpd=lo, state=s) for lo, s in reversed(BANDS)]),
+         expected=dict(days=days, fees=dq_fees(AM1_ROWS, pays, d1))))
+
 # ---------------------------------------------------------------- ledger
 COA = [
     dict(account="cash", type="asset", normal="debit"),

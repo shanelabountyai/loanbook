@@ -1,8 +1,10 @@
 # NEXT
 
-## Pick up here: task 4.1 (delinquency fixtures, gate first), see docs/phase-4-tasks.md; model Opus 5.5
+## Pick up here: task 4.2 (status: pure `dpd`/`stateFromDpd` + `loanStatus`), see docs/phase-4-tasks.md; model Opus 5.5
 
-D18 (bands) and D19 (cumulative cover, late fee 1500¢ at DPD 11) decided 2026-10-01 and written to decisions.md; phase-4-tasks.md written. Next: extend tools/build_fixtures.py + verify_fixtures.py with fixtures/delinquency/ DQ1-DQ5.
+4.1 done (2026-10-01): fixtures/delinquency/DQ1-DQ5 (per-day DPD + state + fee events, AM1 schedule, bands and fee in the fixture input), oracle in build_fixtures.py,
+independent bisect re-derivation in verify_fixtures.py (36 files OK, fixtures:check clean). Fees: DQ1 none, DQ2 4 (02-26, 03-26, 04-26, 05-26), DQ3 1, DQ4 2, DQ5 2.
+Fixture input carries `schedule`, `payments` (cash cents by date), `bands`, `late_fee_cents`: 4.2 tests read exactly that. Bands/fee must come from config.ts, not literals.
 
 Phase 3 exit check PASSED (2026-10-01): CI run 36892445665 green on dd29979, vitest 49 files 441/441, Playwright 10/10, both gates passing.
 Criteria map: WF1-10/WFB via payment.test.ts (3.3); round-trip, exceeds_payoff, D9 on L1 via payoff round-trip (3.5); racing payments via the

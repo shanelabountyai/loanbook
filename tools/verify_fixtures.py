@@ -123,6 +123,38 @@ chk(po["PO1"]["expected"]["interest_cents"] == load("accrual/AC4_first_installme
 chk(po["PO3"]["expected"]["total_cents"] == load("waterfall/WF7.json")["input"]["payment_cents"], "PO3 total == WF7 payment")
 chk(po["PO4"]["expected"]["total_cents"] == 100000, "PO4 principal only")
 
+# ---- delinquency (independent: bisect on cumulative sums, thresholds from the fixture's own band table)
+import bisect
+for p in sorted(glob.glob(os.path.join(ROOT, "delinquency", "*.json"))):
+    f = json.load(open(p)); i, e = f["input"], f["expected"]
+    due = [dt.date.fromisoformat(r["due_date"]) for r in i["schedule"]]
+    cum = [sum(r["payment_cents"] for r in i["schedule"][:k + 1]) for k in range(len(due))]
+    pays = [(dt.date.fromisoformat(x["date"]), x["cents"]) for x in i["payments"]]
+    mins = [b["min_dpd"] for b in i["bands"]]
+    def dpd_on(D):
+        k = bisect.bisect_right(cum, sum(c for d, c in pays if d <= D))   # first installment not covered
+        return (D - due[k]).days if k < len(due) and due[k] < D else 0
+    charged, fees = set(), []
+    for row in e["days"]:
+        D = dt.date.fromisoformat(row["date"]); x = dpd_on(D)
+        chk(row["dpd"] == x, f"{f['id']} {row['date']} dpd {row['dpd']} != {x}")
+        chk(row["state"] == i["bands"][bisect.bisect_right(mins, x) - 1]["state"], f"{f['id']} {row['date']} state")
+        paid = sum(c for d, c in pays if d <= D)
+        for k in range(len(due)):                                           # every uncovered installment past grace exit, once
+            if k not in charged and (D - due[k]).days >= 11 and paid < cum[k]:
+                charged.add(k); fees.append(dict(installment=k + 1, date=row["date"], cents=i["late_fee_cents"]))
+    chk(e["fees"] == fees, f"{f['id']} fees {e['fees']} != {fees}")
+    chk([r["date"] for r in e["days"]] == [(dt.date.fromisoformat(e["days"][0]["date"]) + dt.timedelta(days=k)).isoformat() for k in range(len(e["days"]))], f"{f['id']} days contiguous")
+dq = {x["id"]: x for x in (load(f"delinquency/DQ{k}.json") for k in range(1, 6))}
+chk(all(r["state"] == "current" for r in dq["DQ1"]["expected"]["days"]) and not dq["DQ1"]["expected"]["fees"], "DQ1 always current, no fees")
+chk({r["dpd"] for r in dq["DQ2"]["expected"]["days"]} >= {0, 1, 10, 11, 59, 60, 89, 90, 119, 120}, "DQ2 hits every band boundary")
+chk(dq["DQ2"]["expected"]["days"][-1]["dpd"] > 120, "DQ2 runs past 120")
+chk(len(dq["DQ5"]["expected"]["fees"]) == 2, "DQ5 fee twice")
+chk(len(dq["DQ4"]["expected"]["fees"]) == 2, "DQ4 installment 3 never fined")
+chk(any(r["date"] == "2026-04-20" and r["dpd"] == 0 for r in dq["DQ4"]["expected"]["days"]) and any(r["date"] == "2026-04-19" and r["state"] == "delinquent_60" for r in dq["DQ4"]["expected"]["days"]), "DQ4 delinquent_60 -> current in one payment")
+chk(any(r["date"] == "2026-04-10" and r["dpd"] == 26 for r in dq["DQ5"]["expected"]["days"]), "DQ5 oldest moves to installment 2")
+chk(any(r["date"] == "2026-02-16" and r["dpd"] == 1 for r in dq["DQ3"]["expected"]["days"]), "DQ3 clock not reset")
+
 # ---- ledger
 coa = {a["account"]: a for a in load("ledger/chart_of_accounts.json")["accounts"]}
 def entry_err(en):

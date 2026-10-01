@@ -1,0 +1,748 @@
+{
+  "id": "DQ2",
+  "description": "Nothing ever paid, day by day to day 125 of installment 1: every band boundary (DPD 0/1/10/11/59/60/89/90/119/120); the clock runs from the oldest installment while later ones fall due; a fee at each grace exit",
+  "input": {
+    "loan": "AM1",
+    "schedule": [
+      {
+        "n": 1,
+        "due_date": "2026-02-15",
+        "payment_cents": 17255
+      },
+      {
+        "n": 2,
+        "due_date": "2026-03-15",
+        "payment_cents": 17255
+      },
+      {
+        "n": 3,
+        "due_date": "2026-04-15",
+        "payment_cents": 17255
+      },
+      {
+        "n": 4,
+        "due_date": "2026-05-15",
+        "payment_cents": 17255
+      },
+      {
+        "n": 5,
+        "due_date": "2026-06-15",
+        "payment_cents": 17255
+      },
+      {
+        "n": 6,
+        "due_date": "2026-07-15",
+        "payment_cents": 17253
+      }
+    ],
+    "payments": [],
+    "late_fee_cents": 1500,
+    "bands": [
+      {
+        "min_dpd": 0,
+        "state": "current"
+      },
+      {
+        "min_dpd": 1,
+        "state": "grace"
+      },
+      {
+        "min_dpd": 11,
+        "state": "delinquent_30"
+      },
+      {
+        "min_dpd": 60,
+        "state": "delinquent_60"
+      },
+      {
+        "min_dpd": 90,
+        "state": "delinquent_90"
+      },
+      {
+        "min_dpd": 120,
+        "state": "default_recommended"
+      }
+    ]
+  },
+  "expected": {
+    "days": [
+      {
+        "date": "2026-02-10",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-11",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-12",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-13",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-14",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-15",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-16",
+        "dpd": 1,
+        "state": "grace"
+      },
+      {
+        "date": "2026-02-17",
+        "dpd": 2,
+        "state": "grace"
+      },
+      {
+        "date": "2026-02-18",
+        "dpd": 3,
+        "state": "grace"
+      },
+      {
+        "date": "2026-02-19",
+        "dpd": 4,
+        "state": "grace"
+      },
+      {
+        "date": "2026-02-20",
+        "dpd": 5,
+        "state": "grace"
+      },
+      {
+        "date": "2026-02-21",
+        "dpd": 6,
+        "state": "grace"
+      },
+      {
+        "date": "2026-02-22",
+        "dpd": 7,
+        "state": "grace"
+      },
+      {
+        "date": "2026-02-23",
+        "dpd": 8,
+        "state": "grace"
+      },
+      {
+        "date": "2026-02-24",
+        "dpd": 9,
+        "state": "grace"
+      },
+      {
+        "date": "2026-02-25",
+        "dpd": 10,
+        "state": "grace"
+      },
+      {
+        "date": "2026-02-26",
+        "dpd": 11,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-02-27",
+        "dpd": 12,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-02-28",
+        "dpd": 13,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-01",
+        "dpd": 14,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-02",
+        "dpd": 15,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-03",
+        "dpd": 16,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-04",
+        "dpd": 17,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-05",
+        "dpd": 18,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-06",
+        "dpd": 19,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-07",
+        "dpd": 20,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-08",
+        "dpd": 21,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-09",
+        "dpd": 22,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-10",
+        "dpd": 23,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-11",
+        "dpd": 24,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-12",
+        "dpd": 25,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-13",
+        "dpd": 26,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-14",
+        "dpd": 27,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-15",
+        "dpd": 28,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-16",
+        "dpd": 29,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-17",
+        "dpd": 30,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-18",
+        "dpd": 31,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-19",
+        "dpd": 32,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-20",
+        "dpd": 33,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-21",
+        "dpd": 34,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-22",
+        "dpd": 35,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-23",
+        "dpd": 36,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-24",
+        "dpd": 37,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-25",
+        "dpd": 38,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-26",
+        "dpd": 39,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-27",
+        "dpd": 40,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-28",
+        "dpd": 41,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-29",
+        "dpd": 42,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-30",
+        "dpd": 43,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-31",
+        "dpd": 44,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-01",
+        "dpd": 45,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-02",
+        "dpd": 46,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-03",
+        "dpd": 47,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-04",
+        "dpd": 48,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-05",
+        "dpd": 49,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-06",
+        "dpd": 50,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-07",
+        "dpd": 51,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-08",
+        "dpd": 52,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-09",
+        "dpd": 53,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-10",
+        "dpd": 54,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-11",
+        "dpd": 55,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-12",
+        "dpd": 56,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-13",
+        "dpd": 57,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-14",
+        "dpd": 58,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-15",
+        "dpd": 59,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-16",
+        "dpd": 60,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-04-17",
+        "dpd": 61,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-04-18",
+        "dpd": 62,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-04-19",
+        "dpd": 63,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-04-20",
+        "dpd": 64,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-04-21",
+        "dpd": 65,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-04-22",
+        "dpd": 66,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-04-23",
+        "dpd": 67,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-04-24",
+        "dpd": 68,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-04-25",
+        "dpd": 69,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-04-26",
+        "dpd": 70,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-04-27",
+        "dpd": 71,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-04-28",
+        "dpd": 72,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-04-29",
+        "dpd": 73,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-04-30",
+        "dpd": 74,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-05-01",
+        "dpd": 75,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-05-02",
+        "dpd": 76,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-05-03",
+        "dpd": 77,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-05-04",
+        "dpd": 78,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-05-05",
+        "dpd": 79,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-05-06",
+        "dpd": 80,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-05-07",
+        "dpd": 81,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-05-08",
+        "dpd": 82,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-05-09",
+        "dpd": 83,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-05-10",
+        "dpd": 84,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-05-11",
+        "dpd": 85,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-05-12",
+        "dpd": 86,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-05-13",
+        "dpd": 87,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-05-14",
+        "dpd": 88,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-05-15",
+        "dpd": 89,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-05-16",
+        "dpd": 90,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-05-17",
+        "dpd": 91,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-05-18",
+        "dpd": 92,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-05-19",
+        "dpd": 93,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-05-20",
+        "dpd": 94,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-05-21",
+        "dpd": 95,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-05-22",
+        "dpd": 96,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-05-23",
+        "dpd": 97,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-05-24",
+        "dpd": 98,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-05-25",
+        "dpd": 99,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-05-26",
+        "dpd": 100,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-05-27",
+        "dpd": 101,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-05-28",
+        "dpd": 102,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-05-29",
+        "dpd": 103,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-05-30",
+        "dpd": 104,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-05-31",
+        "dpd": 105,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-06-01",
+        "dpd": 106,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-06-02",
+        "dpd": 107,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-06-03",
+        "dpd": 108,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-06-04",
+        "dpd": 109,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-06-05",
+        "dpd": 110,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-06-06",
+        "dpd": 111,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-06-07",
+        "dpd": 112,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-06-08",
+        "dpd": 113,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-06-09",
+        "dpd": 114,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-06-10",
+        "dpd": 115,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-06-11",
+        "dpd": 116,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-06-12",
+        "dpd": 117,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-06-13",
+        "dpd": 118,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-06-14",
+        "dpd": 119,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-06-15",
+        "dpd": 120,
+        "state": "default_recommended"
+      },
+      {
+        "date": "2026-06-16",
+        "dpd": 121,
+        "state": "default_recommended"
+      },
+      {
+        "date": "2026-06-17",
+        "dpd": 122,
+        "state": "default_recommended"
+      },
+      {
+        "date": "2026-06-18",
+        "dpd": 123,
+        "state": "default_recommended"
+      },
+      {
+        "date": "2026-06-19",
+        "dpd": 124,
+        "state": "default_recommended"
+      },
+      {
+        "date": "2026-06-20",
+        "dpd": 125,
+        "state": "default_recommended"
+      }
+    ],
+    "fees": [
+      {
+        "installment": 1,
+        "date": "2026-02-26",
+        "cents": 1500
+      },
+      {
+        "installment": 2,
+        "date": "2026-03-26",
+        "cents": 1500
+      },
+      {
+        "installment": 3,
+        "date": "2026-04-26",
+        "cents": 1500
+      },
+      {
+        "installment": 4,
+        "date": "2026-05-26",
+        "cents": 1500
+      }
+    ]
+  }
+}
