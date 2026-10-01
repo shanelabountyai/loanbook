@@ -13,7 +13,8 @@ export type EntryErrorCode =
   | 'missing_loan_id'
   | 'unbalanced'
   | 'already_reversed'
-  | 'dangling_reversal';
+  | 'dangling_reversal'
+  | 'accrual_pending';
 
 /** Codes match `fixtures/ledger/entry_validation.json`. `non_integer_amount` arrives as a MoneyError. */
 export class EntryError extends Error {

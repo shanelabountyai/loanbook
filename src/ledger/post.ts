@@ -45,23 +45,37 @@ async function write(db: Db, entry: PostInput, reversesEntryId: string | null): 
 
   await db.query('BEGIN');
   try {
-    const { rows } = await db.query<{ id: string }>(
-      `INSERT INTO "LedgerEntry" ("id", "date", "loanId", "memo", "reversesEntryId", "kind")
-       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5) RETURNING "id"`,
-      [entry.date, entry.loanId ?? null, entry.memo ?? null, reversesEntryId, entry.kind ?? null],
-    );
-    const id = rows[0]!.id;
-    for (const [position, l] of entry.lines.entries()) {
-      await db.query(
-        `INSERT INTO "LedgerLine" ("id", "entryId", "position", "account", "debitCents", "creditCents")
-         VALUES (gen_random_uuid(), $1, $2, $3, $4, $5)`,
-        [id, position, l.account, l.debitCents, l.creditCents],
-      );
-    }
+    const id = await insert(db, entry, reversesEntryId);
     await db.query('COMMIT');
     return id;
   } catch (err) {
     await db.query('ROLLBACK');
     throw err;
   }
+}
+
+/**
+ * Posts one entry inside a transaction the caller already opened and will commit or roll back (D16).
+ * For a read-then-post that must be atomic, e.g. a payment allocated against what is owed.
+ */
+export async function postEntryInTx(db: Db, entry: PostInput): Promise<string> {
+  assertValidEntry(entry);
+  return insert(db, entry, null);
+}
+
+async function insert(db: Db, entry: PostInput, reversesEntryId: string | null): Promise<string> {
+  const { rows } = await db.query<{ id: string }>(
+    `INSERT INTO "LedgerEntry" ("id", "date", "loanId", "memo", "reversesEntryId", "kind")
+     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5) RETURNING "id"`,
+    [entry.date, entry.loanId ?? null, entry.memo ?? null, reversesEntryId, entry.kind ?? null],
+  );
+  const id = rows[0]!.id;
+  for (const [position, l] of entry.lines.entries()) {
+    await db.query(
+      `INSERT INTO "LedgerLine" ("id", "entryId", "position", "account", "debitCents", "creditCents")
+       VALUES (gen_random_uuid(), $1, $2, $3, $4, $5)`,
+      [id, position, l.account, l.debitCents, l.creditCents],
+    );
+  }
+  return id;
 }

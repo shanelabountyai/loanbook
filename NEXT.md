@@ -1,13 +1,15 @@
 # NEXT
 
-## Pick up here: task 3.3 (payment posting, needs D16)
+## Pick up here: task 3.4 (payoff quote; fixtures PO1-PO4 first)
 
-3.2 done (2026-10-01): `owedCents(db, loanId)` in `src/ledger/owed.ts` returns `{ fees, interest, principal }` from `trialBalance`'s
-per-loan view (fees_receivable / interest_receivable / loans_receivable); unknown loan = zeros. Test `tests/integration/owed.test.ts` (2):
-L1 + AC4 accrual reads 100000 / 1019 / 0 and other loans are not mixed in; fees and a principal payment move the figures.
-Mutant killed: interest read from fees (2 red). Local: lint, typecheck, both gates. CI: check `gh run list` with the full SHA.
-Next: 3.3 `postPayment`; first decide D16 (caller-owned transaction in `postEntry` vs loan-row lock; `accrual_pending`). Model Opus 5.5.
-3.1 done (c7daa00): `src/ledger/waterfall.ts`, `allocate` pure, 21 tests.
+3.3 done (2026-10-01, D16): `postPayment(db, { loanId, date, paymentCents, order })` in `src/ledger/payment.ts`: BEGIN, `FOR UPDATE`
+on the Loan row, `accrualDue` (accrue.ts dry mode) must be empty else `accrual_pending`, `owedCents`, `allocate`, `postEntryInTx`
+(new in post.ts), COMMIT. Returns `{ allocation, remaining, loanClosed, entryId }`. Test `tests/integration/payment.test.ts` (15): WF1-WF10
+and WFB3/5/10 through the real path (allocation, remaining, cash line + unordered lines, verify clean), `accrual_pending`,
+and a deterministic lock test (second payment blocks while the first holds the lock, then `exceeds_payoff`). Mutant killed: lock removed (1 red);
+`accrual_pending` check disabled (1 red). Local: lint, typecheck, both gates, vitest 46 files 430/430. CI: check `gh run list` with the full SHA.
+Next: 3.4 gate first (extend build_fixtures.py + verify_fixtures.py with PO1-PO4, D17). Model Opus 5.5.
+3.2 done (b9d41d9): `owedCents`. 3.1 done (c7daa00): `allocate`.
 
 ## Phase 2 exit check (done above)
 

@@ -26,7 +26,14 @@ export async function runAccrual(db: Db, { asOf }: { asOf: string }): Promise<Ac
   return out;
 }
 
-async function accrueLoan(db: Db, loanId: string, aprBps: number, asOf: string): Promise<Accrued[]> {
+/** Accrual days through `asOf` the run would still post for one loan; posts nothing. */
+export async function accrualDue(db: Db, loanId: string, asOf: string): Promise<Accrued[]> {
+  assertDate(asOf);
+  const { rows } = await db.query<{ aprBps: number }>('SELECT "aprBps" FROM "Loan" WHERE "id" = $1', [loanId]);
+  return rows[0] ? accrueLoan(db, loanId, rows[0].aprBps, asOf, true) : [];
+}
+
+async function accrueLoan(db: Db, loanId: string, aprBps: number, asOf: string, dry = false): Promise<Accrued[]> {
   // Principal changes by date. A line dated asOf takes effect the day after, so it is not read (D6).
   const { rows: changes } = await db.query<{ date: string; net: string }>(
     `SELECT e."date"::text AS date, sum(l."debitCents" - l."creditCents")::text AS net
@@ -65,6 +72,11 @@ async function accrueLoan(db: Db, loanId: string, aprBps: number, asOf: string):
     if (principalCents <= 0) continue;
     const amountCents = cumulativeInterestCents(principalCents, aprBps, daysBetween(segmentStart, date)) - segmentPostedCents;
     if (amountCents === 0) continue; // an entry needs positive lines; the next day's difference carries it
+    if (dry) {
+      out.push({ loanId, date, amountCents, entryId: '' });
+      segmentPostedCents += amountCents;
+      continue;
+    }
     try {
       const entryId = await postEntry(db, {
         date,
