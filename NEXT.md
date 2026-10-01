@@ -1,6 +1,10 @@
 # NEXT
 
-## Pick up here: Phase 2 exit check, then Phase 3
+## Pick up here: Phase 3 (waterfall + payoff)
+
+Phase 2 exit verified 2026-10-01: AM1-5 and AC1-5 each asserted in tests; `already_accrued` partial unique index; no stored schedule/balance/accrual column (loan.prisma holds terms only); `ledger:verify` clean after the 31-day two-loan run (accrue-script test); CI run on db2345a green. Phase 3 starts with D9 (final installment due = payoff quote), composing postings in one transaction, and the waterfall allocating against accrued interest (D4). Model Opus 5.5.
+
+## Phase 2 exit check (done above)
 
 2.6 done (2026-09-30): `scripts/accrue.ts` + `npm run accrue -- --as-of YYYY-MM-DD` (`--as-of` required, never
 defaults to today; per-loan `entries, cents` lines plus a total; exit 1 on missing/invalid date or any error).
