@@ -6,7 +6,7 @@ import type { Bucket } from './waterfall';
 /** Payment waterfall order (D7). */
 export const PAYMENT_ORDER: readonly Bucket[] = ['fees', 'interest', 'principal'];
 
-/** Flat late fee in cents. Read by Phase 4's assessment; nothing assesses it yet. */
+/** Flat late fee in cents, assessed by `runStatus` (D19). */
 export const LATE_FEE_CENTS = 1500;
 
 export type LoanState = 'current' | 'grace' | 'delinquent_30' | 'delinquent_60' | 'delinquent_90' | 'default_recommended';
@@ -20,3 +20,6 @@ export const DELINQUENCY_BANDS: readonly { minDpd: number; state: LoanState }[] 
   { minDpd: 90, state: 'delinquent_90' },
   { minDpd: 120, state: 'default_recommended' },
 ];
+
+/** DPD at which grace ends and the late fee is assessed (D19): the floor of the first band after grace. */
+export const GRACE_EXIT_DPD = DELINQUENCY_BANDS.find((b) => b.state === 'delinquent_30')!.minDpd;

@@ -32,6 +32,7 @@
     "foundation:check-modules": "tsx scripts/foundation-check-modules.ts",
     "ledger:verify": "dotenv -e .env.local -- tsx scripts/ledger-verify.ts",
     "accrue": "dotenv -e .env.local -- tsx scripts/accrue.ts",
+    "status": "dotenv -e .env.local -- tsx scripts/status.ts",
     "pay": "dotenv -e .env.local -- tsx scripts/pay.ts",
     "fixtures:check": "python3 tools/build_fixtures.py && python3 tools/verify_fixtures.py && git diff --exit-code fixtures/"
   },

@@ -18,6 +18,7 @@ model LedgerEntry {
   reverses        LedgerEntry? @relation("Reversal", fields: [reversesEntryId], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "dangling_reversal")
   reversedBy      LedgerEntry? @relation("Reversal")
   kind            String?
+  installment     Int?
 }
 
 /// One side of an entry. Append-only, and insertable only in the transaction that created its entry.

@@ -1,6 +1,11 @@
 # NEXT
 
-## Pick up here: task 4.3 (late-fee job `runStatus` + `npm run status`), see docs/phase-4-tasks.md; model Opus 5.5
+## Pick up here: task 4.4 (servicing views + role split + Playwright), see docs/phase-4-tasks.md; model Sonnet ok for wiring, Opus for the role boundary
+
+4.3 done (2026-10-01, D20): `runStatus` in `src/ledger/delinquency.ts`, `GRACE_EXIT_DPD` in config, migration `20261001000000_ledger_late_fee` (`LedgerEntry.installment`, `already_fee_assessed`, `invalid_installment`),
+`scripts/status.ts` + `npm run status -- --as-of`. Tests `tests/integration/late-fee.test.ts` (9): DQ1-DQ5 day by day (fee lands on its exit day, once, owed fees match, verify clean), catch-up run, race, DB constraints, script.
+Local: lint, typecheck, both gates, vitest 52 files 463/463. CI: check `gh run list` with the full SHA.
+
 
 4.2 done (2026-10-01): `dpd`/`stateFromDpd`/`loanStatus` in `src/ledger/delinquency.ts`, `DELINQUENCY_BANDS` + `LoanState` in config.ts.
 Tests: `tests/unit/delinquency.test.ts` (7), `tests/integration/status.test.ts` (6): DQ1-DQ5 every day, pure and from the ledger. Mutants killed: boundary, newest-installment, per-payment reset;

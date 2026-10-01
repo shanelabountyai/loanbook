@@ -10,8 +10,8 @@ import { assertValidEntry, EntryError, type EntryInput } from './entry';
 import { readEntry } from './read';
 
 type Db = Pick<ClientBase, 'query'>;
-/** `kind: 'accrual'` puts the entry under the database's one-per-(loan, day) rule (D15). */
-export type PostInput = EntryInput & { date: string; memo?: string | null; kind?: 'accrual' | null };
+/** `kind: 'accrual'` puts the entry under the database's one-per-(loan, day) rule (D15); `kind: 'late_fee'` with its `installment`, one-per-(loan, installment) (D20). */
+export type PostInput = EntryInput & { date: string; memo?: string | null; kind?: 'accrual' | 'late_fee' | null; installment?: number | null };
 
 /**
  * Posts one entry and returns its id. Owns its transaction, so the caller's connection must not be
@@ -65,9 +65,9 @@ export async function postEntryInTx(db: Db, entry: PostInput): Promise<string> {
 
 async function insert(db: Db, entry: PostInput, reversesEntryId: string | null): Promise<string> {
   const { rows } = await db.query<{ id: string }>(
-    `INSERT INTO "LedgerEntry" ("id", "date", "loanId", "memo", "reversesEntryId", "kind")
-     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5) RETURNING "id"`,
-    [entry.date, entry.loanId ?? null, entry.memo ?? null, reversesEntryId, entry.kind ?? null],
+    `INSERT INTO "LedgerEntry" ("id", "date", "loanId", "memo", "reversesEntryId", "kind", "installment")
+     VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6) RETURNING "id"`,
+    [entry.date, entry.loanId ?? null, entry.memo ?? null, reversesEntryId, entry.kind ?? null, entry.installment ?? null],
   );
   const id = rows[0]!.id;
   for (const [position, l] of entry.lines.entries()) {
