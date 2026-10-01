@@ -1,6 +1,12 @@
 # NEXT
 
-## Pick up here: Phase 3 exit check (docs/phase-3-tasks.md); model Opus 5.5
+## Pick up here: Phase 4 (delinquency + views + P1), start with docs/phase-4-tasks.md; model Opus 5.5
+
+Phase 3 exit check PASSED (2026-10-01): CI run 36892445665 green on dd29979, vitest 49 files 441/441, Playwright 10/10, both gates passing.
+Criteria map: WF1-10/WFB via payment.test.ts (3.3); round-trip, exceeds_payoff, D9 on L1 via payoff round-trip (3.5); racing payments via the
+lock test (3.3); no stored balance/split/quote (3.2 reads trialBalance; quote posts nothing, 3.4); verify clean asserted in each scenario.
+
+## Phase 3 exit (done) / 3.6 brief
 
 3.6 done (2026-10-01): `src/ledger/config.ts` (`PAYMENT_ORDER` = D7 default, `LATE_FEE_CENTS` = 1500, read by Phase 4 only),
 `scripts/pay.ts` + `npm run pay -- --loan <id> --date YYYY-MM-DD --cents N` (all required, integer cents, prints split and
