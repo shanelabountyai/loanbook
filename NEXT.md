@@ -1,6 +1,18 @@
 # NEXT
 
-## Pick up here: task 3.5 (payoff round-trip; model Opus 5.5)
+## Pick up here: task 3.6 (payment command + late-fee config; model Sonnet defensible: wiring, no new money logic)
+
+3.5 done (2026-10-01): two tests in `tests/integration/payoff.test.ts`, no product code (the pieces already composed).
+`payQuote` helper: quote for D, `runAccrual` through D, quote + 1 cent refused `exceeds_payoff` writing nothing, pay the quote:
+`loanClosed`, remaining and `owedCents` all zero, verify clean. Round trip on L1 with a 1500 fee and a 10000 payment, quoted
+2026-03-20 with pending accrual > 0. D9 on L1: five installments of 17255 on the due dates, then the quote on 2026-07-15 is
+17215 (interest 168), not the last row's 17253 (interest 171); paying it closes to zero. Mutants killed: pending accrual
+dropped from the quote (4 red), quote 1 cent short (2 red). Local: lint (1 pre-existing template warning, e2e/billing.spec.ts),
+typecheck, both gates, vitest 47 files 437/437. CI: check `gh run list` with the full SHA.
+Then: Phase 3 exit check (docs/phase-3-tasks.md).
+
+## Earlier: 3.4
+
 
 3.4 done (2026-10-01, D17): fixtures PO1-PO4 (`fixtures/payoff/`, oracle + independent verifier, 31 files OK). `payoffQuote(db, { loanId, asOf })`
 in `src/ledger/payoff.ts` = `owedCents` + `accrualDue` through `asOf` (inclusive), one repeatable-read read-only snapshot, posts nothing;

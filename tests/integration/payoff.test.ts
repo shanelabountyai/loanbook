@@ -3,9 +3,11 @@ import { afterAll, beforeEach, expect, it } from 'vitest';
 import pg from 'pg';
 import { runAccrual } from '@/ledger/accrue';
 import { createLoan } from '@/ledger/loan';
+import { owedCents } from '@/ledger/owed';
 import { payoffQuote } from '@/ledger/payoff';
 import { postPayment } from '@/ledger/payment';
 import { postEntry } from '@/ledger/post';
+import { buildSchedule } from '@/ledger/schedule';
 import { verifyLedger } from '@/ledger/verify';
 
 // Task 3.4 (D17): the quote is read from the ledger plus the accrual days the run would still post.
@@ -22,6 +24,8 @@ beforeEach(async () => {
 const dir = 'fixtures/payoff';
 const fixtures = readdirSync(dir).map((f) => JSON.parse(readFileSync(`${dir}/${f}`, 'utf8')));
 const order = ['fees', 'interest', 'principal'] as const;
+const am1 = JSON.parse(readFileSync('fixtures/amortization/AM1.json', 'utf8')).input;
+const L1 = { principalCents: am1.principal_cents, aprBps: am1.apr_bps, termMonths: am1.term_months, disbursementDate: am1.disbursement_date };
 
 async function build(f: (typeof fixtures)[number]) {
   const i = f.input;
@@ -71,6 +75,50 @@ for (const f of fixtures) {
     expect((await verifyLedger(client)).findings).toEqual([]);
   });
 }
+
+// Task 3.5: the quote is what the payment path accepts. Pay it after accruing through its date and the loan is zero.
+async function payQuote(loanId: string, date: string) {
+  const q = await payoffQuote(client, { loanId, asOf: date });
+  await runAccrual(client, { asOf: date });
+  const before = (await client.query('SELECT count(*)::int AS n FROM "LedgerEntry"')).rows[0].n;
+  const over = { loanId, date, paymentCents: q.totalCents + 1, order };
+  await expect(postPayment(client, over)).rejects.toMatchObject({ code: 'exceeds_payoff' }); // WF8, real path
+  expect((await client.query('SELECT count(*)::int AS n FROM "LedgerEntry"')).rows[0].n).toBe(before);
+  const paid = await postPayment(client, { loanId, date, paymentCents: q.totalCents, order });
+  expect(paid.loanClosed).toBe(true);
+  expect(paid.remaining).toEqual({ fees: 0, interest: 0, principal: 0 });
+  expect(await owedCents(client, loanId)).toEqual({ fees: 0, interest: 0, principal: 0 });
+  expect((await verifyLedger(client)).findings).toEqual([]);
+  return q;
+}
+
+it('round trip: quote for D, accrue through D, pay the quote on D closes the loan to zero', async () => {
+  const { loanId } = await createLoan(client, L1);
+  await postEntry(client, {
+    date: '2026-02-01',
+    loanId,
+    lines: [
+      { account: 'fees_receivable', debitCents: 1500, creditCents: 0 },
+      { account: 'fees_income', debitCents: 0, creditCents: 1500 },
+    ],
+  });
+  await runAccrual(client, { asOf: '2026-02-15' });
+  await postPayment(client, { loanId, date: '2026-02-15', paymentCents: 10000, order });
+  const q = await payQuote(loanId, '2026-03-20'); // accrual partly posted, partly pending at the quote
+  expect(q.pendingAccrualCents).toBeGreaterThan(0);
+});
+
+it('D9: L1 paid on schedule owes the quote on the final due date, not the last row', async () => {
+  const { loanId } = await createLoan(client, L1);
+  const s = buildSchedule(L1);
+  for (const r of s.rows.slice(0, -1)) {
+    await runAccrual(client, { asOf: r.dueDate });
+    await postPayment(client, { loanId, date: r.dueDate, paymentCents: s.installmentCents, order });
+  }
+  const last = s.rows.at(-1)!;
+  const q = await payQuote(loanId, last.dueDate);
+  expect(q.totalCents).not.toBe(last.paymentCents); // D4's drift lands in the final payment
+});
 
 it('an unknown loan and a bad date are refused', async () => {
   await expect(payoffQuote(client, { loanId: 'nope', asOf: '2026-02-15' })).rejects.toMatchObject({ code: 'unknown_loan' });
