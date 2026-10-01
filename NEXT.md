@@ -1,15 +1,17 @@
 # NEXT
 
-## Pick up here: task 3.6 (payment command + late-fee config; model Sonnet defensible: wiring, no new money logic)
+## Pick up here: Phase 3 exit check (docs/phase-3-tasks.md); model Opus 5.5
 
-3.5 done (2026-10-01): two tests in `tests/integration/payoff.test.ts`, no product code (the pieces already composed).
-`payQuote` helper: quote for D, `runAccrual` through D, quote + 1 cent refused `exceeds_payoff` writing nothing, pay the quote:
-`loanClosed`, remaining and `owedCents` all zero, verify clean. Round trip on L1 with a 1500 fee and a 10000 payment, quoted
-2026-03-20 with pending accrual > 0. D9 on L1: five installments of 17255 on the due dates, then the quote on 2026-07-15 is
-17215 (interest 168), not the last row's 17253 (interest 171); paying it closes to zero. Mutants killed: pending accrual
-dropped from the quote (4 red), quote 1 cent short (2 red). Local: lint (1 pre-existing template warning, e2e/billing.spec.ts),
-typecheck, both gates, vitest 47 files 437/437. CI run 36890904011 green on 1736d6b: vitest 47 files 437/437, Playwright 10/10, both gates passing.
-Then: Phase 3 exit check (docs/phase-3-tasks.md).
+3.6 done (2026-10-01): `src/ledger/config.ts` (`PAYMENT_ORDER` = D7 default, `LATE_FEE_CENTS` = 1500, read by Phase 4 only),
+`scripts/pay.ts` + `npm run pay -- --loan <id> --date YYYY-MM-DD --cents N` (all required, integer cents, prints split and
+remaining, exit 1 on any refusal, wraps `postPayment`). Tests: `tests/integration/pay-script.test.ts` (2: two-loan book, short, exact,
+payoff, verify clean; refusals write nothing) and `tests/unit/ledger-config.test.ts` (2: values, and no literal order or 1500 elsewhere).
+Mutant killed: script hardcoding a different order (1 red). Local: lint, typecheck, both gates, vitest 49 files 441/441. CI: check `gh run list` with the full SHA.
+Then: verify Phase 3 exit criteria against CI, then Phase 4 (delinquency + views + P1).
+
+## Earlier: 3.5 (done)
+
+3.5 done (2026-10-01): payoff round trip and D9 on L1, CI run 36890904011 green on 1736d6b.
 
 ## Earlier: 3.4
 
