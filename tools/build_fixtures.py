@@ -6,7 +6,7 @@ arithmetic (fractions.Fraction) so the product implementation can be tested agai
 numbers it did not produce. Do not import it from the product; do not port it line by
 line -- write the product test-first against the frozen fixtures instead.
 
-Rules encoded here are defined in docs/decisions.md (D1-D9, D17). Stdlib only, Python >= 3.9.
+Rules encoded here are defined in docs/decisions.md (D1-D9, D17-D20, D22). Stdlib only, Python >= 3.9.
 """
 import calendar, csv, datetime as dt, json, os
 from fractions import Fraction
@@ -282,6 +282,84 @@ for fid, desc, pays, first, last in DQ:
                     payments=[dict(date=d.isoformat(), cents=c) for d, c in pays], late_fee_cents=LATE_FEE,
                     bands=[dict(min_dpd=lo, state=s) for lo, s in reversed(BANDS)]),
          expected=dict(days=days, fees=dq_fees(AM1_ROWS, pays, d1))))
+
+# ---------------------------------------------------------------- capstone (D22)
+def money(c): return f"${c // 100}.{c % 100:02d}"
+
+
+def capstone(pays, last):
+    """L1's life day by day: accrual for D, then a fee dated D, then a payment on D (D6, D20). A payment of None
+    is the payoff: the whole of what is owed after D's accrual (D17). Returns ledger entries, payments, fees."""
+    P0, apr = 100000, 1200
+    cash = [(d, c) for d, c in pays if c is not None]
+    fees = dq_fees(AM1_ROWS, cash, last)
+    owed, P, start, posted = st(0, 0, P0), P0, L1D, 0
+    entries = [dict(date=L1D.isoformat(), kind="disbursement", cents=P0)]
+    paid = []
+    D = L1D
+    while D < last:
+        D += dt.timedelta(days=1)
+        c = cum_interest(P, apr, (D - start).days)
+        if c > posted:
+            entries.append(dict(date=D.isoformat(), kind="accrual", cents=c - posted)); owed["interest"] += c - posted; posted = c
+        for f in fees:
+            if f["date"] == D.isoformat():
+                entries.append(dict(date=f["date"], kind="late_fee", cents=f["cents"])); owed["fees"] += f["cents"]
+        for d, c in pays:
+            if d != D: continue
+            amt = sum(owed.values()) if c is None else c
+            a = allocate(owed, amt, CFG_A)
+            paid.append(dict(date=D.isoformat(), cents=amt, payoff=c is None, owed_before=dict(owed),
+                             allocation=a["allocation"], remaining=a["remaining"], loan_closed=a["loan_closed"]))
+            entries.append(dict(date=D.isoformat(), kind="payment", cents=amt, split=a["allocation"]))
+            owed = dict(a["remaining"])
+            if a["allocation"]["principal"] > 0:
+                P, start, posted = P - a["allocation"]["principal"], D, 0
+    return entries, paid, fees, owed
+
+
+def statement(entries, owed, as_of):
+    out, run = [], None
+    for e in entries + [None]:
+        if e and e["kind"] == "accrual":
+            run = [run[0], e["date"], run[2] + e["cents"]] if run else [e["date"], e["date"], e["cents"]]
+            continue
+        if run:
+            out.append(f"{run[0]} to {run[1]} Interest accrued {money(run[2])}"); run = None
+        if e is None: break
+        if e["kind"] == "disbursement": out.append(f"{e['date']} Disbursed {money(e['cents'])}")
+        if e["kind"] == "late_fee": out.append(f"{e['date']} Late fee {money(e['cents'])}")
+        if e["kind"] == "payment":
+            s = e["split"]
+            out.append(f"{e['date']} Payment {money(e['cents'])}: fees {money(s['fees'])}, interest {money(s['interest'])}, principal {money(s['principal'])}")
+    out.append(f"{as_of} Owed {money(sum(owed.values()))}: fees {money(owed['fees'])}, interest {money(owed['interest'])}, principal {money(owed['principal'])}")
+    return out
+
+
+CP_LAST = dt.date(2026, 7, 1)
+CP_PAYS = [("2026-02-15", X), ("2026-03-15", 10000), ("2026-03-20", X - 10000), ("2026-05-01", X), ("2026-06-20", 2 * X), ("2026-07-01", None)]
+cp_pays = [(dt.date.fromisoformat(d), c) for d, c in CP_PAYS]
+cp_entries, cp_paid, cp_fees, cp_owed = capstone(cp_pays, CP_LAST)
+cp_cash = [(dt.date.fromisoformat(p["date"]), p["cents"]) for p in cp_paid]
+assert cp_fees == dq_fees(AM1_ROWS, cp_cash, CP_LAST)  # the payoff's cash changes no fee
+dump("capstone/CP1.json", dict(
+    id="CP1", description="Capstone: L1 (AM1 terms) from disbursement to early payoff, run day by day (accrual, then the late-fee job, then any payment). "
+                          "Six payments: on time (02-15); short, 10000 of 17255 (03-15); the shortfall inside grace (03-20, DPD 5, no fee); "
+                          "installment 3 missed, fee at grace exit 04-26, paid late 05-01; installment 4 missed, fee 05-26, caught up with installment 5 in one payment 06-20; "
+                          "payoff on 07-01 at the quote, before installment 6 falls due. Every receivable ends at zero.",
+    input=dict(loan="AM1", principal_cents=100000, apr_bps=1200, term_months=6, disbursement_date=L1D.isoformat(),
+               waterfall_order=CFG_A, late_fee_cents=LATE_FEE, run_through=CP_LAST.isoformat(),
+               payments=[dict(date=d, cents=c) if c is not None else dict(date=d, payoff=True) for d, c in CP_PAYS]),
+    expected=dict(
+        payments=cp_paid, fees=cp_fees,
+        days=[dict(date=(L1D + dt.timedelta(days=k)).isoformat(), dpd=dq_day(AM1_ROWS, cp_cash, L1D + dt.timedelta(days=k)),
+                   state=band(dq_day(AM1_ROWS, cp_cash, L1D + dt.timedelta(days=k)))) for k in range((CP_LAST - L1D).days + 1)],
+        totals=dict(cash_received_cents=sum(c for _, c in cp_cash),
+                    interest_income_cents=sum(e["cents"] for e in cp_entries if e["kind"] == "accrual"),
+                    fees_income_cents=sum(f["cents"] for f in cp_fees),
+                    accrual_entries=sum(1 for e in cp_entries if e["kind"] == "accrual")),
+        owed_at_end=cp_owed,
+        statement=statement(cp_entries, cp_owed, CP_LAST.isoformat()))))
 
 # ---------------------------------------------------------------- ledger
 COA = [

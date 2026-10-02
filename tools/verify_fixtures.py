@@ -155,8 +155,58 @@ chk(any(r["date"] == "2026-04-20" and r["dpd"] == 0 for r in dq["DQ4"]["expected
 chk(any(r["date"] == "2026-04-10" and r["dpd"] == 26 for r in dq["DQ5"]["expected"]["days"]), "DQ5 oldest moves to installment 2")
 chk(any(r["date"] == "2026-02-16" and r["dpd"] == 1 for r in dq["DQ3"]["expected"]["days"]), "DQ3 clock not reset")
 
+# ---- capstone (independent: state as running balances, one loop per day; DPD and fees from the DQ check above)
+cp = load("capstone/CP1.json"); i, e = cp["input"], cp["expected"]
+d0, last = dt.date.fromisoformat(i["disbursement_date"]), dt.date.fromisoformat(i["run_through"])
+sched = load("amortization/AM1.json")["expected"]["schedule"]
+due = [dt.date.fromisoformat(r["due_date"]) for r in sched]
+cum_due = [sum(r["payment_cents"] for r in sched[:k + 1]) for k in range(len(sched))]
+want = {x["date"]: x for x in i["payments"]}
+P, seg, prev, fees, intr, charged, cash, got_pays, lines = i["principal_cents"], d0, 0, 0, 0, set(), [], [], []
+acc_run, acc_total, n_acc, fee_list = None, 0, 0, []
+def m(c): return f"${Decimal(c) / 100:.2f}"
+lines.append(f"{d0} Disbursed {m(i['principal_cents'])}")
+D = d0
+while D < last:
+    D += dt.timedelta(days=1)
+    x = q(Decimal(P) * i["apr_bps"] * (D - seg).days / (Decimal(10000) * 365)) - prev  # `cum` is shadowed by the DQ check
+    prev += x; intr += x; acc_total += x
+    if x: n_acc += 1; acc_run = [acc_run[0] if acc_run else D, D, (acc_run[2] if acc_run else 0) + x]
+    paid_now = sum(c for _, c in cash)
+    for k in range(len(due)):
+        if k not in charged and (D - due[k]).days == 11 and paid_now < cum_due[k]:
+            charged.add(k); fees += i["late_fee_cents"]; fee_list.append(dict(installment=k + 1, date=D.isoformat(), cents=i["late_fee_cents"]))
+            lines.append(f"{acc_run[0]} to {acc_run[1]} Interest accrued {m(acc_run[2])}"); acc_run = None
+            lines.append(f"{D} Late fee {m(i['late_fee_cents'])}")
+    w = want.get(D.isoformat())
+    if w:
+        before = dict(fees=fees, interest=intr, principal=P)
+        amt = sum(before.values()) if w.get("payoff") else w["cents"]
+        a = alloc(before, amt, i["waterfall_order"])
+        got_pays.append(dict(date=D.isoformat(), cents=amt, payoff=bool(w.get("payoff")), owed_before=before, allocation=a,
+                             remaining={b: before[b] - a[b] for b in before}, loan_closed=amt == sum(before.values())))
+        fees, intr = fees - a["fees"], intr - a["interest"]
+        if a["principal"]: P, seg, prev = P - a["principal"], D, 0
+        cash.append((D, amt))
+        lines.append(f"{acc_run[0]} to {acc_run[1]} Interest accrued {m(acc_run[2])}"); acc_run = None
+        lines.append(f"{D} Payment {m(amt)}: fees {m(a['fees'])}, interest {m(a['interest'])}, principal {m(a['principal'])}")
+if acc_run: lines.append(f"{acc_run[0]} to {acc_run[1]} Interest accrued {m(acc_run[2])}")
+lines.append(f"{last} Owed {m(fees + intr + P)}: fees {m(fees)}, interest {m(intr)}, principal {m(P)}")
+chk(e["payments"] == got_pays, "CP1 payments")
+chk(e["fees"] == fee_list, "CP1 fees")
+chk(e["owed_at_end"] == dict(fees=fees, interest=intr, principal=P) == dict(fees=0, interest=0, principal=0), "CP1 closes to zero")
+chk(e["statement"] == lines, "CP1 statement")
+T = e["totals"]
+chk(T == dict(cash_received_cents=sum(c for _, c in cash), interest_income_cents=acc_total, fees_income_cents=len(fee_list) * i["late_fee_cents"], accrual_entries=n_acc), "CP1 totals")
+chk(T["cash_received_cents"] == i["principal_cents"] + T["interest_income_cents"] + T["fees_income_cents"], "CP1 cash = principal + interest + fees")
+for row in e["days"]:
+    Dd = dt.date.fromisoformat(row["date"]); k = bisect.bisect_right(cum_due, sum(c for d, c in cash if d <= Dd))
+    chk(row["dpd"] == ((Dd - due[k]).days if k < len(due) and due[k] < Dd else 0), f"CP1 {row['date']} dpd")
+chk({r["state"] for r in e["days"]} == {"current", "grace", "delinquent_30"}, "CP1 visits current, grace, delinquent_30")
+chk(got_pays[-1]["payoff"] and dt.date.fromisoformat(got_pays[-1]["date"]) < due[-1], "CP1 payoff is early")
+
 # ---- ledger
-coa = {a["account"]: a for a in load("ledger/chart_of_accounts.json")["accounts"]}
+coa ={a["account"]: a for a in load("ledger/chart_of_accounts.json")["accounts"]}
 def entry_err(en):
     L = en["lines"]
     if len(L) < 2: return "too_few_lines"

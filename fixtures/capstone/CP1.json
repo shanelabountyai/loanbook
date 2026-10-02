@@ -1,0 +1,1059 @@
+{
+  "id": "CP1",
+  "description": "Capstone: L1 (AM1 terms) from disbursement to early payoff, run day by day (accrual, then the late-fee job, then any payment). Six payments: on time (02-15); short, 10000 of 17255 (03-15); the shortfall inside grace (03-20, DPD 5, no fee); installment 3 missed, fee at grace exit 04-26, paid late 05-01; installment 4 missed, fee 05-26, caught up with installment 5 in one payment 06-20; payoff on 07-01 at the quote, before installment 6 falls due. Every receivable ends at zero.",
+  "input": {
+    "loan": "AM1",
+    "principal_cents": 100000,
+    "apr_bps": 1200,
+    "term_months": 6,
+    "disbursement_date": "2026-01-15",
+    "waterfall_order": [
+      "fees",
+      "interest",
+      "principal"
+    ],
+    "late_fee_cents": 1500,
+    "run_through": "2026-07-01",
+    "payments": [
+      {
+        "date": "2026-02-15",
+        "cents": 17255
+      },
+      {
+        "date": "2026-03-15",
+        "cents": 10000
+      },
+      {
+        "date": "2026-03-20",
+        "cents": 7255
+      },
+      {
+        "date": "2026-05-01",
+        "cents": 17255
+      },
+      {
+        "date": "2026-06-20",
+        "cents": 34510
+      },
+      {
+        "date": "2026-07-01",
+        "payoff": true
+      }
+    ]
+  },
+  "expected": {
+    "payments": [
+      {
+        "date": "2026-02-15",
+        "cents": 17255,
+        "payoff": false,
+        "owed_before": {
+          "fees": 0,
+          "interest": 1019,
+          "principal": 100000
+        },
+        "allocation": {
+          "fees": 0,
+          "interest": 1019,
+          "principal": 16236
+        },
+        "remaining": {
+          "fees": 0,
+          "interest": 0,
+          "principal": 83764
+        },
+        "loan_closed": false
+      },
+      {
+        "date": "2026-03-15",
+        "cents": 10000,
+        "payoff": false,
+        "owed_before": {
+          "fees": 0,
+          "interest": 771,
+          "principal": 83764
+        },
+        "allocation": {
+          "fees": 0,
+          "interest": 771,
+          "principal": 9229
+        },
+        "remaining": {
+          "fees": 0,
+          "interest": 0,
+          "principal": 74535
+        },
+        "loan_closed": false
+      },
+      {
+        "date": "2026-03-20",
+        "cents": 7255,
+        "payoff": false,
+        "owed_before": {
+          "fees": 0,
+          "interest": 123,
+          "principal": 74535
+        },
+        "allocation": {
+          "fees": 0,
+          "interest": 123,
+          "principal": 7132
+        },
+        "remaining": {
+          "fees": 0,
+          "interest": 0,
+          "principal": 67403
+        },
+        "loan_closed": false
+      },
+      {
+        "date": "2026-05-01",
+        "cents": 17255,
+        "payoff": false,
+        "owed_before": {
+          "fees": 1500,
+          "interest": 931,
+          "principal": 67403
+        },
+        "allocation": {
+          "fees": 1500,
+          "interest": 931,
+          "principal": 14824
+        },
+        "remaining": {
+          "fees": 0,
+          "interest": 0,
+          "principal": 52579
+        },
+        "loan_closed": false
+      },
+      {
+        "date": "2026-06-20",
+        "cents": 34510,
+        "payoff": false,
+        "owed_before": {
+          "fees": 1500,
+          "interest": 864,
+          "principal": 52579
+        },
+        "allocation": {
+          "fees": 1500,
+          "interest": 864,
+          "principal": 32146
+        },
+        "remaining": {
+          "fees": 0,
+          "interest": 0,
+          "principal": 20433
+        },
+        "loan_closed": false
+      },
+      {
+        "date": "2026-07-01",
+        "cents": 20507,
+        "payoff": true,
+        "owed_before": {
+          "fees": 0,
+          "interest": 74,
+          "principal": 20433
+        },
+        "allocation": {
+          "fees": 0,
+          "interest": 74,
+          "principal": 20433
+        },
+        "remaining": {
+          "fees": 0,
+          "interest": 0,
+          "principal": 0
+        },
+        "loan_closed": true
+      }
+    ],
+    "fees": [
+      {
+        "installment": 3,
+        "date": "2026-04-26",
+        "cents": 1500
+      },
+      {
+        "installment": 4,
+        "date": "2026-05-26",
+        "cents": 1500
+      }
+    ],
+    "days": [
+      {
+        "date": "2026-01-15",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-01-16",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-01-17",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-01-18",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-01-19",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-01-20",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-01-21",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-01-22",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-01-23",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-01-24",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-01-25",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-01-26",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-01-27",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-01-28",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-01-29",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-01-30",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-01-31",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-01",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-02",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-03",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-04",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-05",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-06",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-07",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-08",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-09",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-10",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-11",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-12",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-13",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-14",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-15",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-16",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-17",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-18",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-19",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-20",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-21",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-22",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-23",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-24",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-25",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-26",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-27",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-28",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-01",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-02",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-03",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-04",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-05",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-06",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-07",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-08",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-09",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-10",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-11",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-12",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-13",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-14",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-15",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-16",
+        "dpd": 1,
+        "state": "grace"
+      },
+      {
+        "date": "2026-03-17",
+        "dpd": 2,
+        "state": "grace"
+      },
+      {
+        "date": "2026-03-18",
+        "dpd": 3,
+        "state": "grace"
+      },
+      {
+        "date": "2026-03-19",
+        "dpd": 4,
+        "state": "grace"
+      },
+      {
+        "date": "2026-03-20",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-21",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-22",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-23",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-24",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-25",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-26",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-27",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-28",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-29",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-30",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-31",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-04-01",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-04-02",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-04-03",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-04-04",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-04-05",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-04-06",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-04-07",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-04-08",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-04-09",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-04-10",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-04-11",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-04-12",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-04-13",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-04-14",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-04-15",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-04-16",
+        "dpd": 1,
+        "state": "grace"
+      },
+      {
+        "date": "2026-04-17",
+        "dpd": 2,
+        "state": "grace"
+      },
+      {
+        "date": "2026-04-18",
+        "dpd": 3,
+        "state": "grace"
+      },
+      {
+        "date": "2026-04-19",
+        "dpd": 4,
+        "state": "grace"
+      },
+      {
+        "date": "2026-04-20",
+        "dpd": 5,
+        "state": "grace"
+      },
+      {
+        "date": "2026-04-21",
+        "dpd": 6,
+        "state": "grace"
+      },
+      {
+        "date": "2026-04-22",
+        "dpd": 7,
+        "state": "grace"
+      },
+      {
+        "date": "2026-04-23",
+        "dpd": 8,
+        "state": "grace"
+      },
+      {
+        "date": "2026-04-24",
+        "dpd": 9,
+        "state": "grace"
+      },
+      {
+        "date": "2026-04-25",
+        "dpd": 10,
+        "state": "grace"
+      },
+      {
+        "date": "2026-04-26",
+        "dpd": 11,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-27",
+        "dpd": 12,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-28",
+        "dpd": 13,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-29",
+        "dpd": 14,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-30",
+        "dpd": 15,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-05-01",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-05-02",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-05-03",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-05-04",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-05-05",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-05-06",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-05-07",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-05-08",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-05-09",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-05-10",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-05-11",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-05-12",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-05-13",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-05-14",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-05-15",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-05-16",
+        "dpd": 1,
+        "state": "grace"
+      },
+      {
+        "date": "2026-05-17",
+        "dpd": 2,
+        "state": "grace"
+      },
+      {
+        "date": "2026-05-18",
+        "dpd": 3,
+        "state": "grace"
+      },
+      {
+        "date": "2026-05-19",
+        "dpd": 4,
+        "state": "grace"
+      },
+      {
+        "date": "2026-05-20",
+        "dpd": 5,
+        "state": "grace"
+      },
+      {
+        "date": "2026-05-21",
+        "dpd": 6,
+        "state": "grace"
+      },
+      {
+        "date": "2026-05-22",
+        "dpd": 7,
+        "state": "grace"
+      },
+      {
+        "date": "2026-05-23",
+        "dpd": 8,
+        "state": "grace"
+      },
+      {
+        "date": "2026-05-24",
+        "dpd": 9,
+        "state": "grace"
+      },
+      {
+        "date": "2026-05-25",
+        "dpd": 10,
+        "state": "grace"
+      },
+      {
+        "date": "2026-05-26",
+        "dpd": 11,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-05-27",
+        "dpd": 12,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-05-28",
+        "dpd": 13,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-05-29",
+        "dpd": 14,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-05-30",
+        "dpd": 15,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-05-31",
+        "dpd": 16,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-06-01",
+        "dpd": 17,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-06-02",
+        "dpd": 18,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-06-03",
+        "dpd": 19,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-06-04",
+        "dpd": 20,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-06-05",
+        "dpd": 21,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-06-06",
+        "dpd": 22,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-06-07",
+        "dpd": 23,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-06-08",
+        "dpd": 24,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-06-09",
+        "dpd": 25,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-06-10",
+        "dpd": 26,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-06-11",
+        "dpd": 27,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-06-12",
+        "dpd": 28,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-06-13",
+        "dpd": 29,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-06-14",
+        "dpd": 30,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-06-15",
+        "dpd": 31,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-06-16",
+        "dpd": 32,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-06-17",
+        "dpd": 33,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-06-18",
+        "dpd": 34,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-06-19",
+        "dpd": 35,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-06-20",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-06-21",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-06-22",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-06-23",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-06-24",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-06-25",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-06-26",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-06-27",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-06-28",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-06-29",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-06-30",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-07-01",
+        "dpd": 0,
+        "state": "current"
+      }
+    ],
+    "totals": {
+      "cash_received_cents": 106782,
+      "interest_income_cents": 3782,
+      "fees_income_cents": 3000,
+      "accrual_entries": 167
+    },
+    "owed_at_end": {
+      "fees": 0,
+      "interest": 0,
+      "principal": 0
+    },
+    "statement": [
+      "2026-01-15 Disbursed $1000.00",
+      "2026-01-16 to 2026-02-15 Interest accrued $10.19",
+      "2026-02-15 Payment $172.55: fees $0.00, interest $10.19, principal $162.36",
+      "2026-02-16 to 2026-03-15 Interest accrued $7.71",
+      "2026-03-15 Payment $100.00: fees $0.00, interest $7.71, principal $92.29",
+      "2026-03-16 to 2026-03-20 Interest accrued $1.23",
+      "2026-03-20 Payment $72.55: fees $0.00, interest $1.23, principal $71.32",
+      "2026-03-21 to 2026-04-26 Interest accrued $8.20",
+      "2026-04-26 Late fee $15.00",
+      "2026-04-27 to 2026-05-01 Interest accrued $1.11",
+      "2026-05-01 Payment $172.55: fees $15.00, interest $9.31, principal $148.24",
+      "2026-05-02 to 2026-05-26 Interest accrued $4.32",
+      "2026-05-26 Late fee $15.00",
+      "2026-05-27 to 2026-06-20 Interest accrued $4.32",
+      "2026-06-20 Payment $345.10: fees $15.00, interest $8.64, principal $321.46",
+      "2026-06-21 to 2026-07-01 Interest accrued $0.74",
+      "2026-07-01 Payment $205.07: fees $0.00, interest $0.74, principal $204.33",
+      "2026-07-01 Owed $0.00: fees $0.00, interest $0.00, principal $0.00"
+    ]
+  }
+}

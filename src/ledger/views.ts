@@ -8,7 +8,7 @@ import { trialBalance } from './balances';
 import { DELINQUENCY_BANDS, type LoanState } from './config';
 import { loanStatus, type LoanStatus } from './delinquency';
 import { EntryError } from './entry';
-import { centsFromNumeric } from './money';
+import { centsFromNumeric, formatCents } from './money';
 import { owedCents } from './owed';
 import { buildSchedule, type ScheduleRow, type ScheduleTerms } from './schedule';
 import type { Buckets } from './waterfall';
@@ -82,7 +82,45 @@ export async function loanStatement(db: Db, loanId: string): Promise<Statement> 
   return { loanId, payments: paymentsFrom(await loanLedger(db, loanId)), owed: await owedCents(db, loanId) };
 }
 
-export type BookLoan = { loanId: string; state: LoanState; dpd: number; outstandingCents: number };
+/**
+ * The loan's life as text, from its ledger lines alone (task 4.5, D22): entries through `asOf` in posting order,
+ * runs of accrual entries folded into one line, then what is owed on `asOf` as the receivables' sums.
+ */
+export function statementText(lines: readonly LedgerRow[], asOf: string): string[] {
+  const entries = new Map<string, LedgerRow[]>();
+  for (const l of lines) if (l.date <= asOf) entries.set(l.entryId, [...(entries.get(l.entryId) ?? []), l]);
+  const owed: Buckets = { fees: 0, interest: 0, principal: 0 };
+  const out: string[] = [];
+  let run = null as { from: string; to: string; cents: number } | null;
+  const flush = () => {
+    if (run) out.push(`${run.from} to ${run.to} Interest accrued ${formatCents(run.cents)}`);
+    run = null;
+  };
+  for (const e of entries.values()) {
+    for (const l of e) {
+      const bucket = BUCKET_OF[l.account];
+      if (bucket) owed[bucket] += l.debitCents - l.creditCents;
+    }
+    const dr = (a: AccountName) => e.find((l) => l.account === a && l.debitCents > 0)?.debitCents;
+    const date = e[0]!.date;
+    const accrued = dr('interest_receivable');
+    if (accrued !== undefined) {
+      run = run ? { ...run, to: date, cents: run.cents + accrued } : { from: date, to: date, cents: accrued };
+      continue;
+    }
+    flush();
+    const paid = paymentsFrom(e)[0];
+    if (paid) out.push(`${date} Payment ${formatCents(paid.cents)}: fees ${formatCents(paid.split.fees)}, interest ${formatCents(paid.split.interest)}, principal ${formatCents(paid.split.principal)}`);
+    else if (dr('loans_receivable') !== undefined) out.push(`${date} Disbursed ${formatCents(dr('loans_receivable')!)}`);
+    else if (dr('fees_receivable') !== undefined) out.push(`${date} Late fee ${formatCents(dr('fees_receivable')!)}`);
+    else out.push(`${date} ${e[0]!.memo ?? 'Entry'}`);
+  }
+  flush();
+  out.push(`${asOf} Owed ${formatCents(owed.fees + owed.interest + owed.principal)}: fees ${formatCents(owed.fees)}, interest ${formatCents(owed.interest)}, principal ${formatCents(owed.principal)}`);
+  return out;
+}
+
+export type BookLoan ={ loanId: string; state: LoanState; dpd: number; outstandingCents: number };
 export type Book = { asOf: string; loans: BookLoan[]; outstanding: Buckets; buckets: { state: LoanState; count: number; outstandingCents: number }[] };
 
 /**

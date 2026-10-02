@@ -10,6 +10,7 @@ Frozen expected values. Tests **read** these; product code must never generate t
 | `waterfall/` | WF1–WF10 (default order), WFB3/5/10 (second order) | P0-4 |
 | `payoff/` | PO1–PO4 (accrual-day quote, quote after a principal reduction, quote with a fee, disbursement-day quote) | P0-6 |
 | `delinquency/` | DQ1–DQ5 (on-time, never paid through every band boundary, short payment, catch-up, two missed installments); per-day DPD and state plus late-fee events | P0-5 |
+| `capstone/` | CP1: L1 from disbursement to early payoff, six payments (on time, short, topped up in grace, late with fee, catch-up of two, payoff at the quote); every payment's split, the fees, per-day DPD and state, totals, and the statement text | P0-7 |
 
 Conventions: amounts are integer cents; rates are basis points; dates are ISO `YYYY-MM-DD`. Journal lines in waterfall fixtures should be compared as an unordered set (plus the cash line).
 
