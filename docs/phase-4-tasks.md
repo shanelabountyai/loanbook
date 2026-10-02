@@ -11,3 +11,7 @@ Goal: state is computed, never set (PRD P0-5); the book and a single loan can be
 - [ ] **4.7 P1 (only what time allows, each its own item).** Fee waiver (reversing entry with reason), write-off flow (default → `write_offs`), CSV statement export, aging report.
 
 **Exit criteria:** DQ1–DQ5 pass on every simulated day to the cent and the day; late fee posted once per missed installment under re-run and race; catch-up recomputes to `current`; no stored state, DPD or balance; views role-split; capstone and 40-loan book `ledger:verify` clean; CI green, both gates passing.
+
+**Phase 4 exit check PASSED (2026-10-02)** on CI run 37048725095, green on 07f14aa (later commits are NEXT.md only): vitest 55 files 480/480, Playwright 15/15, both gates passing.
+Criteria map: DQ1–DQ5 every day via `tests/unit/delinquency.test.ts` + `tests/integration/status.test.ts` (4.2); fee once under re-run, catch-up run and race via `late-fee.test.ts` (4.3); catch-up to `current` is DQ4; no state, DPD or balance column in `prisma/schema` (grep empty); role split via `e2e/loans.spec.ts` boundary specs (4.4); capstone and BK1 assert `verifyLedger` findings empty (4.5, 4.6).
+Scope call (2026-10-02): close Phase 4 now; P1 continues after it as separate items, fee waiver first. Write-off, CSV and aging are optional after that.
