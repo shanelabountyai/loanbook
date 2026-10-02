@@ -9,7 +9,7 @@ export const PAYMENT_ORDER: readonly Bucket[] = ['fees', 'interest', 'principal'
 /** Flat late fee in cents, assessed by `runStatus` (D19). */
 export const LATE_FEE_CENTS = 1500;
 
-export type LoanState = 'current' | 'grace' | 'delinquent_30' | 'delinquent_60' | 'delinquent_90' | 'default_recommended';
+export type LoanState = 'current' | 'grace' | 'delinquent_30' | 'delinquent_60' | 'delinquent_90' | 'default_recommended' | 'written_off';
 
 /** Delinquency bands (D18): each state starts at its `minDpd`, ascending. */
 export const DELINQUENCY_BANDS: readonly { minDpd: number; state: LoanState }[] = [

@@ -86,6 +86,6 @@ it('BK1: book totals and end states reconcile, and ledger:verify is clean', asyn
   expect(tb.balancesCents.cash).toBe(t.cash_received_cents - lent);
   expect([...seen.values()].reduce((s, l) => s + l.accrual_entries, 0)).toBe(t.accrual_entries);
   const book = await bookOverview(client, { loanIds: [...ids.values()], asOf: end });
-  expect(Object.fromEntries(book.buckets.map((b) => [b.state, b.count]))).toEqual(t.states_at_end);
+  expect(Object.fromEntries(book.buckets.map((b) => [b.state, b.count]))).toEqual({ ...t.states_at_end, written_off: 0 }); // BK1 writes nothing off (D25)
   expect((await verifyLedger(client)).findings).toEqual([]);
 });

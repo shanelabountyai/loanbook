@@ -6,7 +6,8 @@
 /// loan id wherever an account requires one (D8). A reversal names the entry it reverses; each entry
 /// is reversed at most once, and only an entry that exists (task 1.8). `kind` = 'accrual' marks a daily
 /// accrual; a partial unique index in migration 20260930200000_ledger_accrual_kind allows one per
-/// (loanId, date) (D15). Prisma does not model the index or its CHECK.
+/// (loanId, date) (D15); 'late_fee' one per (loanId, installment) (D20); 'write_off' one per loanId (D25).
+/// Prisma does not model the indexes or their CHECK.
 model LedgerEntry {
   id              String       @id @default(uuid()) @db.Uuid
   date            DateTime     @db.Date

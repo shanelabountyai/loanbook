@@ -6,7 +6,7 @@ arithmetic (fractions.Fraction) so the product implementation can be tested agai
 numbers it did not produce. Do not import it from the product; do not port it line by
 line -- write the product test-first against the frozen fixtures instead.
 
-Rules encoded here are defined in docs/decisions.md (D1-D9, D17-D20, D22, D23). Stdlib only, Python >= 3.9.
+Rules encoded here are defined in docs/decisions.md (D1-D9, D17-D20, D22-D25). Stdlib only, Python >= 3.9.
 """
 import calendar, csv, datetime as dt, json, os
 from fractions import Fraction
@@ -491,6 +491,85 @@ dump("waiver/WV1.json", dict(
         fees_paid_cents=sum(r.get("fees_paid", 0) for r in wv_out), fees_owed_at_end=wv_out[-1]["fees_owed_after"],
         fees_income_cents=sum(f["cents"] for f in wv_fees) - wv_waived))))
 
+# ---------------------------------------------------------------- write-off (D25)
+def write_offs(events, last):
+    """L1 day by day in job order: accrual for D, the fee job, then what is posted on D in order. A write-off zeroes
+    every receivable: principal to write_offs, unpaid interest and fees back out of their income. Principal is then
+    zero, so nothing accrues and no fee is charged (D23)."""
+    P0, apr = 100000, 1200
+    owed, P, start, posted, cash, fees, out, wo, last_entry, n_acc = st(0, 0, P0), P0, L1D, 0, [], [], [], None, L1D, 0
+    D = L1D
+    while D < last:
+        D += dt.timedelta(days=1)
+        c = cum_interest(P, apr, (D - start).days)
+        if c > posted:
+            owed["interest"] += c - posted; posted = c; n_acc += 1; last_entry = D
+        cum = 0
+        for r in AM1_ROWS:
+            cum += r["payment_cents"]
+            if P > 0 and dt.date.fromisoformat(r["due_date"]) + dt.timedelta(days=GRACE_EXIT) == D and sum(x for _, x in cash) < cum:
+                fees.append(dict(installment=r["n"], date=D.isoformat(), cents=LATE_FEE)); owed["fees"] += LATE_FEE; last_entry = D
+        for e in (e for e in events if e["posted_on"] == D.isoformat()):
+            if "payment" in e:
+                a = allocate(owed, e["payment"], CFG_A)
+                if "error" in a: out.append(dict(error=a["error"])); continue
+                out.append(dict(allocation=a["allocation"]))
+                owed, cash, last_entry = dict(a["remaining"]), cash + [(D, e["payment"])], D
+                if a["allocation"]["principal"] > 0:
+                    P, start, posted = P - a["allocation"]["principal"], D, 0
+                continue
+            date = dt.date.fromisoformat(e["date"])
+            err = ("reason_required" if not e["reason"].strip() else "already_written_off" if wo
+                   else "backdated" if date < last_entry else "accrual_pending" if date > D
+                   else "not_in_default" if band(dq_day(AM1_ROWS, cash, date)) != "default_recommended" else None)
+            if err:
+                out.append(dict(error=err)); continue
+            pairs = [("write_offs", "loans_receivable", owed["principal"]), ("interest_income", "interest_receivable", owed["interest"]),
+                     ("fees_income", "fees_receivable", owed["fees"])]
+            out.append(dict(written_off=dict(owed), memo=f"Written off {money(sum(owed.values()))}: {e['reason'].strip()}",
+                            lines=[l for dr, cr, c in pairs if c for l in (line(dr, c), line(cr, 0, c))]))
+            owed, P, start, posted, wo, last_entry = st(0, 0, 0), 0, D, 0, date, D
+    days = []
+    for k in range((last - L1D).days + 1):
+        Dk = L1D + dt.timedelta(days=k)
+        if wo and Dk >= wo: days.append(dict(date=Dk.isoformat(), dpd=dq_day(AM1_ROWS, cash, wo), state="written_off"))
+        else: days.append(dict(date=Dk.isoformat(), dpd=dq_day(AM1_ROWS, cash, Dk), state=band(dq_day(AM1_ROWS, cash, Dk))))
+    return fees, out, days, n_acc
+
+
+def line(a, d=0, c=0): return dict(account=a, debit=d, credit=c)
+
+
+WO_LAST = dt.date(2026, 7, 31)
+WO_EVENTS = [
+    dict(posted_on="2026-02-15", payment=X),
+    dict(posted_on="2026-03-15", payment=5000),
+    dict(posted_on="2026-07-10", write_off=True, date="2026-07-10", reason="   "),
+    dict(posted_on="2026-07-12", write_off=True, date="2026-07-10", reason="stale date"),
+    dict(posted_on="2026-07-12", write_off=True, date="2026-07-12", reason="one day early"),
+    dict(posted_on="2026-07-13", write_off=True, date="2026-07-14", reason="tomorrow"),
+    dict(posted_on="2026-07-13", write_off=True, date="2026-07-13", reason="borrower unreachable"),
+    dict(posted_on="2026-07-14", write_off=True, date="2026-07-14", reason="again"),
+    dict(posted_on="2026-07-20", payment=1000),
+]
+wo_fees, wo_out, wo_days, wo_acc = write_offs(WO_EVENTS, WO_LAST)
+wo_done = next(r for r in wo_out if "written_off" in r)["written_off"]
+dump("writeoff/WO1.json", dict(
+    id="WO1", description="Write-off on L1 (AM1 terms), run day by day (accrual, the late-fee job, then what is posted that day in order). "
+                          "Installment 1 paid, 5000 of installment 2 on its due date, then nothing: fees for installments 2-5, DPD 120 "
+                          "(default_recommended) on 07-13. Refused: blank reason; dated 07-10 after accrual is posted through 07-12; DPD 119 "
+                          "on 07-12; dated 07-14 before that day's accrual; a second write-off. Written off on 07-13: principal to write_offs, "
+                          "unpaid interest and fees reversed out of income. Afterwards nothing accrues, installment 6 takes no fee, the loan reads "
+                          "written_off (DPD frozen at 120), and a payment is refused exceeds_payoff (no recovery path).",
+    input=dict(loan="AM1", principal_cents=100000, apr_bps=1200, term_months=6, disbursement_date=L1D.isoformat(),
+               waterfall_order=CFG_A, late_fee_cents=LATE_FEE, run_through=WO_LAST.isoformat(), events=WO_EVENTS),
+    expected=dict(fees=wo_fees, results=wo_out, days=wo_days, totals=dict(
+        cash_received_cents=sum(e["payment"] for e, r in zip(WO_EVENTS, wo_out) if "payment" in e and "error" not in r),
+        accrual_entries=wo_acc, write_offs_cents=wo_done["principal"],
+        interest_income_cents=sum(r["allocation"]["interest"] for r in wo_out if "allocation" in r),
+        fees_income_cents=sum(r["allocation"]["fees"] for r in wo_out if "allocation" in r),
+        receivables_at_end=st(0, 0, 0)))))
+
 # ---------------------------------------------------------------- ledger
 COA = [
     dict(account="cash", type="asset", normal="debit"),
@@ -503,9 +582,6 @@ COA = [
     dict(account="write_offs", type="expense", normal="debit", requires_loan_id=True),
 ]
 dump("ledger/chart_of_accounts.json", dict(accounts=COA))
-
-
-def line(a, d=0, c=0): return dict(account=a, debit=d, credit=c)
 
 
 entries = [

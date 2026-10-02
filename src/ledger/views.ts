@@ -124,7 +124,7 @@ export type BookLoan ={ loanId: string; state: LoanState; dpd: number; outstandi
 export type Book = { asOf: string; loans: BookLoan[]; outstanding: Buckets; buckets: { state: LoanState; count: number; outstandingCents: number }[] };
 
 /**
- * Portfolio for the given loans: outstanding from one trial balance, and the loans counted into the D18 bands.
+ * Portfolio for the given loans: outstanding from one trial balance, and the loans counted into the D18 bands, then written_off (D25).
  * ponytail: one loanStatus per loan (N snapshots); one query over the book if it grows past a few hundred loans.
  */
 export async function bookOverview(db: Db, { loanIds, asOf }: { loanIds: readonly string[]; asOf: string }): Promise<Book> {
@@ -140,7 +140,8 @@ export async function bookOverview(db: Db, { loanIds, asOf }: { loanIds: readonl
     const s = await loanStatus(db, { loanId, asOf });
     loans.push({ loanId, state: s.state, dpd: s.dpd, outstandingCents: owed.fees + owed.interest + owed.principal });
   }
-  const buckets = DELINQUENCY_BANDS.map(({ state }) => {
+  const states: LoanState[] = [...DELINQUENCY_BANDS.map((b) => b.state), 'written_off'];
+  const buckets = states.map((state) => {
     const inBand = loans.filter((l) => l.state === state);
     return { state, count: inBand.length, outstandingCents: inBand.reduce((sum, l) => sum + l.outstandingCents, 0) };
   });

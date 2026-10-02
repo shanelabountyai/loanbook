@@ -10,8 +10,8 @@ import { assertValidEntry, EntryError, type EntryInput } from './entry';
 import { readEntry, type StoredEntry } from './read';
 
 type Db = Pick<ClientBase, 'query'>;
-/** `kind: 'accrual'` puts the entry under the database's one-per-(loan, day) rule (D15); `kind: 'late_fee'` with its `installment`, one-per-(loan, installment) (D20). */
-export type PostInput = EntryInput & { date: string; memo?: string | null; kind?: 'accrual' | 'late_fee' | null; installment?: number | null };
+/** `kind: 'accrual'` puts the entry under the database's one-per-(loan, day) rule (D15); `kind: 'late_fee'` with its `installment`, one-per-(loan, installment) (D20); `kind: 'write_off'`, one per loan (D25). */
+export type PostInput = EntryInput & { date: string; memo?: string | null; kind?: 'accrual' | 'late_fee' | 'write_off' | null; installment?: number | null };
 
 /**
  * Posts one entry and returns its id. Owns its transaction, so the caller's connection must not be

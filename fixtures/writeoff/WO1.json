@@ -1,0 +1,1170 @@
+{
+  "id": "WO1",
+  "description": "Write-off on L1 (AM1 terms), run day by day (accrual, the late-fee job, then what is posted that day in order). Installment 1 paid, 5000 of installment 2 on its due date, then nothing: fees for installments 2-5, DPD 120 (default_recommended) on 07-13. Refused: blank reason; dated 07-10 after accrual is posted through 07-12; DPD 119 on 07-12; dated 07-14 before that day's accrual; a second write-off. Written off on 07-13: principal to write_offs, unpaid interest and fees reversed out of income. Afterwards nothing accrues, installment 6 takes no fee, the loan reads written_off (DPD frozen at 120), and a payment is refused exceeds_payoff (no recovery path).",
+  "input": {
+    "loan": "AM1",
+    "principal_cents": 100000,
+    "apr_bps": 1200,
+    "term_months": 6,
+    "disbursement_date": "2026-01-15",
+    "waterfall_order": [
+      "fees",
+      "interest",
+      "principal"
+    ],
+    "late_fee_cents": 1500,
+    "run_through": "2026-07-31",
+    "events": [
+      {
+        "posted_on": "2026-02-15",
+        "payment": 17255
+      },
+      {
+        "posted_on": "2026-03-15",
+        "payment": 5000
+      },
+      {
+        "posted_on": "2026-07-10",
+        "write_off": true,
+        "date": "2026-07-10",
+        "reason": "   "
+      },
+      {
+        "posted_on": "2026-07-12",
+        "write_off": true,
+        "date": "2026-07-10",
+        "reason": "stale date"
+      },
+      {
+        "posted_on": "2026-07-12",
+        "write_off": true,
+        "date": "2026-07-12",
+        "reason": "one day early"
+      },
+      {
+        "posted_on": "2026-07-13",
+        "write_off": true,
+        "date": "2026-07-14",
+        "reason": "tomorrow"
+      },
+      {
+        "posted_on": "2026-07-13",
+        "write_off": true,
+        "date": "2026-07-13",
+        "reason": "borrower unreachable"
+      },
+      {
+        "posted_on": "2026-07-14",
+        "write_off": true,
+        "date": "2026-07-14",
+        "reason": "again"
+      },
+      {
+        "posted_on": "2026-07-20",
+        "payment": 1000
+      }
+    ]
+  },
+  "expected": {
+    "fees": [
+      {
+        "installment": 2,
+        "date": "2026-03-26",
+        "cents": 1500
+      },
+      {
+        "installment": 3,
+        "date": "2026-04-26",
+        "cents": 1500
+      },
+      {
+        "installment": 4,
+        "date": "2026-05-26",
+        "cents": 1500
+      },
+      {
+        "installment": 5,
+        "date": "2026-06-26",
+        "cents": 1500
+      }
+    ],
+    "results": [
+      {
+        "allocation": {
+          "fees": 0,
+          "interest": 1019,
+          "principal": 16236
+        }
+      },
+      {
+        "allocation": {
+          "fees": 0,
+          "interest": 771,
+          "principal": 4229
+        }
+      },
+      {
+        "error": "reason_required"
+      },
+      {
+        "error": "backdated"
+      },
+      {
+        "error": "not_in_default"
+      },
+      {
+        "error": "accrual_pending"
+      },
+      {
+        "written_off": {
+          "fees": 6000,
+          "interest": 3138,
+          "principal": 79535
+        },
+        "memo": "Written off $886.73: borrower unreachable",
+        "lines": [
+          {
+            "account": "write_offs",
+            "debit": 79535,
+            "credit": 0
+          },
+          {
+            "account": "loans_receivable",
+            "debit": 0,
+            "credit": 79535
+          },
+          {
+            "account": "interest_income",
+            "debit": 3138,
+            "credit": 0
+          },
+          {
+            "account": "interest_receivable",
+            "debit": 0,
+            "credit": 3138
+          },
+          {
+            "account": "fees_income",
+            "debit": 6000,
+            "credit": 0
+          },
+          {
+            "account": "fees_receivable",
+            "debit": 0,
+            "credit": 6000
+          }
+        ]
+      },
+      {
+        "error": "already_written_off"
+      },
+      {
+        "error": "exceeds_payoff"
+      }
+    ],
+    "days": [
+      {
+        "date": "2026-01-15",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-01-16",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-01-17",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-01-18",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-01-19",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-01-20",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-01-21",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-01-22",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-01-23",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-01-24",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-01-25",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-01-26",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-01-27",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-01-28",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-01-29",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-01-30",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-01-31",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-01",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-02",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-03",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-04",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-05",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-06",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-07",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-08",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-09",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-10",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-11",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-12",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-13",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-14",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-15",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-16",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-17",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-18",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-19",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-20",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-21",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-22",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-23",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-24",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-25",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-26",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-27",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-02-28",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-01",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-02",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-03",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-04",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-05",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-06",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-07",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-08",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-09",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-10",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-11",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-12",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-13",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-14",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-15",
+        "dpd": 0,
+        "state": "current"
+      },
+      {
+        "date": "2026-03-16",
+        "dpd": 1,
+        "state": "grace"
+      },
+      {
+        "date": "2026-03-17",
+        "dpd": 2,
+        "state": "grace"
+      },
+      {
+        "date": "2026-03-18",
+        "dpd": 3,
+        "state": "grace"
+      },
+      {
+        "date": "2026-03-19",
+        "dpd": 4,
+        "state": "grace"
+      },
+      {
+        "date": "2026-03-20",
+        "dpd": 5,
+        "state": "grace"
+      },
+      {
+        "date": "2026-03-21",
+        "dpd": 6,
+        "state": "grace"
+      },
+      {
+        "date": "2026-03-22",
+        "dpd": 7,
+        "state": "grace"
+      },
+      {
+        "date": "2026-03-23",
+        "dpd": 8,
+        "state": "grace"
+      },
+      {
+        "date": "2026-03-24",
+        "dpd": 9,
+        "state": "grace"
+      },
+      {
+        "date": "2026-03-25",
+        "dpd": 10,
+        "state": "grace"
+      },
+      {
+        "date": "2026-03-26",
+        "dpd": 11,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-27",
+        "dpd": 12,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-28",
+        "dpd": 13,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-29",
+        "dpd": 14,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-30",
+        "dpd": 15,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-03-31",
+        "dpd": 16,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-01",
+        "dpd": 17,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-02",
+        "dpd": 18,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-03",
+        "dpd": 19,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-04",
+        "dpd": 20,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-05",
+        "dpd": 21,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-06",
+        "dpd": 22,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-07",
+        "dpd": 23,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-08",
+        "dpd": 24,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-09",
+        "dpd": 25,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-10",
+        "dpd": 26,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-11",
+        "dpd": 27,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-12",
+        "dpd": 28,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-13",
+        "dpd": 29,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-14",
+        "dpd": 30,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-15",
+        "dpd": 31,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-16",
+        "dpd": 32,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-17",
+        "dpd": 33,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-18",
+        "dpd": 34,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-19",
+        "dpd": 35,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-20",
+        "dpd": 36,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-21",
+        "dpd": 37,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-22",
+        "dpd": 38,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-23",
+        "dpd": 39,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-24",
+        "dpd": 40,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-25",
+        "dpd": 41,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-26",
+        "dpd": 42,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-27",
+        "dpd": 43,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-28",
+        "dpd": 44,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-29",
+        "dpd": 45,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-04-30",
+        "dpd": 46,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-05-01",
+        "dpd": 47,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-05-02",
+        "dpd": 48,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-05-03",
+        "dpd": 49,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-05-04",
+        "dpd": 50,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-05-05",
+        "dpd": 51,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-05-06",
+        "dpd": 52,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-05-07",
+        "dpd": 53,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-05-08",
+        "dpd": 54,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-05-09",
+        "dpd": 55,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-05-10",
+        "dpd": 56,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-05-11",
+        "dpd": 57,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-05-12",
+        "dpd": 58,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-05-13",
+        "dpd": 59,
+        "state": "delinquent_30"
+      },
+      {
+        "date": "2026-05-14",
+        "dpd": 60,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-05-15",
+        "dpd": 61,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-05-16",
+        "dpd": 62,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-05-17",
+        "dpd": 63,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-05-18",
+        "dpd": 64,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-05-19",
+        "dpd": 65,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-05-20",
+        "dpd": 66,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-05-21",
+        "dpd": 67,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-05-22",
+        "dpd": 68,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-05-23",
+        "dpd": 69,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-05-24",
+        "dpd": 70,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-05-25",
+        "dpd": 71,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-05-26",
+        "dpd": 72,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-05-27",
+        "dpd": 73,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-05-28",
+        "dpd": 74,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-05-29",
+        "dpd": 75,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-05-30",
+        "dpd": 76,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-05-31",
+        "dpd": 77,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-06-01",
+        "dpd": 78,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-06-02",
+        "dpd": 79,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-06-03",
+        "dpd": 80,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-06-04",
+        "dpd": 81,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-06-05",
+        "dpd": 82,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-06-06",
+        "dpd": 83,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-06-07",
+        "dpd": 84,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-06-08",
+        "dpd": 85,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-06-09",
+        "dpd": 86,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-06-10",
+        "dpd": 87,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-06-11",
+        "dpd": 88,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-06-12",
+        "dpd": 89,
+        "state": "delinquent_60"
+      },
+      {
+        "date": "2026-06-13",
+        "dpd": 90,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-06-14",
+        "dpd": 91,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-06-15",
+        "dpd": 92,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-06-16",
+        "dpd": 93,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-06-17",
+        "dpd": 94,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-06-18",
+        "dpd": 95,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-06-19",
+        "dpd": 96,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-06-20",
+        "dpd": 97,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-06-21",
+        "dpd": 98,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-06-22",
+        "dpd": 99,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-06-23",
+        "dpd": 100,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-06-24",
+        "dpd": 101,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-06-25",
+        "dpd": 102,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-06-26",
+        "dpd": 103,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-06-27",
+        "dpd": 104,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-06-28",
+        "dpd": 105,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-06-29",
+        "dpd": 106,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-06-30",
+        "dpd": 107,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-07-01",
+        "dpd": 108,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-07-02",
+        "dpd": 109,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-07-03",
+        "dpd": 110,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-07-04",
+        "dpd": 111,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-07-05",
+        "dpd": 112,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-07-06",
+        "dpd": 113,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-07-07",
+        "dpd": 114,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-07-08",
+        "dpd": 115,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-07-09",
+        "dpd": 116,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-07-10",
+        "dpd": 117,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-07-11",
+        "dpd": 118,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-07-12",
+        "dpd": 119,
+        "state": "delinquent_90"
+      },
+      {
+        "date": "2026-07-13",
+        "dpd": 120,
+        "state": "written_off"
+      },
+      {
+        "date": "2026-07-14",
+        "dpd": 120,
+        "state": "written_off"
+      },
+      {
+        "date": "2026-07-15",
+        "dpd": 120,
+        "state": "written_off"
+      },
+      {
+        "date": "2026-07-16",
+        "dpd": 120,
+        "state": "written_off"
+      },
+      {
+        "date": "2026-07-17",
+        "dpd": 120,
+        "state": "written_off"
+      },
+      {
+        "date": "2026-07-18",
+        "dpd": 120,
+        "state": "written_off"
+      },
+      {
+        "date": "2026-07-19",
+        "dpd": 120,
+        "state": "written_off"
+      },
+      {
+        "date": "2026-07-20",
+        "dpd": 120,
+        "state": "written_off"
+      },
+      {
+        "date": "2026-07-21",
+        "dpd": 120,
+        "state": "written_off"
+      },
+      {
+        "date": "2026-07-22",
+        "dpd": 120,
+        "state": "written_off"
+      },
+      {
+        "date": "2026-07-23",
+        "dpd": 120,
+        "state": "written_off"
+      },
+      {
+        "date": "2026-07-24",
+        "dpd": 120,
+        "state": "written_off"
+      },
+      {
+        "date": "2026-07-25",
+        "dpd": 120,
+        "state": "written_off"
+      },
+      {
+        "date": "2026-07-26",
+        "dpd": 120,
+        "state": "written_off"
+      },
+      {
+        "date": "2026-07-27",
+        "dpd": 120,
+        "state": "written_off"
+      },
+      {
+        "date": "2026-07-28",
+        "dpd": 120,
+        "state": "written_off"
+      },
+      {
+        "date": "2026-07-29",
+        "dpd": 120,
+        "state": "written_off"
+      },
+      {
+        "date": "2026-07-30",
+        "dpd": 120,
+        "state": "written_off"
+      },
+      {
+        "date": "2026-07-31",
+        "dpd": 120,
+        "state": "written_off"
+      }
+    ],
+    "totals": {
+      "cash_received_cents": 22255,
+      "accrual_entries": 179,
+      "write_offs_cents": 79535,
+      "interest_income_cents": 1790,
+      "fees_income_cents": 0,
+      "receivables_at_end": {
+        "fees": 0,
+        "interest": 0,
+        "principal": 0
+      }
+    }
+  }
+}

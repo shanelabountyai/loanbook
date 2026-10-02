@@ -12,6 +12,7 @@ Frozen expected values. Tests **read** these; product code must never generate t
 | `delinquency/` | DQ1–DQ5 (on-time, never paid through every band boundary, short payment, catch-up, two missed installments); per-day DPD and state plus late-fee events | P0-5 |
 | `capstone/` | CP1: L1 from disbursement to early payoff, six payments (on time, short, topped up in grace, late with fee, catch-up of two, payoff at the quote); every payment's split, the fees, per-day DPD and state, totals, and the statement text | P0-7 |
 | `waiver/` | WV1: fee waivers on L1 (D24): fees for installments 2-4; every refusal (blank reason, not a fee, partly paid with nothing else owed, second waiver, pool too small, back-dated below the pool, dated before the fee) and two waivers; fees owed after each step, and no installment fined again | P1 |
+| `writeoff/` | WO1: write-off on L1 (D25): installment 1 paid, 5000 of 2, then nothing; every refusal (blank reason, back-dated, DPD 119, ahead of accrual, second write-off) and the write-off at DPD 120: principal to write_offs, interest and fees reversed out of income; state every day (written_off, DPD frozen), nothing accrued or charged after, a later payment refused | P1 |
 
 Conventions: amounts are integer cents; rates are basis points; dates are ISO `YYYY-MM-DD`. Journal lines in waterfall fixtures should be compared as an unordered set (plus the cash line).
 

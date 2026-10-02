@@ -1,4 +1,4 @@
-// Delinquency status (task 4.2, D18/D19, D23), late fees (D20) and fee waivers (D24): pure functions of the schedule, the cash received and the date.
+// Delinquency status (task 4.2, D18/D19, D23), late fees (D20), fee waivers (D24) and write-offs (D25): pure functions of the schedule, the cash received and the date.
 // Nothing is stored; the state is recomputed from the ledger and the loan's terms on every read.
 
 import type { ClientBase } from 'pg';
@@ -7,9 +7,12 @@ import { addDays, assertDate, daysBetween } from './calendar';
 import { DELINQUENCY_BANDS, GRACE_EXIT_DPD, LATE_FEE_CENTS, type LoanState } from './config';
 import { EntryError } from './entry';
 import { formatCents } from './money';
-import { postEntry, reverseEntryInTx } from './post';
+import { accrualDue } from './accrue';
+import { owedCents } from './owed';
+import { postEntry, postEntryInTx, reverseEntryInTx } from './post';
 import { readEntry } from './read';
 import { buildSchedule } from './schedule';
+import type { Buckets } from './waterfall';
 
 export type Installment = { dueDate: string; paymentCents: number };
 export type Payment = { date: string; cents: number };
@@ -60,17 +63,28 @@ export async function loanStatus(db: Pick<ClientBase, 'query'>, { loanId, asOf }
   assertDate(asOf);
   await db.query('BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY');
   try {
-    const { rows: loans } = await db.query<{ principalCents: number; aprBps: number; termMonths: number; disbursementDate: string }>(
-      'SELECT "principalCents", "aprBps", "termMonths", "disbursementDate"::text AS "disbursementDate" FROM "Loan" WHERE "id" = $1',
-      [loanId],
-    );
-    if (!loans[0]) throw new EntryError('unknown_loan');
-    const byDate = await ledgerByDate(db, loanId);
-    const days = closedBy(byDate, asOf) ? 0 : dpd(buildSchedule(loans[0]).rows, byDate.filter((r) => r.date <= asOf), asOf);
-    return { loanId, asOf, dpd: days, state: stateFromDpd(days) };
+    return await statusIn(db, loanId, asOf);
   } finally {
     await db.query('ROLLBACK');
   }
+}
+
+/** `loanStatus` inside a transaction the caller owns. D25: from its write-off date a loan is `written_off`, DPD as of that date. */
+async function statusIn(db: Pick<ClientBase, 'query'>, loanId: string, asOf: string): Promise<LoanStatus> {
+  const { rows: loans } = await db.query<{ principalCents: number; aprBps: number; termMonths: number; disbursementDate: string }>(
+    'SELECT "principalCents", "aprBps", "termMonths", "disbursementDate"::text AS "disbursementDate" FROM "Loan" WHERE "id" = $1',
+    [loanId],
+  );
+  if (!loans[0]) throw new EntryError('unknown_loan');
+  const { rows: wo } = await db.query<{ date: string }>(
+    `SELECT "date"::text AS date FROM "LedgerEntry" WHERE "loanId" = $1 AND "kind" = 'write_off' AND "date" <= $2`,
+    [loanId, asOf],
+  );
+  const byDate = await ledgerByDate(db, loanId);
+  const schedule = buildSchedule(loans[0]).rows;
+  if (wo[0]) return { loanId, asOf, dpd: dpd(schedule, byDate.filter((r) => r.date <= wo[0]!.date), wo[0].date), state: 'written_off' };
+  const days = closedBy(byDate, asOf) ? 0 : dpd(schedule, byDate.filter((r) => r.date <= asOf), asOf);
+  return { loanId, asOf, dpd: days, state: stateFromDpd(days) };
 }
 
 export type FeeAssessed = { loanId: string; installment: number; date: string; cents: number; entryId: string };
@@ -165,6 +179,56 @@ export async function waiveFee(db: Pick<ClientBase, 'query'>, { entryId, date, r
   } catch (err) {
     await db.query('ROLLBACK');
     if ((err as DatabaseError).constraint === 'already_reversed') throw new EntryError('already_reversed');
+    throw err;
+  }
+}
+
+export type WrittenOff = { loanId: string; date: string; entryId: string; writtenOff: Buckets };
+
+/**
+ * D25: writes off a defaulted loan in one entry, with a reason: principal Dr write_offs, unpaid interest and fees
+ * back out of their income, every receivable to zero. Under the D16 row lock, refuses a second write-off, one dated
+ * before an entry already posted, one ahead of the accrual run, and a loan not `default_recommended` on `date`.
+ */
+export async function writeOff(db: Pick<ClientBase, 'query'>, { loanId, date, reason }: { loanId: string; date: string; reason: string }): Promise<WrittenOff> {
+  assertDate(date);
+  const why = reason.trim();
+  if (!why) throw new EntryError('reason_required');
+  await db.query('BEGIN');
+  try {
+    const { rowCount } = await db.query('SELECT 1 FROM "Loan" WHERE "id" = $1 FOR UPDATE', [loanId]);
+    if (!rowCount) throw new EntryError('unknown_loan');
+    const { rows } = await db.query<{ done: boolean | null; later: boolean | null }>(
+      `SELECT bool_or("kind" = 'write_off') AS done, bool_or("date" > $2::date) AS later FROM "LedgerEntry" WHERE "loanId" = $1`,
+      [loanId, date],
+    );
+    if (rows[0]!.done) throw new EntryError('already_written_off');
+    if (rows[0]!.later) throw new EntryError('backdated');
+    if ((await accrualDue(db, loanId, date)).length > 0) throw new EntryError('accrual_pending');
+    if ((await statusIn(db, loanId, date)).state !== 'default_recommended') throw new EntryError('not_in_default');
+    const owed = await owedCents(db, loanId);
+    const pairs = [
+      ['write_offs', 'loans_receivable', owed.principal],
+      ['interest_income', 'interest_receivable', owed.interest],
+      ['fees_income', 'fees_receivable', owed.fees],
+    ] as const;
+    const entryId = await postEntryInTx(db, {
+      date,
+      loanId,
+      kind: 'write_off',
+      memo: `Written off ${formatCents(owed.fees + owed.interest + owed.principal)}: ${why}`,
+      lines: pairs
+        .filter(([, , cents]) => cents > 0)
+        .flatMap(([dr, cr, cents]) => [
+          { account: dr, debitCents: cents, creditCents: 0 },
+          { account: cr, debitCents: 0, creditCents: cents },
+        ]),
+    });
+    await db.query('COMMIT');
+    return { loanId, date, entryId, writtenOff: owed };
+  } catch (err) {
+    await db.query('ROLLBACK');
+    if ((err as DatabaseError).constraint === 'already_written_off') throw new EntryError('already_written_off');
     throw err;
   }
 }

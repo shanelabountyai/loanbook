@@ -19,7 +19,10 @@ export type EntryErrorCode =
   | 'reason_required'
   | 'not_a_fee'
   | 'before_fee'
-  | 'fee_paid';
+  | 'fee_paid'
+  | 'already_written_off'
+  | 'backdated'
+  | 'not_in_default';
 
 /** Codes match `fixtures/ledger/entry_validation.json`. `non_integer_amount` arrives as a MoneyError. */
 export class EntryError extends Error {

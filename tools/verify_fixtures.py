@@ -250,6 +250,65 @@ chk({r.get("error") for r in got} >= {"reason_required", "not_a_fee", "fee_paid"
 chk(sum(c for d, c in book if d <= "2026-04-28") == 500 and sum(c for d, c in book if d <= "2026-05-26") == 1500, "WV1 back-dated case is real")
 chk(any(f["installment"] == 4 for f in fees) and 4 in waived and len(fees) == 3, "WV1 a waived installment is not fined again")
 
+# ---- write-off (independent: the loan as a list of dated ledger lines; owed, interest and the last entry date are
+#      sums and maxima over it; principal for day D is loans_receivable dated before D; DPD by bisect)
+wo = load("writeoff/WO1.json"); i, e = wo["input"], wo["expected"]
+d0, last, fee_amt, apr = dt.date.fromisoformat(i["disbursement_date"]), dt.date.fromisoformat(i["run_through"]), i["late_fee_cents"], Decimal(i["apr_bps"])
+sched = load("amortization/AM1.json")["expected"]["schedule"]
+due = [dt.date.fromisoformat(r["due_date"]) for r in sched]
+cum_due = [sum(r["payment_cents"] for r in sched[:k + 1]) for k in range(len(sched))]
+led = [(d0, "loans_receivable", i["principal_cents"])]          # (date, account, debit - credit)
+REC = dict(fees="fees_receivable", interest="interest_receivable", principal="loans_receivable")
+def bal(acct, before=None): return sum(c for d, a, c in led if a == acct and (before is None or d < before))
+def owed_now(): return {b: bal(a) for b, a in REC.items()}
+def wo_dpd(D, cash):
+    k = bisect.bisect_right(cum_due, sum(c for d, c in cash if d <= D))
+    return (D - due[k]).days if k < len(due) and due[k] < D else 0
+cash, fees, got, n_acc, wo_date = [], [], [], 0, None
+bands_dq = load("delinquency/DQ1.json")["input"]["bands"]
+seg_of = lambda D: max([d for d, a, c in led if a == "loans_receivable" and d < D])
+D = d0
+while D < last:
+    D += dt.timedelta(days=1)
+    P, s = bal("loans_receivable", D), seg_of(D)
+    acc = q(Decimal(P) * apr * (D - s).days / (Decimal(10000) * 365)) + sum(c for d, a, c in led if a == "interest_income" and c < 0 and d > s)  # accrual credits are negative
+    if acc > 0: led += [(D, "interest_receivable", acc), (D, "interest_income", -acc)]; n_acc += 1
+    for k in range(len(due)):
+        if bal("loans_receivable") > 0 and (D - due[k]).days == 11 and sum(c for _, c in cash) < cum_due[k]:
+            fees.append(dict(installment=k + 1, date=D.isoformat(), cents=fee_amt)); led += [(D, "fees_receivable", fee_amt), (D, "fees_income", -fee_amt)]
+    for x in (x for x in i["events"] if x["posted_on"] == D.isoformat()):
+        if "payment" in x:
+            a = alloc(owed_now(), x["payment"], i["waterfall_order"])
+            if "error" in a: got.append(dict(error=a["error"])); continue
+            got.append(dict(allocation=a)); cash.append((D, x["payment"])); led.append((D, "cash", x["payment"]))
+            led += [(D, REC[b], -c) for b, c in a.items() if c]
+            continue
+        wd = dt.date.fromisoformat(x["date"])
+        if not x["reason"].strip(): err = "reason_required"
+        elif wo_date: err = "already_written_off"
+        elif any(d > wd for d, _, _ in led): err = "backdated"
+        elif wd > D: err = "accrual_pending"
+        elif [b["state"] for b in bands_dq if wo_dpd(wd, cash) >= b["min_dpd"]][-1] != "default_recommended": err = "not_in_default"
+        else: err = None
+        if err: got.append(dict(error=err)); continue
+        o = owed_now(); wo_date = wd
+        L = []
+        for b, dr in (("principal", "write_offs"), ("interest", "interest_income"), ("fees", "fees_income")):
+            if o[b]: L += [dict(account=dr, debit=o[b], credit=0), dict(account=REC[b], debit=0, credit=o[b])]; led += [(wd, dr, o[b]), (wd, REC[b], -o[b])]
+        got.append(dict(written_off=o, memo=f"Written off {m(sum(o.values()))}: {x['reason'].strip()}", lines=L))
+chk(e["fees"] == fees, "WO1 fees")
+chk(e["results"] == got, "WO1 results")
+chk(owed_now() == e["totals"]["receivables_at_end"] == dict(fees=0, interest=0, principal=0), "WO1 receivables zero")
+chk(e["totals"] == dict(cash_received_cents=sum(c for _, c in cash), accrual_entries=n_acc, write_offs_cents=bal("write_offs"),
+                        interest_income_cents=-bal("interest_income"), fees_income_cents=-bal("fees_income"), receivables_at_end=owed_now()), "WO1 totals")
+chk(bal("write_offs") + sum(c for _, c in cash) == i["principal_cents"] + e["totals"]["interest_income_cents"] + e["totals"]["fees_income_cents"], "WO1 loss + cash = principal + income")
+for row in e["days"]:
+    Dd = dt.date.fromisoformat(row["date"])
+    want = (wo_dpd(wo_date, cash), "written_off") if wo_date and Dd >= wo_date else (wo_dpd(Dd, cash), [b["state"] for b in bands_dq if wo_dpd(Dd, cash) >= b["min_dpd"]][-1])
+    chk((row["dpd"], row["state"]) == want, f"WO1 {row['date']} state")
+chk({r.get("error") for r in got} >= {"reason_required", "backdated", "not_in_default", "accrual_pending", "already_written_off", "exceeds_payoff"}, "WO1 every refusal")
+chk(not any(f["installment"] == 6 for f in fees) and not any(d > wo_date for d, a, _ in led if a == "interest_receivable"), "WO1 nothing accrues or is charged after")
+
 # ---- simulated book (independent: Decimal schedule, running balances, bisect DPD; D23 closed = principal 0)
 bk = load("book/BK1.json"); bi, be = bk["input"], bk["expected"]
 names = ["current", "grace", "delinquent_30", "delinquent_60", "delinquent_90", "default_recommended"]
