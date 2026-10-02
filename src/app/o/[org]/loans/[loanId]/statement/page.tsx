@@ -14,19 +14,22 @@ export default async function StatementPage({ params }: { params: Promise<{ org:
   const o = s.owed;
   return (
     <main>
-      <h1>Statement for loan {loanId}</h1>
-      <table aria-label="Payments">
-        <thead><tr><th>Date</th><th>Paid</th><th>Fees</th><th>Interest</th><th>Principal</th></tr></thead>
-        <tbody>
-          {s.payments.map((p) => (
-            <tr key={p.entryId}>
-              <td>{p.date}</td><td>{formatCents(p.cents)}</td><td>{formatCents(p.split.fees)}</td><td>{formatCents(p.split.interest)}</td><td>{formatCents(p.split.principal)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      {s.payments.length === 0 && <p>No payments yet.</p>}
-      <p>Balance owed {formatCents(o.principal + o.interest + o.fees)}: principal {formatCents(o.principal)}, interest {formatCents(o.interest)}, fees {formatCents(o.fees)}.</p>
+      <div className="head"><h1>Statement for loan {loanId}</h1></div>
+      <section className="card scroll">
+        <h2>Payments</h2>
+        <table aria-label="Payments">
+          <thead><tr><th>Date</th><th className="n">Paid</th><th className="n">Fees</th><th className="n">Interest</th><th className="n">Principal</th></tr></thead>
+          <tbody>
+            {s.payments.map((p) => (
+              <tr key={p.entryId}>
+                <td className="mono">{p.date}</td><td className="n">{formatCents(p.cents)}</td><td className="n">{formatCents(p.split.fees)}</td><td className="n">{formatCents(p.split.interest)}</td><td className="n">{formatCents(p.split.principal)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {s.payments.length === 0 && <p className="empty">No payments yet.</p>}
+        <p className="owed">Balance owed <strong className="n">{formatCents(o.principal + o.interest + o.fees)}</strong>: principal <span className="n">{formatCents(o.principal)}</span>, interest <span className="n">{formatCents(o.interest)}</span>, fees <span className="n">{formatCents(o.fees)}</span>.</p>
+      </section>
     </main>
   );
 }

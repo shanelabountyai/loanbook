@@ -1,0 +1,96 @@
+/* LoanBook design system (Claude Design "LoanBook Board"): paper and ink, one ink-blue, amber only for "past date".
+   Scoped to .lb so the template's other pages stay untouched. Light by default, dark via the OS setting. */
+.lb {
+  --paper: oklch(0.972 0.006 85); --sheet: oklch(0.995 0.003 85); --ink: oklch(0.23 0.012 70); --ink2: oklch(0.46 0.012 70);
+  --rule: oklch(0.80 0.012 80); --rule2: oklch(0.91 0.008 80); --fold: oklch(0.975 0.006 85); --hl: oklch(0.93 0.06 92);
+  --accent: oklch(0.45 0.11 250); --past: oklch(0.87 0.10 82); --pastink: oklch(0.27 0.05 65); --paststripe: oklch(0.66 0.13 72);
+  --danger: oklch(0.48 0.16 25); --hover: oklch(0.96 0.01 85);
+  --badge-l: 0.935; --badge-c: 0.045; --badge-fg-l: 0.40; --badge-fg-c: 0.09;
+  min-height: 100vh; background: var(--paper); color: var(--ink); font: 14px/1.45 var(--font-sans), system-ui, sans-serif; -webkit-font-smoothing: antialiased;
+}
+@media (prefers-color-scheme: dark) {
+  .lb {
+    --paper: oklch(0.185 0.008 75); --sheet: oklch(0.218 0.008 75); --ink: oklch(0.93 0.008 85); --ink2: oklch(0.74 0.012 85);
+    --rule: oklch(0.40 0.01 75); --rule2: oklch(0.29 0.008 75); --fold: oklch(0.2 0.008 75); --hl: oklch(0.32 0.05 90);
+    --accent: oklch(0.78 0.10 250); --past: oklch(0.36 0.07 75); --pastink: oklch(0.96 0.03 85); --paststripe: oklch(0.72 0.12 75);
+    --danger: oklch(0.74 0.14 25); --hover: oklch(0.25 0.008 75);
+    --badge-l: 0.33; --badge-c: 0.05; --badge-fg-l: 0.89; --badge-fg-c: 0.08;
+  }
+}
+.lb a { color: var(--accent); text-underline-offset: 2px }
+.lb a:hover { color: var(--ink) }
+.lb button, .lb input { font: inherit; color: inherit }
+.lb button { cursor: pointer }
+
+.lb .wrap { max-width: 1360px; margin: 0 auto; padding-left: 28px; padding-right: 28px }
+@media (max-width: 640px) { .lb .wrap { padding-left: 16px; padding-right: 16px } }
+.lb .scope { border-bottom: 1px solid var(--rule2); font-size: 12.5px; color: var(--ink2); text-wrap: pretty }
+.lb .scope p { margin: 0; padding-top: 7px; padding-bottom: 7px }
+.lb .scope strong { color: var(--ink) }
+.lb main { max-width: 1360px; margin: 0 auto; padding: 24px 28px 72px }
+@media (max-width: 640px) { .lb main { padding-left: 16px; padding-right: 16px } }
+
+.lb h1, .lb h2 { font-family: var(--font-serif), Georgia, serif; font-weight: 600; margin: 0 }
+.lb h1 { font-size: 30px; line-height: 1.15 }
+.lb h2 { font-size: 19px }
+.lb .head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 18px }
+.lb .kicker { font-size: 12.5px; color: var(--ink2) }
+.lb .mono, .lb .n { font-family: var(--font-mono), monospace; font-variant-numeric: tabular-nums }
+.lb .chip { font-size: 13px; padding: 4px 10px; border-radius: 3px; border: 1px solid var(--rule) }
+.lb .chip.past { background: var(--past); color: var(--pastink) }
+
+.lb .card { background: var(--sheet); border: 1px solid var(--rule); border-radius: 4px; margin-bottom: 20px; min-width: 0 }
+.lb .card > h2 { padding: 14px 16px 10px }
+.lb .scroll { overflow-x: auto }
+.lb .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)) }
+.lb .stat { padding: 16px 20px; border-left: 1px solid var(--rule2) }
+.lb .stat:first-child { border-left: 0 }
+.lb .label { font-size: 11.5px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink2) }
+.lb .stat .n { font-size: 22px; margin-top: 4px }
+.lb .stat.big .n { font-size: 30px; font-weight: 500 }
+.lb .stat .acct { font-size: 11.5px; color: var(--ink2) }
+
+.lb table { width: 100%; border-collapse: collapse }
+.lb th { text-align: left; font-weight: 600; font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink2); padding: 7px 12px; border-bottom: 1px solid var(--ink); white-space: nowrap }
+.lb td, .lb tbody th { padding: 6px 12px; border-bottom: 1px solid var(--rule2); vertical-align: top }
+.lb tbody th { font-weight: 400; text-transform: none; letter-spacing: 0; font-size: inherit; color: inherit }
+.lb tr > :first-child { padding-left: 16px }
+.lb tr > :last-child { padding-right: 16px }
+.lb tbody tr:hover { background: var(--hover) }
+.lb th.n, .lb td.n { text-align: right; white-space: nowrap }
+.lb td.n, .lb .mono { font-size: 13px }
+.lb tfoot th, .lb tfoot td { border-top: 1px solid var(--ink); border-bottom: 3px double var(--ink); font-weight: 600; text-transform: none; letter-spacing: 0; color: inherit; font-size: inherit }
+.lb .acct-credit { padding-left: 32px }
+.lb .missed { color: var(--danger) }
+.lb .muted { color: var(--ink2) }
+.lb .empty { padding: 0 16px 14px; color: var(--ink2) }
+.lb p.owed { margin: 0; padding: 14px 16px; border-top: 1px solid var(--rule2) }
+
+.lb .badge { display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px 2px 6px; border-radius: 3px; font-size: 12.5px; font-weight: 600; line-height: 18px; white-space: nowrap;
+  background: oklch(var(--badge-l) var(--badge-c) var(--h)); color: oklch(var(--badge-fg-l) var(--badge-fg-c) var(--h)) }
+.lb .badge.off { background: oklch(var(--badge-l) 0 0); color: oklch(var(--badge-fg-l) 0 0) }
+.lb .pips { display: inline-flex; gap: 2px }
+.lb .pips i { width: 3px; height: 10px; border-radius: 1px; background: currentColor; opacity: 0.22 }
+.lb .pips i.on { opacity: 1 }
+.lb .key { display: block; font-size: 11px; color: var(--ink2); margin-top: 2px }
+
+/* The as-of bar: quiet on today, amber with a hatched edge on any other day. */
+.lb .asof { position: sticky; top: 0; z-index: 20; border-bottom: 1px solid var(--rule); background: var(--sheet) }
+.lb .asof.past { background: var(--past); color: var(--pastink) }
+.lb .asof .stripe { height: 4px }
+.lb .asof.past .stripe { background: repeating-linear-gradient(135deg, var(--paststripe) 0 8px, transparent 8px 16px) }
+.lb .asof form { display: flex; align-items: center; gap: 12px 20px; flex-wrap: wrap; padding-top: 9px; padding-bottom: 10px }
+.lb .asof .grp { display: flex; align-items: center; gap: 6px }
+.lb .asof label, .lb .asof .tag { font-size: 11.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase }
+.lb .asof .tag { padding: 2px 7px; border: 1.5px solid currentColor; border-radius: 3px; white-space: nowrap }
+.lb .asof .step, .lb .asof .jump, .lb .asof .go { display: inline-grid; place-items: center; border: 1px solid currentColor; border-radius: 4px; background: transparent; text-decoration: none; color: inherit }
+.lb .asof .step { width: 32px; height: 36px; font-size: 16px }
+.lb .asof .step.off { opacity: 0.35; pointer-events: none }
+.lb .asof .jump { padding: 3px 7px; font-size: 12.5px; border-radius: 3px }
+.lb .asof .jump.cur { background: var(--pastink); color: var(--past) }
+.lb .asof .go { height: 36px; padding: 0 12px }
+.lb .asof input[type=date] { font-family: var(--font-mono), monospace; font-size: 17px; font-weight: 500; height: 36px; box-sizing: border-box; padding: 0 10px; border: 1.5px solid currentColor; border-radius: 4px; background: var(--sheet); color: var(--ink) }
+.lb .asof .msg { flex: 1 1 360px; display: flex; align-items: center; gap: 10px; font-size: 13.5px; text-wrap: pretty }
+.lb .asof .msg p { margin: 0 }
+.lb .asof .home { height: 36px; padding: 0 14px; border-radius: 4px; background: var(--pastink); color: var(--past); font-weight: 600; display: inline-flex; align-items: center; text-decoration: none }
+.lb .asof .home:hover { color: var(--past) }
