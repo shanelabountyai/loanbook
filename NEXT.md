@@ -150,7 +150,7 @@ Next: 2.4 accrual math, pure. Model: **Opus 5.5** (money rounding, D4/D5).
   `tests/integration/ledger-balances.test.ts` (2): TB1 is posted through `postEntry` and matches `expected`
   exactly, and an empty ledger gives all zeros and no loans. Mutants killed: normal side ignored, write_offs in
   the per-loan view, wrong grouping set, credit side dropped. Local: lint, typecheck, both gates, 8 ledger
-  and unit files 142/142 plus the `todo`. No local full sweep; CI owns it: run 37048725095 green on 07f14aa, vitest 55 files 480/480 (477 + 3 book), Playwright 15/15, both gates passing.
+  and unit files 142/142 plus the `todo`. No local full sweep; CI owns it.
   run 36730676698 green on 68ba958, vitest 36 files 299/299 plus 1 `todo` (297 + 2 new), Playwright 10/10,
   `fixtures:check` and `ledger:verify` passing, both jobs successful.
 
@@ -173,7 +173,7 @@ Next: 2.4 accrual math, pure. Model: **Opus 5.5** (money rounding, D4/D5).
   `tests/unit/money.test.ts`. Mutants killed: reading a fraction as whole, and `ORDER BY position DESC`.
   **Survived:** dropping `ORDER BY` entirely, because Postgres walks the `(entryId, position)` unique index
   and returns position order anyway. The `ORDER BY` stays; no test can force that plan. Local: lint,
-  typecheck, both gates, 8 ledger/unit files 145/145 plus the `todo`. No local full sweep; CI owns it: run 37048725095 green on 07f14aa, vitest 55 files 480/480 (477 + 3 book), Playwright 15/15, both gates passing.
+  typecheck, both gates, 8 ledger/unit files 145/145 plus the `todo`. No local full sweep; CI owns it.
   run 36630488191 green on b270c35, vitest 34 files 284/284 plus 1 `todo` (269 + 15 new), Playwright 10/10,
   `fixtures:check` and `ledger:verify` passing, both jobs with no failed or skipped step.
 
