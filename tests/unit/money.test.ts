@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { MoneyError, assertBps, assertCents, centsFromNumeric, roundHalfUp } from '@/ledger/money';
+import { MoneyError, assertBps, assertCents, centsFromNumeric, formatCents, roundHalfUp } from '@/ledger/money';
 
 const code = (fn: () => unknown) => {
   try {
@@ -96,4 +96,15 @@ describe('roundHalfUp (D2)', () => {
   ])('rejects %s', (_, n, d) => {
     expect(code(() => roundHalfUp(n, d))).toBe('invalid_rounding_input');
   });
+});
+
+describe('formatCents (display)', () => {
+  it.each([
+    [0, '$0.00'],
+    [5, '$0.05'],
+    [1500, '$15.00'],
+    [123456, '$1234.56'],
+    [-1205, '-$12.05'],
+  ])('%i is %s', (c, s) => expect(formatCents(c)).toBe(s));
+  it('refuses a fraction', () => expect(() => formatCents(1.5)).toThrow(MoneyError));
 });

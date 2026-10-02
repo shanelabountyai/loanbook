@@ -13,3 +13,16 @@ model Loan {
   disbursementDate DateTime @db.Date
   createdAt        DateTime @default(now()) @db.Timestamptz(6)
 }
+
+/// Who may see a loan (task 4.4, D21): the servicing org (its owner and admins) and one borrower (a member).
+/// Append-only. No foreign keys, as LedgerEntry.loanId: Org and User live in template-owned core.prisma, and a
+/// row naming a deleted user, org or loan grants nothing because the page guard also requires membership.
+model LoanAccess {
+  loanId         String   @id
+  orgId          String   @db.Uuid
+  borrowerUserId String   @db.Uuid
+  createdAt      DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([orgId])
+  @@index([borrowerUserId])
+}

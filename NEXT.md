@@ -1,6 +1,14 @@
 # NEXT
 
-## Pick up here: task 4.4 (servicing views + role split + Playwright), see docs/phase-4-tasks.md; model Sonnet ok for wiring, Opus for the role boundary
+## Pick up here: task 4.5 (capstone: one loan's life narrated from ledger entries), see docs/phase-4-tasks.md; fixture first; model Opus 5.5
+
+4.4 done (2026-10-02, D21): `LoanAccess` (migration `20261002000000_loan_access`, append-only, no FKs) links a loan to its servicing org and one borrower.
+`src/ledger/views.ts`: `loanLedger`, `paymentsFrom`, `scheduleActuals`, `loanDetail`, `loanStatement`, `bookOverview` (reads only). `formatCents` in money.ts (display, string-based).
+Pages: `/o/[org]/loans` (servicer book, or a borrower's own loans), `/loans/[id]` (servicer only), `/loans/[id]/statement` (servicer or that borrower); guard `requireLoan` + `viewDate` (`?asOf=`) + `withLedger` pg pool (max 3) in `loans/access.ts`. Nav link in the org layout.
+Tests: `tests/integration/views.test.ts` (4, DQ3+DQ2 through accrual/fee/waterfall), formatCents in money.test.ts (6), `e2e/loans.spec.ts` (5: book, detail, statement, two boundary specs; seeds its own org).
+Mutants killed: no coverage floor, fees not split, asOf ignored, fees not in outstanding (views); member treated as servicer, org filter dropped (each turned one boundary spec red).
+Local: lint, typecheck, both gates, views + money 61/61, loans e2e 5/5 (before the FR-06 fix below). Local full vitest sweep abandoned at load 88 (rental/bookable sweeps): only timeouts plus one real failure, FR-06 ("guards first"): the loan pages awaited `params` before the guard. Fixed: `requireOrg` first, then `requireLoan(ctx, loanId, need)`. CI owns the full sweep: check `gh run list` with the full SHA.
+Not done: demo seed has no loans (`scripts/seed-demo.ts` untouched); 4.6's simulated book is the natural place to seed a demo book.
 
 4.3 done (2026-10-01, D20): `runStatus` in `src/ledger/delinquency.ts`, `GRACE_EXIT_DPD` in config, migration `20261001000000_ledger_late_fee` (`LedgerEntry.installment`, `already_fee_assessed`, `invalid_installment`),
 `scripts/status.ts` + `npm run status -- --as-of`. Tests `tests/integration/late-fee.test.ts` (9): DQ1-DQ5 day by day (fee lands on its exit day, once, owed fees match, verify clean), catch-up run, race, DB constraints, script.
