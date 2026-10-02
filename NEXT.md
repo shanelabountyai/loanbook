@@ -5,7 +5,7 @@
 4.5 done (2026-10-02, D22): fixture `fixtures/capstone/CP1.json` (oracle `capstone()`/`statement()` in build_fixtures.py; independent running-balance re-derivation in verify_fixtures.py, 37 files OK; tamper proven red).
 L1 day by day (accrual, then runStatus, then payment): 02-15 17255; 03-15 10000 short; 03-20 7255 in grace; fee 04-26, 05-01 17255; fee 05-26, 06-20 34510 (inst 4+5); 07-01 payoff 20507 at the quote. Totals: cash 106782 = 100000 + interest 3782 + fees 3000; 167 accrual entries.
 `statementText(lines, asOf)` in views.ts: text from ledger lines only (accrual runs folded, payment split, fees, closing owed). Test `tests/integration/capstone.test.ts` (4): payments/splits, fees + per-day DPD/state, statement word for word (and an earlier asOf), receivables zero + income reconcile + verify clean.
-Mutants killed (each 1 red): no asOf filter, no accrual folding, owed ignoring credits, payments unlabeled. Local: lint, typecheck, both gates, capstone + views + money + ledger-config 67/67. No local full sweep; CI owns it.
+Mutants killed (each 1 red): no asOf filter, no accrual folding, owed ignoring credits, payments unlabeled. Local: lint, typecheck, both gates, capstone + views + money + ledger-config 67/67. No local full sweep; CI owns it: run 37034983272 green on a2c813c, vitest 54 files 477/477 (473 + 4 capstone), Playwright 15/15, both gates passing.
 
 4.4 done (2026-10-02, D21): `LoanAccess` (migration `20261002000000_loan_access`, append-only, no FKs) links a loan to its servicing org and one borrower.
 `src/ledger/views.ts`: `loanLedger`, `paymentsFrom`, `scheduleActuals`, `loanDetail`, `loanStatement`, `bookOverview` (reads only). `formatCents` in money.ts (display, string-based).
