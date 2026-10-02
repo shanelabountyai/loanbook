@@ -5,7 +5,7 @@
 4.6 done (2026-10-02, D23): fixture `fixtures/book/BK1.json` (oracle `life()`/`book_loan()` in build_fixtures.py; independent Decimal/bisect re-derivation in verify_fixtures.py, 38 files OK). 40 loans over 2026, 10 each on_time/chronic_late/payoff_early/default; states as transitions. End: 28 current, 1 grace, 1 delinquent_30, 10 default_recommended; 10041 accrual entries.
 Bug found by the book (D23): a loan closed at the quote (early payoff, or the D9 final payment) paid less than the schedule sums to, so `loanStatus` read it past due and `runStatus` charged it late fees. Fix in delinquency.ts: `ledgerByDate` + `closedBy` (loans_receivable through the date is 0 → DPD 0, no fee). Tamper proven on the oracle (verify red without D23).
 Test `tests/integration/book.test.ts` (3): per-loan payments/allocations, fees, state transitions; owed at year end; totals, end-state buckets via `bookOverview`, verify clean. ~57s locally (hook timeout 900s).
-Mutants killed: no D23 in loanStatus (2 red), no D23 in runStatus (3 red). Local: lint, typecheck, both gates, book + status + late-fee + capstone + views + delinquency unit 33/33. No local full sweep; CI owns it.
+Mutants killed: no D23 in loanStatus (2 red), no D23 in runStatus (3 red). Local: lint, typecheck, both gates, book + status + late-fee + capstone + views + delinquency unit 33/33. No local full sweep; CI owns it: run 37048725095 green on 07f14aa, vitest 55 files 480/480 (477 + 3 book), Playwright 15/15, both gates passing.
 
 4.5 done (2026-10-02, D22): fixture `fixtures/capstone/CP1.json` (oracle `capstone()`/`statement()` in build_fixtures.py; independent running-balance re-derivation in verify_fixtures.py, 37 files OK; tamper proven red).
 L1 day by day (accrual, then runStatus, then payment): 02-15 17255; 03-15 10000 short; 03-20 7255 in grace; fee 04-26, 05-01 17255; fee 05-26, 06-20 34510 (inst 4+5); 07-01 payoff 20507 at the quote. Totals: cash 106782 = 100000 + interest 3782 + fees 3000; 167 accrual entries.
@@ -150,7 +150,7 @@ Next: 2.4 accrual math, pure. Model: **Opus 5.5** (money rounding, D4/D5).
   `tests/integration/ledger-balances.test.ts` (2): TB1 is posted through `postEntry` and matches `expected`
   exactly, and an empty ledger gives all zeros and no loans. Mutants killed: normal side ignored, write_offs in
   the per-loan view, wrong grouping set, credit side dropped. Local: lint, typecheck, both gates, 8 ledger
-  and unit files 142/142 plus the `todo`. No local full sweep; CI owns it:
+  and unit files 142/142 plus the `todo`. No local full sweep; CI owns it: run 37048725095 green on 07f14aa, vitest 55 files 480/480 (477 + 3 book), Playwright 15/15, both gates passing.
   run 36730676698 green on 68ba958, vitest 36 files 299/299 plus 1 `todo` (297 + 2 new), Playwright 10/10,
   `fixtures:check` and `ledger:verify` passing, both jobs successful.
 
@@ -173,7 +173,7 @@ Next: 2.4 accrual math, pure. Model: **Opus 5.5** (money rounding, D4/D5).
   `tests/unit/money.test.ts`. Mutants killed: reading a fraction as whole, and `ORDER BY position DESC`.
   **Survived:** dropping `ORDER BY` entirely, because Postgres walks the `(entryId, position)` unique index
   and returns position order anyway. The `ORDER BY` stays; no test can force that plan. Local: lint,
-  typecheck, both gates, 8 ledger/unit files 145/145 plus the `todo`. No local full sweep; CI owns it:
+  typecheck, both gates, 8 ledger/unit files 145/145 plus the `todo`. No local full sweep; CI owns it: run 37048725095 green on 07f14aa, vitest 55 files 480/480 (477 + 3 book), Playwright 15/15, both gates passing.
   run 36630488191 green on b270c35, vitest 34 files 284/284 plus 1 `todo` (269 + 15 new), Playwright 10/10,
   `fixtures:check` and `ledger:verify` passing, both jobs with no failed or skipped step.
 
