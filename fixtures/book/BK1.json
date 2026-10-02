@@ -1,0 +1,6093 @@
+{
+  "id": "BK1",
+  "description": "Simulated book (PRD success metric): 40 loans over 2026, ten each on_time, chronic_late (3-26 days late, the last payment the quote), payoff_early (quote 10-19 days after installment 2-4) and default (0-2 payments, then none). Run day by day: create loans on their disbursement day, accrual, the late-fee job, then payments. States are transitions (a new row only when the state changes). D23: a repaid loan is closed, current, and takes no fee.",
+  "input": {
+    "start": "2026-01-01",
+    "run_through": "2026-12-31",
+    "waterfall_order": [
+      "fees",
+      "interest",
+      "principal"
+    ],
+    "late_fee_cents": 1500,
+    "loans": [
+      {
+        "n": 1,
+        "behavior": "on_time",
+        "principal_cents": 50000,
+        "apr_bps": 900,
+        "term_months": 6,
+        "disbursement_date": "2026-01-01",
+        "payments": [
+          {
+            "date": "2026-02-01",
+            "cents": 8553
+          },
+          {
+            "date": "2026-03-01",
+            "cents": 8553
+          },
+          {
+            "date": "2026-04-01",
+            "cents": 8553
+          },
+          {
+            "date": "2026-05-01",
+            "cents": 8553
+          },
+          {
+            "date": "2026-06-01",
+            "cents": 8553
+          },
+          {
+            "date": "2026-07-01",
+            "payoff": true
+          }
+        ]
+      },
+      {
+        "n": 2,
+        "behavior": "chronic_late",
+        "principal_cents": 225000,
+        "apr_bps": 1200,
+        "term_months": 12,
+        "disbursement_date": "2026-01-02",
+        "payments": [
+          {
+            "date": "2026-02-11",
+            "cents": 19991
+          },
+          {
+            "date": "2026-03-18",
+            "cents": 19991
+          },
+          {
+            "date": "2026-04-25",
+            "cents": 19991
+          },
+          {
+            "date": "2026-05-08",
+            "cents": 19991
+          },
+          {
+            "date": "2026-06-15",
+            "cents": 19991
+          },
+          {
+            "date": "2026-07-22",
+            "cents": 19991
+          },
+          {
+            "date": "2026-08-05",
+            "cents": 19991
+          },
+          {
+            "date": "2026-09-12",
+            "cents": 19991
+          },
+          {
+            "date": "2026-10-19",
+            "cents": 19991
+          },
+          {
+            "date": "2026-11-26",
+            "cents": 19991
+          },
+          {
+            "date": "2026-12-09",
+            "cents": 19991
+          }
+        ]
+      },
+      {
+        "n": 3,
+        "behavior": "payoff_early",
+        "principal_cents": 150000,
+        "apr_bps": 1800,
+        "term_months": 9,
+        "disbursement_date": "2026-01-03",
+        "payments": [
+          {
+            "date": "2026-02-03",
+            "cents": 17941
+          },
+          {
+            "date": "2026-03-03",
+            "cents": 17941
+          },
+          {
+            "date": "2026-04-03",
+            "cents": 17941
+          },
+          {
+            "date": "2026-05-03",
+            "cents": 17941
+          },
+          {
+            "date": "2026-05-15",
+            "payoff": true
+          }
+        ]
+      },
+      {
+        "n": 4,
+        "behavior": "default",
+        "principal_cents": 75000,
+        "apr_bps": 2400,
+        "term_months": 6,
+        "disbursement_date": "2026-01-04",
+        "payments": []
+      },
+      {
+        "n": 5,
+        "behavior": "on_time",
+        "principal_cents": 250000,
+        "apr_bps": 3600,
+        "term_months": 12,
+        "disbursement_date": "2026-01-05",
+        "payments": [
+          {
+            "date": "2026-02-05",
+            "cents": 25116
+          },
+          {
+            "date": "2026-03-05",
+            "cents": 25116
+          },
+          {
+            "date": "2026-04-05",
+            "cents": 25116
+          },
+          {
+            "date": "2026-05-05",
+            "cents": 25116
+          },
+          {
+            "date": "2026-06-05",
+            "cents": 25116
+          },
+          {
+            "date": "2026-07-05",
+            "cents": 25116
+          },
+          {
+            "date": "2026-08-05",
+            "cents": 25116
+          },
+          {
+            "date": "2026-09-05",
+            "cents": 25116
+          },
+          {
+            "date": "2026-10-05",
+            "cents": 25116
+          },
+          {
+            "date": "2026-11-05",
+            "cents": 25116
+          },
+          {
+            "date": "2026-12-05",
+            "cents": 25116
+          }
+        ]
+      },
+      {
+        "n": 6,
+        "behavior": "chronic_late",
+        "principal_cents": 175000,
+        "apr_bps": 900,
+        "term_months": 9,
+        "disbursement_date": "2026-01-06",
+        "payments": [
+          {
+            "date": "2026-02-19",
+            "cents": 20181
+          },
+          {
+            "date": "2026-03-26",
+            "cents": 20181
+          },
+          {
+            "date": "2026-04-09",
+            "cents": 20181
+          },
+          {
+            "date": "2026-05-16",
+            "cents": 20181
+          },
+          {
+            "date": "2026-06-23",
+            "cents": 20181
+          },
+          {
+            "date": "2026-07-30",
+            "cents": 20181
+          },
+          {
+            "date": "2026-08-13",
+            "cents": 20181
+          },
+          {
+            "date": "2026-09-20",
+            "cents": 20181
+          },
+          {
+            "date": "2026-10-27",
+            "payoff": true
+          }
+        ]
+      },
+      {
+        "n": 7,
+        "behavior": "payoff_early",
+        "principal_cents": 100000,
+        "apr_bps": 1200,
+        "term_months": 6,
+        "disbursement_date": "2026-01-07",
+        "payments": [
+          {
+            "date": "2026-02-07",
+            "cents": 17255
+          },
+          {
+            "date": "2026-03-07",
+            "cents": 17255
+          },
+          {
+            "date": "2026-03-23",
+            "payoff": true
+          }
+        ]
+      },
+      {
+        "n": 8,
+        "behavior": "default",
+        "principal_cents": 275000,
+        "apr_bps": 1800,
+        "term_months": 12,
+        "disbursement_date": "2026-01-08",
+        "payments": [
+          {
+            "date": "2026-02-08",
+            "cents": 25212
+          }
+        ]
+      },
+      {
+        "n": 9,
+        "behavior": "on_time",
+        "principal_cents": 200000,
+        "apr_bps": 2400,
+        "term_months": 9,
+        "disbursement_date": "2026-01-09",
+        "payments": [
+          {
+            "date": "2026-02-09",
+            "cents": 24503
+          },
+          {
+            "date": "2026-03-09",
+            "cents": 24503
+          },
+          {
+            "date": "2026-04-09",
+            "cents": 24503
+          },
+          {
+            "date": "2026-05-09",
+            "cents": 24503
+          },
+          {
+            "date": "2026-06-09",
+            "cents": 24503
+          },
+          {
+            "date": "2026-07-09",
+            "cents": 24503
+          },
+          {
+            "date": "2026-08-09",
+            "cents": 24503
+          },
+          {
+            "date": "2026-09-09",
+            "cents": 24503
+          },
+          {
+            "date": "2026-10-09",
+            "payoff": true
+          }
+        ]
+      },
+      {
+        "n": 10,
+        "behavior": "chronic_late",
+        "principal_cents": 125000,
+        "apr_bps": 3600,
+        "term_months": 6,
+        "disbursement_date": "2026-01-10",
+        "payments": [
+          {
+            "date": "2026-02-27",
+            "cents": 23075
+          },
+          {
+            "date": "2026-04-03",
+            "cents": 23075
+          },
+          {
+            "date": "2026-04-17",
+            "cents": 23075
+          },
+          {
+            "date": "2026-05-24",
+            "cents": 23075
+          },
+          {
+            "date": "2026-07-01",
+            "cents": 23075
+          },
+          {
+            "date": "2026-07-14",
+            "payoff": true
+          }
+        ]
+      },
+      {
+        "n": 11,
+        "behavior": "payoff_early",
+        "principal_cents": 50000,
+        "apr_bps": 900,
+        "term_months": 12,
+        "disbursement_date": "2026-01-11",
+        "payments": [
+          {
+            "date": "2026-02-11",
+            "cents": 4373
+          },
+          {
+            "date": "2026-03-11",
+            "cents": 4373
+          },
+          {
+            "date": "2026-04-11",
+            "cents": 4373
+          },
+          {
+            "date": "2026-04-21",
+            "payoff": true
+          }
+        ]
+      },
+      {
+        "n": 12,
+        "behavior": "default",
+        "principal_cents": 225000,
+        "apr_bps": 1200,
+        "term_months": 9,
+        "disbursement_date": "2026-01-12",
+        "payments": [
+          {
+            "date": "2026-02-12",
+            "cents": 26267
+          },
+          {
+            "date": "2026-03-12",
+            "cents": 26267
+          }
+        ]
+      },
+      {
+        "n": 13,
+        "behavior": "on_time",
+        "principal_cents": 150000,
+        "apr_bps": 1800,
+        "term_months": 6,
+        "disbursement_date": "2026-01-13",
+        "payments": [
+          {
+            "date": "2026-02-13",
+            "cents": 26329
+          },
+          {
+            "date": "2026-03-13",
+            "cents": 26329
+          },
+          {
+            "date": "2026-04-13",
+            "cents": 26329
+          },
+          {
+            "date": "2026-05-13",
+            "cents": 26329
+          },
+          {
+            "date": "2026-06-13",
+            "cents": 26329
+          },
+          {
+            "date": "2026-07-13",
+            "payoff": true
+          }
+        ]
+      },
+      {
+        "n": 14,
+        "behavior": "chronic_late",
+        "principal_cents": 75000,
+        "apr_bps": 2400,
+        "term_months": 12,
+        "disbursement_date": "2026-01-14",
+        "payments": [
+          {
+            "date": "2026-03-07",
+            "cents": 7092
+          },
+          {
+            "date": "2026-03-18",
+            "cents": 7092
+          },
+          {
+            "date": "2026-04-25",
+            "cents": 7092
+          },
+          {
+            "date": "2026-06-01",
+            "cents": 7092
+          },
+          {
+            "date": "2026-07-09",
+            "cents": 7092
+          },
+          {
+            "date": "2026-07-22",
+            "cents": 7092
+          },
+          {
+            "date": "2026-08-29",
+            "cents": 7092
+          },
+          {
+            "date": "2026-10-06",
+            "cents": 7092
+          },
+          {
+            "date": "2026-10-19",
+            "cents": 7092
+          },
+          {
+            "date": "2026-11-26",
+            "cents": 7092
+          }
+        ]
+      },
+      {
+        "n": 15,
+        "behavior": "payoff_early",
+        "principal_cents": 250000,
+        "apr_bps": 3600,
+        "term_months": 9,
+        "disbursement_date": "2026-01-15",
+        "payments": [
+          {
+            "date": "2026-02-15",
+            "cents": 32108
+          },
+          {
+            "date": "2026-03-15",
+            "cents": 32108
+          },
+          {
+            "date": "2026-04-15",
+            "cents": 32108
+          },
+          {
+            "date": "2026-05-15",
+            "cents": 32108
+          },
+          {
+            "date": "2026-05-29",
+            "payoff": true
+          }
+        ]
+      },
+      {
+        "n": 16,
+        "behavior": "default",
+        "principal_cents": 175000,
+        "apr_bps": 900,
+        "term_months": 6,
+        "disbursement_date": "2026-01-16",
+        "payments": []
+      },
+      {
+        "n": 17,
+        "behavior": "on_time",
+        "principal_cents": 100000,
+        "apr_bps": 1200,
+        "term_months": 12,
+        "disbursement_date": "2026-01-17",
+        "payments": [
+          {
+            "date": "2026-02-17",
+            "cents": 8885
+          },
+          {
+            "date": "2026-03-17",
+            "cents": 8885
+          },
+          {
+            "date": "2026-04-17",
+            "cents": 8885
+          },
+          {
+            "date": "2026-05-17",
+            "cents": 8885
+          },
+          {
+            "date": "2026-06-17",
+            "cents": 8885
+          },
+          {
+            "date": "2026-07-17",
+            "cents": 8885
+          },
+          {
+            "date": "2026-08-17",
+            "cents": 8885
+          },
+          {
+            "date": "2026-09-17",
+            "cents": 8885
+          },
+          {
+            "date": "2026-10-17",
+            "cents": 8885
+          },
+          {
+            "date": "2026-11-17",
+            "cents": 8885
+          },
+          {
+            "date": "2026-12-17",
+            "cents": 8885
+          }
+        ]
+      },
+      {
+        "n": 18,
+        "behavior": "chronic_late",
+        "principal_cents": 275000,
+        "apr_bps": 1800,
+        "term_months": 9,
+        "disbursement_date": "2026-01-18",
+        "payments": [
+          {
+            "date": "2026-03-15",
+            "cents": 32893
+          },
+          {
+            "date": "2026-03-26",
+            "cents": 32893
+          },
+          {
+            "date": "2026-05-03",
+            "cents": 32893
+          },
+          {
+            "date": "2026-06-09",
+            "cents": 32893
+          },
+          {
+            "date": "2026-06-23",
+            "cents": 32893
+          },
+          {
+            "date": "2026-07-30",
+            "cents": 32893
+          },
+          {
+            "date": "2026-09-06",
+            "cents": 32893
+          },
+          {
+            "date": "2026-10-14",
+            "cents": 32893
+          },
+          {
+            "date": "2026-10-27",
+            "payoff": true
+          }
+        ]
+      },
+      {
+        "n": 19,
+        "behavior": "payoff_early",
+        "principal_cents": 200000,
+        "apr_bps": 2400,
+        "term_months": 6,
+        "disbursement_date": "2026-01-19",
+        "payments": [
+          {
+            "date": "2026-02-19",
+            "cents": 35705
+          },
+          {
+            "date": "2026-03-19",
+            "cents": 35705
+          },
+          {
+            "date": "2026-04-06",
+            "payoff": true
+          }
+        ]
+      },
+      {
+        "n": 20,
+        "behavior": "default",
+        "principal_cents": 125000,
+        "apr_bps": 3600,
+        "term_months": 12,
+        "disbursement_date": "2026-01-20",
+        "payments": [
+          {
+            "date": "2026-02-20",
+            "cents": 12558
+          }
+        ]
+      },
+      {
+        "n": 21,
+        "behavior": "on_time",
+        "principal_cents": 50000,
+        "apr_bps": 900,
+        "term_months": 9,
+        "disbursement_date": "2026-01-21",
+        "payments": [
+          {
+            "date": "2026-02-21",
+            "cents": 5766
+          },
+          {
+            "date": "2026-03-21",
+            "cents": 5766
+          },
+          {
+            "date": "2026-04-21",
+            "cents": 5766
+          },
+          {
+            "date": "2026-05-21",
+            "cents": 5766
+          },
+          {
+            "date": "2026-06-21",
+            "cents": 5766
+          },
+          {
+            "date": "2026-07-21",
+            "cents": 5766
+          },
+          {
+            "date": "2026-08-21",
+            "cents": 5766
+          },
+          {
+            "date": "2026-09-21",
+            "cents": 5766
+          },
+          {
+            "date": "2026-10-21",
+            "payoff": true
+          }
+        ]
+      },
+      {
+        "n": 22,
+        "behavior": "chronic_late",
+        "principal_cents": 225000,
+        "apr_bps": 1200,
+        "term_months": 6,
+        "disbursement_date": "2026-01-22",
+        "payments": [
+          {
+            "date": "2026-02-27",
+            "cents": 38823
+          },
+          {
+            "date": "2026-04-03",
+            "cents": 38823
+          },
+          {
+            "date": "2026-05-11",
+            "cents": 38823
+          },
+          {
+            "date": "2026-06-17",
+            "cents": 38823
+          },
+          {
+            "date": "2026-07-01",
+            "cents": 38823
+          },
+          {
+            "date": "2026-08-07",
+            "payoff": true
+          }
+        ]
+      },
+      {
+        "n": 23,
+        "behavior": "payoff_early",
+        "principal_cents": 150000,
+        "apr_bps": 1800,
+        "term_months": 12,
+        "disbursement_date": "2026-01-23",
+        "payments": [
+          {
+            "date": "2026-02-23",
+            "cents": 13752
+          },
+          {
+            "date": "2026-03-23",
+            "cents": 13752
+          },
+          {
+            "date": "2026-04-23",
+            "cents": 13752
+          },
+          {
+            "date": "2026-05-05",
+            "payoff": true
+          }
+        ]
+      },
+      {
+        "n": 24,
+        "behavior": "default",
+        "principal_cents": 75000,
+        "apr_bps": 2400,
+        "term_months": 9,
+        "disbursement_date": "2026-01-24",
+        "payments": [
+          {
+            "date": "2026-02-24",
+            "cents": 9189
+          },
+          {
+            "date": "2026-03-24",
+            "cents": 9189
+          }
+        ]
+      },
+      {
+        "n": 25,
+        "behavior": "on_time",
+        "principal_cents": 250000,
+        "apr_bps": 3600,
+        "term_months": 6,
+        "disbursement_date": "2026-01-25",
+        "payments": [
+          {
+            "date": "2026-02-25",
+            "cents": 46149
+          },
+          {
+            "date": "2026-03-25",
+            "cents": 46149
+          },
+          {
+            "date": "2026-04-25",
+            "cents": 46149
+          },
+          {
+            "date": "2026-05-25",
+            "cents": 46149
+          },
+          {
+            "date": "2026-06-25",
+            "cents": 46149
+          },
+          {
+            "date": "2026-07-25",
+            "payoff": true
+          }
+        ]
+      },
+      {
+        "n": 26,
+        "behavior": "chronic_late",
+        "principal_cents": 175000,
+        "apr_bps": 900,
+        "term_months": 12,
+        "disbursement_date": "2026-01-26",
+        "payments": [
+          {
+            "date": "2026-03-07",
+            "cents": 15304
+          },
+          {
+            "date": "2026-04-11",
+            "cents": 15304
+          },
+          {
+            "date": "2026-05-19",
+            "cents": 15304
+          },
+          {
+            "date": "2026-06-01",
+            "cents": 15304
+          },
+          {
+            "date": "2026-07-09",
+            "cents": 15304
+          },
+          {
+            "date": "2026-08-15",
+            "cents": 15304
+          },
+          {
+            "date": "2026-08-29",
+            "cents": 15304
+          },
+          {
+            "date": "2026-10-06",
+            "cents": 15304
+          },
+          {
+            "date": "2026-11-12",
+            "cents": 15304
+          },
+          {
+            "date": "2026-12-20",
+            "cents": 15304
+          }
+        ]
+      },
+      {
+        "n": 27,
+        "behavior": "payoff_early",
+        "principal_cents": 100000,
+        "apr_bps": 1200,
+        "term_months": 9,
+        "disbursement_date": "2026-01-27",
+        "payments": [
+          {
+            "date": "2026-02-27",
+            "cents": 11674
+          },
+          {
+            "date": "2026-03-27",
+            "cents": 11674
+          },
+          {
+            "date": "2026-04-27",
+            "cents": 11674
+          },
+          {
+            "date": "2026-05-27",
+            "cents": 11674
+          },
+          {
+            "date": "2026-06-12",
+            "payoff": true
+          }
+        ]
+      },
+      {
+        "n": 28,
+        "behavior": "default",
+        "principal_cents": 275000,
+        "apr_bps": 1800,
+        "term_months": 6,
+        "disbursement_date": "2026-01-28",
+        "payments": []
+      },
+      {
+        "n": 29,
+        "behavior": "on_time",
+        "principal_cents": 200000,
+        "apr_bps": 2400,
+        "term_months": 12,
+        "disbursement_date": "2026-01-01",
+        "payments": [
+          {
+            "date": "2026-02-01",
+            "cents": 18912
+          },
+          {
+            "date": "2026-03-01",
+            "cents": 18912
+          },
+          {
+            "date": "2026-04-01",
+            "cents": 18912
+          },
+          {
+            "date": "2026-05-01",
+            "cents": 18912
+          },
+          {
+            "date": "2026-06-01",
+            "cents": 18912
+          },
+          {
+            "date": "2026-07-01",
+            "cents": 18912
+          },
+          {
+            "date": "2026-08-01",
+            "cents": 18912
+          },
+          {
+            "date": "2026-09-01",
+            "cents": 18912
+          },
+          {
+            "date": "2026-10-01",
+            "cents": 18912
+          },
+          {
+            "date": "2026-11-01",
+            "cents": 18912
+          },
+          {
+            "date": "2026-12-01",
+            "cents": 18912
+          }
+        ]
+      },
+      {
+        "n": 30,
+        "behavior": "chronic_late",
+        "principal_cents": 125000,
+        "apr_bps": 3600,
+        "term_months": 9,
+        "disbursement_date": "2026-01-02",
+        "payments": [
+          {
+            "date": "2026-02-15",
+            "cents": 16054
+          },
+          {
+            "date": "2026-03-22",
+            "cents": 16054
+          },
+          {
+            "date": "2026-04-05",
+            "cents": 16054
+          },
+          {
+            "date": "2026-05-12",
+            "cents": 16054
+          },
+          {
+            "date": "2026-06-19",
+            "cents": 16054
+          },
+          {
+            "date": "2026-07-26",
+            "cents": 16054
+          },
+          {
+            "date": "2026-08-09",
+            "cents": 16054
+          },
+          {
+            "date": "2026-09-16",
+            "cents": 16054
+          },
+          {
+            "date": "2026-10-23",
+            "payoff": true
+          }
+        ]
+      },
+      {
+        "n": 31,
+        "behavior": "payoff_early",
+        "principal_cents": 50000,
+        "apr_bps": 900,
+        "term_months": 6,
+        "disbursement_date": "2026-01-03",
+        "payments": [
+          {
+            "date": "2026-02-03",
+            "cents": 8553
+          },
+          {
+            "date": "2026-03-03",
+            "cents": 8553
+          },
+          {
+            "date": "2026-03-13",
+            "payoff": true
+          }
+        ]
+      },
+      {
+        "n": 32,
+        "behavior": "default",
+        "principal_cents": 225000,
+        "apr_bps": 1200,
+        "term_months": 12,
+        "disbursement_date": "2026-01-04",
+        "payments": [
+          {
+            "date": "2026-02-04",
+            "cents": 19991
+          }
+        ]
+      },
+      {
+        "n": 33,
+        "behavior": "on_time",
+        "principal_cents": 150000,
+        "apr_bps": 1800,
+        "term_months": 9,
+        "disbursement_date": "2026-01-05",
+        "payments": [
+          {
+            "date": "2026-02-05",
+            "cents": 17941
+          },
+          {
+            "date": "2026-03-05",
+            "cents": 17941
+          },
+          {
+            "date": "2026-04-05",
+            "cents": 17941
+          },
+          {
+            "date": "2026-05-05",
+            "cents": 17941
+          },
+          {
+            "date": "2026-06-05",
+            "cents": 17941
+          },
+          {
+            "date": "2026-07-05",
+            "cents": 17941
+          },
+          {
+            "date": "2026-08-05",
+            "cents": 17941
+          },
+          {
+            "date": "2026-09-05",
+            "cents": 17941
+          },
+          {
+            "date": "2026-10-05",
+            "payoff": true
+          }
+        ]
+      },
+      {
+        "n": 34,
+        "behavior": "chronic_late",
+        "principal_cents": 75000,
+        "apr_bps": 2400,
+        "term_months": 6,
+        "disbursement_date": "2026-01-06",
+        "payments": [
+          {
+            "date": "2026-02-23",
+            "cents": 13389
+          },
+          {
+            "date": "2026-03-30",
+            "cents": 13389
+          },
+          {
+            "date": "2026-04-13",
+            "cents": 13389
+          },
+          {
+            "date": "2026-05-20",
+            "cents": 13389
+          },
+          {
+            "date": "2026-06-27",
+            "cents": 13389
+          },
+          {
+            "date": "2026-07-10",
+            "payoff": true
+          }
+        ]
+      },
+      {
+        "n": 35,
+        "behavior": "payoff_early",
+        "principal_cents": 250000,
+        "apr_bps": 3600,
+        "term_months": 12,
+        "disbursement_date": "2026-01-07",
+        "payments": [
+          {
+            "date": "2026-02-07",
+            "cents": 25116
+          },
+          {
+            "date": "2026-03-07",
+            "cents": 25116
+          },
+          {
+            "date": "2026-04-07",
+            "cents": 25116
+          },
+          {
+            "date": "2026-04-21",
+            "payoff": true
+          }
+        ]
+      },
+      {
+        "n": 36,
+        "behavior": "default",
+        "principal_cents": 175000,
+        "apr_bps": 900,
+        "term_months": 9,
+        "disbursement_date": "2026-01-08",
+        "payments": [
+          {
+            "date": "2026-02-08",
+            "cents": 20181
+          },
+          {
+            "date": "2026-03-08",
+            "cents": 20181
+          }
+        ]
+      },
+      {
+        "n": 37,
+        "behavior": "on_time",
+        "principal_cents": 100000,
+        "apr_bps": 1200,
+        "term_months": 6,
+        "disbursement_date": "2026-01-09",
+        "payments": [
+          {
+            "date": "2026-02-09",
+            "cents": 17255
+          },
+          {
+            "date": "2026-03-09",
+            "cents": 17255
+          },
+          {
+            "date": "2026-04-09",
+            "cents": 17255
+          },
+          {
+            "date": "2026-05-09",
+            "cents": 17255
+          },
+          {
+            "date": "2026-06-09",
+            "cents": 17255
+          },
+          {
+            "date": "2026-07-09",
+            "payoff": true
+          }
+        ]
+      },
+      {
+        "n": 38,
+        "behavior": "chronic_late",
+        "principal_cents": 275000,
+        "apr_bps": 1800,
+        "term_months": 12,
+        "disbursement_date": "2026-01-10",
+        "payments": [
+          {
+            "date": "2026-03-03",
+            "cents": 25212
+          },
+          {
+            "date": "2026-03-14",
+            "cents": 25212
+          },
+          {
+            "date": "2026-04-21",
+            "cents": 25212
+          },
+          {
+            "date": "2026-05-28",
+            "cents": 25212
+          },
+          {
+            "date": "2026-07-05",
+            "cents": 25212
+          },
+          {
+            "date": "2026-07-18",
+            "cents": 25212
+          },
+          {
+            "date": "2026-08-25",
+            "cents": 25212
+          },
+          {
+            "date": "2026-10-02",
+            "cents": 25212
+          },
+          {
+            "date": "2026-10-15",
+            "cents": 25212
+          },
+          {
+            "date": "2026-11-22",
+            "cents": 25212
+          },
+          {
+            "date": "2026-12-29",
+            "cents": 25212
+          }
+        ]
+      },
+      {
+        "n": 39,
+        "behavior": "payoff_early",
+        "principal_cents": 200000,
+        "apr_bps": 2400,
+        "term_months": 9,
+        "disbursement_date": "2026-01-11",
+        "payments": [
+          {
+            "date": "2026-02-11",
+            "cents": 24503
+          },
+          {
+            "date": "2026-03-11",
+            "cents": 24503
+          },
+          {
+            "date": "2026-04-11",
+            "cents": 24503
+          },
+          {
+            "date": "2026-05-11",
+            "cents": 24503
+          },
+          {
+            "date": "2026-05-29",
+            "payoff": true
+          }
+        ]
+      },
+      {
+        "n": 40,
+        "behavior": "default",
+        "principal_cents": 125000,
+        "apr_bps": 3600,
+        "term_months": 6,
+        "disbursement_date": "2026-01-12",
+        "payments": []
+      }
+    ]
+  },
+  "expected": {
+    "loans": [
+      {
+        "n": 1,
+        "payments": [
+          {
+            "date": "2026-02-01",
+            "cents": 8553,
+            "allocation": {
+              "fees": 0,
+              "interest": 382,
+              "principal": 8171
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-03-01",
+            "cents": 8553,
+            "allocation": {
+              "fees": 0,
+              "interest": 289,
+              "principal": 8264
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-04-01",
+            "cents": 8553,
+            "allocation": {
+              "fees": 0,
+              "interest": 257,
+              "principal": 8296
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-05-01",
+            "cents": 8553,
+            "allocation": {
+              "fees": 0,
+              "interest": 187,
+              "principal": 8366
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-06-01",
+            "cents": 8553,
+            "allocation": {
+              "fees": 0,
+              "interest": 129,
+              "principal": 8424
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-07-01",
+            "cents": 8542,
+            "allocation": {
+              "fees": 0,
+              "interest": 63,
+              "principal": 8479
+            },
+            "loan_closed": true
+          }
+        ],
+        "fees": [],
+        "states": [
+          {
+            "date": "2026-01-01",
+            "state": "current"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 0,
+          "interest": 0,
+          "principal": 0
+        },
+        "interest_income_cents": 1307,
+        "accrual_entries": 181
+      },
+      {
+        "n": 2,
+        "payments": [
+          {
+            "date": "2026-02-11",
+            "cents": 19991,
+            "allocation": {
+              "fees": 0,
+              "interest": 2959,
+              "principal": 17032
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-03-18",
+            "cents": 19991,
+            "allocation": {
+              "fees": 1500,
+              "interest": 2393,
+              "principal": 16098
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-04-25",
+            "cents": 19991,
+            "allocation": {
+              "fees": 1500,
+              "interest": 2397,
+              "principal": 16094
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-05-08",
+            "cents": 19991,
+            "allocation": {
+              "fees": 0,
+              "interest": 751,
+              "principal": 19240
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-06-15",
+            "cents": 19991,
+            "allocation": {
+              "fees": 1500,
+              "interest": 1956,
+              "principal": 16535
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-07-22",
+            "cents": 19991,
+            "allocation": {
+              "fees": 1500,
+              "interest": 1703,
+              "principal": 16788
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-08-05",
+            "cents": 19991,
+            "allocation": {
+              "fees": 0,
+              "interest": 567,
+              "principal": 19424
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-09-12",
+            "cents": 19991,
+            "allocation": {
+              "fees": 0,
+              "interest": 1297,
+              "principal": 18694
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-10-19",
+            "cents": 19991,
+            "allocation": {
+              "fees": 1500,
+              "interest": 1035,
+              "principal": 17456
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-11-26",
+            "cents": 19991,
+            "allocation": {
+              "fees": 1500,
+              "interest": 845,
+              "principal": 17646
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-12-09",
+            "cents": 19991,
+            "allocation": {
+              "fees": 0,
+              "interest": 214,
+              "principal": 19777
+            },
+            "loan_closed": false
+          }
+        ],
+        "fees": [
+          {
+            "installment": 2,
+            "date": "2026-03-13",
+            "cents": 1500
+          },
+          {
+            "installment": 3,
+            "date": "2026-04-13",
+            "cents": 1500
+          },
+          {
+            "installment": 5,
+            "date": "2026-06-13",
+            "cents": 1500
+          },
+          {
+            "installment": 6,
+            "date": "2026-07-13",
+            "cents": 1500
+          },
+          {
+            "installment": 9,
+            "date": "2026-10-13",
+            "cents": 1500
+          },
+          {
+            "installment": 10,
+            "date": "2026-11-13",
+            "cents": 1500
+          }
+        ],
+        "states": [
+          {
+            "date": "2026-01-02",
+            "state": "current"
+          },
+          {
+            "date": "2026-02-03",
+            "state": "grace"
+          },
+          {
+            "date": "2026-02-11",
+            "state": "current"
+          },
+          {
+            "date": "2026-03-03",
+            "state": "grace"
+          },
+          {
+            "date": "2026-03-13",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-03-18",
+            "state": "current"
+          },
+          {
+            "date": "2026-04-03",
+            "state": "grace"
+          },
+          {
+            "date": "2026-04-13",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-04-25",
+            "state": "current"
+          },
+          {
+            "date": "2026-05-03",
+            "state": "grace"
+          },
+          {
+            "date": "2026-05-08",
+            "state": "current"
+          },
+          {
+            "date": "2026-06-03",
+            "state": "grace"
+          },
+          {
+            "date": "2026-06-13",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-06-15",
+            "state": "current"
+          },
+          {
+            "date": "2026-07-03",
+            "state": "grace"
+          },
+          {
+            "date": "2026-07-13",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-07-22",
+            "state": "current"
+          },
+          {
+            "date": "2026-08-03",
+            "state": "grace"
+          },
+          {
+            "date": "2026-08-05",
+            "state": "current"
+          },
+          {
+            "date": "2026-09-03",
+            "state": "grace"
+          },
+          {
+            "date": "2026-09-12",
+            "state": "current"
+          },
+          {
+            "date": "2026-10-03",
+            "state": "grace"
+          },
+          {
+            "date": "2026-10-13",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-10-19",
+            "state": "current"
+          },
+          {
+            "date": "2026-11-03",
+            "state": "grace"
+          },
+          {
+            "date": "2026-11-13",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-11-26",
+            "state": "current"
+          },
+          {
+            "date": "2026-12-03",
+            "state": "grace"
+          },
+          {
+            "date": "2026-12-09",
+            "state": "current"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 0,
+          "interest": 219,
+          "principal": 30216
+        },
+        "interest_income_cents": 16336,
+        "accrual_entries": 363
+      },
+      {
+        "n": 3,
+        "payments": [
+          {
+            "date": "2026-02-03",
+            "cents": 17941,
+            "allocation": {
+              "fees": 0,
+              "interest": 2293,
+              "principal": 15648
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-03-03",
+            "cents": 17941,
+            "allocation": {
+              "fees": 0,
+              "interest": 1855,
+              "principal": 16086
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-04-03",
+            "cents": 17941,
+            "allocation": {
+              "fees": 0,
+              "interest": 1808,
+              "principal": 16133
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-05-03",
+            "cents": 17941,
+            "allocation": {
+              "fees": 0,
+              "interest": 1511,
+              "principal": 16430
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-05-15",
+            "cents": 86210,
+            "allocation": {
+              "fees": 0,
+              "interest": 507,
+              "principal": 85703
+            },
+            "loan_closed": true
+          }
+        ],
+        "fees": [],
+        "states": [
+          {
+            "date": "2026-01-03",
+            "state": "current"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 0,
+          "interest": 0,
+          "principal": 0
+        },
+        "interest_income_cents": 7974,
+        "accrual_entries": 132
+      },
+      {
+        "n": 4,
+        "payments": [],
+        "fees": [
+          {
+            "installment": 1,
+            "date": "2026-02-15",
+            "cents": 1500
+          },
+          {
+            "installment": 2,
+            "date": "2026-03-15",
+            "cents": 1500
+          },
+          {
+            "installment": 3,
+            "date": "2026-04-15",
+            "cents": 1500
+          },
+          {
+            "installment": 4,
+            "date": "2026-05-15",
+            "cents": 1500
+          },
+          {
+            "installment": 5,
+            "date": "2026-06-15",
+            "cents": 1500
+          },
+          {
+            "installment": 6,
+            "date": "2026-07-15",
+            "cents": 1500
+          }
+        ],
+        "states": [
+          {
+            "date": "2026-01-04",
+            "state": "current"
+          },
+          {
+            "date": "2026-02-05",
+            "state": "grace"
+          },
+          {
+            "date": "2026-02-15",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-04-05",
+            "state": "delinquent_60"
+          },
+          {
+            "date": "2026-05-05",
+            "state": "delinquent_90"
+          },
+          {
+            "date": "2026-06-04",
+            "state": "default_recommended"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 9000,
+          "interest": 17803,
+          "principal": 75000
+        },
+        "interest_income_cents": 17803,
+        "accrual_entries": 361
+      },
+      {
+        "n": 5,
+        "payments": [
+          {
+            "date": "2026-02-05",
+            "cents": 25116,
+            "allocation": {
+              "fees": 0,
+              "interest": 7644,
+              "principal": 17472
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-03-05",
+            "cents": 25116,
+            "allocation": {
+              "fees": 0,
+              "interest": 6422,
+              "principal": 18694
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-04-05",
+            "cents": 25116,
+            "allocation": {
+              "fees": 0,
+              "interest": 6538,
+              "principal": 18578
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-05-05",
+            "cents": 25116,
+            "allocation": {
+              "fees": 0,
+              "interest": 5777,
+              "principal": 19339
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-06-05",
+            "cents": 25116,
+            "allocation": {
+              "fees": 0,
+              "interest": 5379,
+              "principal": 19737
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-07-05",
+            "cents": 25116,
+            "allocation": {
+              "fees": 0,
+              "interest": 4621,
+              "principal": 20495
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-08-05",
+            "cents": 25116,
+            "allocation": {
+              "fees": 0,
+              "interest": 4149,
+              "principal": 20967
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-09-05",
+            "cents": 25116,
+            "allocation": {
+              "fees": 0,
+              "interest": 3508,
+              "principal": 21608
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-10-05",
+            "cents": 25116,
+            "allocation": {
+              "fees": 0,
+              "interest": 2755,
+              "principal": 22361
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-11-05",
+            "cents": 25116,
+            "allocation": {
+              "fees": 0,
+              "interest": 2163,
+              "principal": 22953
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-12-05",
+            "cents": 25116,
+            "allocation": {
+              "fees": 0,
+              "interest": 1414,
+              "principal": 23702
+            },
+            "loan_closed": false
+          }
+        ],
+        "fees": [],
+        "states": [
+          {
+            "date": "2026-01-05",
+            "state": "current"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 0,
+          "interest": 618,
+          "principal": 24094
+        },
+        "interest_income_cents": 50988,
+        "accrual_entries": 360
+      },
+      {
+        "n": 6,
+        "payments": [
+          {
+            "date": "2026-02-19",
+            "cents": 20181,
+            "allocation": {
+              "fees": 1500,
+              "interest": 1899,
+              "principal": 16782
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-03-26",
+            "cents": 20181,
+            "allocation": {
+              "fees": 1500,
+              "interest": 1365,
+              "principal": 17316
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-04-09",
+            "cents": 20181,
+            "allocation": {
+              "fees": 0,
+              "interest": 486,
+              "principal": 19695
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-05-16",
+            "cents": 20181,
+            "allocation": {
+              "fees": 0,
+              "interest": 1106,
+              "principal": 19075
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-06-23",
+            "cents": 20181,
+            "allocation": {
+              "fees": 1500,
+              "interest": 957,
+              "principal": 17724
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-07-30",
+            "cents": 20181,
+            "allocation": {
+              "fees": 1500,
+              "interest": 770,
+              "principal": 17911
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-08-13",
+            "cents": 20181,
+            "allocation": {
+              "fees": 0,
+              "interest": 230,
+              "principal": 19951
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-09-20",
+            "cents": 20181,
+            "allocation": {
+              "fees": 1500,
+              "interest": 436,
+              "principal": 18245
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-10-27",
+            "cents": 30059,
+            "allocation": {
+              "fees": 1500,
+              "interest": 258,
+              "principal": 28301
+            },
+            "loan_closed": true
+          }
+        ],
+        "fees": [
+          {
+            "installment": 1,
+            "date": "2026-02-17",
+            "cents": 1500
+          },
+          {
+            "installment": 2,
+            "date": "2026-03-17",
+            "cents": 1500
+          },
+          {
+            "installment": 5,
+            "date": "2026-06-17",
+            "cents": 1500
+          },
+          {
+            "installment": 6,
+            "date": "2026-07-17",
+            "cents": 1500
+          },
+          {
+            "installment": 8,
+            "date": "2026-09-17",
+            "cents": 1500
+          },
+          {
+            "installment": 9,
+            "date": "2026-10-17",
+            "cents": 1500
+          }
+        ],
+        "states": [
+          {
+            "date": "2026-01-06",
+            "state": "current"
+          },
+          {
+            "date": "2026-02-07",
+            "state": "grace"
+          },
+          {
+            "date": "2026-02-17",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-02-19",
+            "state": "current"
+          },
+          {
+            "date": "2026-03-07",
+            "state": "grace"
+          },
+          {
+            "date": "2026-03-17",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-03-26",
+            "state": "current"
+          },
+          {
+            "date": "2026-04-07",
+            "state": "grace"
+          },
+          {
+            "date": "2026-04-09",
+            "state": "current"
+          },
+          {
+            "date": "2026-05-07",
+            "state": "grace"
+          },
+          {
+            "date": "2026-05-16",
+            "state": "current"
+          },
+          {
+            "date": "2026-06-07",
+            "state": "grace"
+          },
+          {
+            "date": "2026-06-17",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-06-23",
+            "state": "current"
+          },
+          {
+            "date": "2026-07-07",
+            "state": "grace"
+          },
+          {
+            "date": "2026-07-17",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-07-30",
+            "state": "current"
+          },
+          {
+            "date": "2026-08-07",
+            "state": "grace"
+          },
+          {
+            "date": "2026-08-13",
+            "state": "current"
+          },
+          {
+            "date": "2026-09-07",
+            "state": "grace"
+          },
+          {
+            "date": "2026-09-17",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-09-20",
+            "state": "current"
+          },
+          {
+            "date": "2026-10-07",
+            "state": "grace"
+          },
+          {
+            "date": "2026-10-17",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-10-27",
+            "state": "current"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 0,
+          "interest": 0,
+          "principal": 0
+        },
+        "interest_income_cents": 7507,
+        "accrual_entries": 294
+      },
+      {
+        "n": 7,
+        "payments": [
+          {
+            "date": "2026-02-07",
+            "cents": 17255,
+            "allocation": {
+              "fees": 0,
+              "interest": 1019,
+              "principal": 16236
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-03-07",
+            "cents": 17255,
+            "allocation": {
+              "fees": 0,
+              "interest": 771,
+              "principal": 16484
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-03-23",
+            "cents": 67634,
+            "allocation": {
+              "fees": 0,
+              "interest": 354,
+              "principal": 67280
+            },
+            "loan_closed": true
+          }
+        ],
+        "fees": [],
+        "states": [
+          {
+            "date": "2026-01-07",
+            "state": "current"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 0,
+          "interest": 0,
+          "principal": 0
+        },
+        "interest_income_cents": 2144,
+        "accrual_entries": 75
+      },
+      {
+        "n": 8,
+        "payments": [
+          {
+            "date": "2026-02-08",
+            "cents": 25212,
+            "allocation": {
+              "fees": 0,
+              "interest": 4204,
+              "principal": 21008
+            },
+            "loan_closed": false
+          }
+        ],
+        "fees": [
+          {
+            "installment": 2,
+            "date": "2026-03-19",
+            "cents": 1500
+          },
+          {
+            "installment": 3,
+            "date": "2026-04-19",
+            "cents": 1500
+          },
+          {
+            "installment": 4,
+            "date": "2026-05-19",
+            "cents": 1500
+          },
+          {
+            "installment": 5,
+            "date": "2026-06-19",
+            "cents": 1500
+          },
+          {
+            "installment": 6,
+            "date": "2026-07-19",
+            "cents": 1500
+          },
+          {
+            "installment": 7,
+            "date": "2026-08-19",
+            "cents": 1500
+          },
+          {
+            "installment": 8,
+            "date": "2026-09-19",
+            "cents": 1500
+          },
+          {
+            "installment": 9,
+            "date": "2026-10-19",
+            "cents": 1500
+          },
+          {
+            "installment": 10,
+            "date": "2026-11-19",
+            "cents": 1500
+          },
+          {
+            "installment": 11,
+            "date": "2026-12-19",
+            "cents": 1500
+          }
+        ],
+        "states": [
+          {
+            "date": "2026-01-08",
+            "state": "current"
+          },
+          {
+            "date": "2026-03-09",
+            "state": "grace"
+          },
+          {
+            "date": "2026-03-19",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-05-07",
+            "state": "delinquent_60"
+          },
+          {
+            "date": "2026-06-06",
+            "state": "delinquent_90"
+          },
+          {
+            "date": "2026-07-06",
+            "state": "default_recommended"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 15000,
+          "interest": 40834,
+          "principal": 253992
+        },
+        "interest_income_cents": 45038,
+        "accrual_entries": 357
+      },
+      {
+        "n": 9,
+        "payments": [
+          {
+            "date": "2026-02-09",
+            "cents": 24503,
+            "allocation": {
+              "fees": 0,
+              "interest": 4077,
+              "principal": 20426
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-03-09",
+            "cents": 24503,
+            "allocation": {
+              "fees": 0,
+              "interest": 3306,
+              "principal": 21197
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-04-09",
+            "cents": 24503,
+            "allocation": {
+              "fees": 0,
+              "interest": 3228,
+              "principal": 21275
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-05-09",
+            "cents": 24503,
+            "allocation": {
+              "fees": 0,
+              "interest": 2704,
+              "principal": 21799
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-06-09",
+            "cents": 24503,
+            "allocation": {
+              "fees": 0,
+              "interest": 2350,
+              "principal": 22153
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-07-09",
+            "cents": 24503,
+            "allocation": {
+              "fees": 0,
+              "interest": 1837,
+              "principal": 22666
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-08-09",
+            "cents": 24503,
+            "allocation": {
+              "fees": 0,
+              "interest": 1437,
+              "principal": 23066
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-09-09",
+            "cents": 24503,
+            "allocation": {
+              "fees": 0,
+              "interest": 967,
+              "principal": 23536
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-10-09",
+            "cents": 24353,
+            "allocation": {
+              "fees": 0,
+              "interest": 471,
+              "principal": 23882
+            },
+            "loan_closed": true
+          }
+        ],
+        "fees": [],
+        "states": [
+          {
+            "date": "2026-01-09",
+            "state": "current"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 0,
+          "interest": 0,
+          "principal": 0
+        },
+        "interest_income_cents": 20377,
+        "accrual_entries": 273
+      },
+      {
+        "n": 10,
+        "payments": [
+          {
+            "date": "2026-02-27",
+            "cents": 23075,
+            "allocation": {
+              "fees": 1500,
+              "interest": 5918,
+              "principal": 15657
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-04-03",
+            "cents": 23075,
+            "allocation": {
+              "fees": 1500,
+              "interest": 3775,
+              "principal": 17800
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-04-17",
+            "cents": 23075,
+            "allocation": {
+              "fees": 0,
+              "interest": 1264,
+              "principal": 21811
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-05-24",
+            "cents": 23075,
+            "allocation": {
+              "fees": 1500,
+              "interest": 2545,
+              "principal": 19030
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-07-01",
+            "cents": 23075,
+            "allocation": {
+              "fees": 1500,
+              "interest": 1900,
+              "principal": 19675
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-07-14",
+            "cents": 31425,
+            "allocation": {
+              "fees": 0,
+              "interest": 398,
+              "principal": 31027
+            },
+            "loan_closed": true
+          }
+        ],
+        "fees": [
+          {
+            "installment": 1,
+            "date": "2026-02-21",
+            "cents": 1500
+          },
+          {
+            "installment": 2,
+            "date": "2026-03-21",
+            "cents": 1500
+          },
+          {
+            "installment": 4,
+            "date": "2026-05-21",
+            "cents": 1500
+          },
+          {
+            "installment": 5,
+            "date": "2026-06-21",
+            "cents": 1500
+          }
+        ],
+        "states": [
+          {
+            "date": "2026-01-10",
+            "state": "current"
+          },
+          {
+            "date": "2026-02-11",
+            "state": "grace"
+          },
+          {
+            "date": "2026-02-21",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-02-27",
+            "state": "current"
+          },
+          {
+            "date": "2026-03-11",
+            "state": "grace"
+          },
+          {
+            "date": "2026-03-21",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-04-03",
+            "state": "current"
+          },
+          {
+            "date": "2026-04-11",
+            "state": "grace"
+          },
+          {
+            "date": "2026-04-17",
+            "state": "current"
+          },
+          {
+            "date": "2026-05-11",
+            "state": "grace"
+          },
+          {
+            "date": "2026-05-21",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-05-24",
+            "state": "current"
+          },
+          {
+            "date": "2026-06-11",
+            "state": "grace"
+          },
+          {
+            "date": "2026-06-21",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-07-01",
+            "state": "current"
+          },
+          {
+            "date": "2026-07-11",
+            "state": "grace"
+          },
+          {
+            "date": "2026-07-14",
+            "state": "current"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 0,
+          "interest": 0,
+          "principal": 0
+        },
+        "interest_income_cents": 15800,
+        "accrual_entries": 185
+      },
+      {
+        "n": 11,
+        "payments": [
+          {
+            "date": "2026-02-11",
+            "cents": 4373,
+            "allocation": {
+              "fees": 0,
+              "interest": 382,
+              "principal": 3991
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-03-11",
+            "cents": 4373,
+            "allocation": {
+              "fees": 0,
+              "interest": 318,
+              "principal": 4055
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-04-11",
+            "cents": 4373,
+            "allocation": {
+              "fees": 0,
+              "interest": 321,
+              "principal": 4052
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-04-21",
+            "cents": 37995,
+            "allocation": {
+              "fees": 0,
+              "interest": 93,
+              "principal": 37902
+            },
+            "loan_closed": true
+          }
+        ],
+        "fees": [],
+        "states": [
+          {
+            "date": "2026-01-11",
+            "state": "current"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 0,
+          "interest": 0,
+          "principal": 0
+        },
+        "interest_income_cents": 1114,
+        "accrual_entries": 100
+      },
+      {
+        "n": 12,
+        "payments": [
+          {
+            "date": "2026-02-12",
+            "cents": 26267,
+            "allocation": {
+              "fees": 0,
+              "interest": 2293,
+              "principal": 23974
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-03-12",
+            "cents": 26267,
+            "allocation": {
+              "fees": 0,
+              "interest": 1851,
+              "principal": 24416
+            },
+            "loan_closed": false
+          }
+        ],
+        "fees": [
+          {
+            "installment": 3,
+            "date": "2026-04-23",
+            "cents": 1500
+          },
+          {
+            "installment": 4,
+            "date": "2026-05-23",
+            "cents": 1500
+          },
+          {
+            "installment": 5,
+            "date": "2026-06-23",
+            "cents": 1500
+          },
+          {
+            "installment": 6,
+            "date": "2026-07-23",
+            "cents": 1500
+          },
+          {
+            "installment": 7,
+            "date": "2026-08-23",
+            "cents": 1500
+          },
+          {
+            "installment": 8,
+            "date": "2026-09-23",
+            "cents": 1500
+          },
+          {
+            "installment": 9,
+            "date": "2026-10-23",
+            "cents": 1500
+          }
+        ],
+        "states": [
+          {
+            "date": "2026-01-12",
+            "state": "current"
+          },
+          {
+            "date": "2026-04-13",
+            "state": "grace"
+          },
+          {
+            "date": "2026-04-23",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-06-11",
+            "state": "delinquent_60"
+          },
+          {
+            "date": "2026-07-11",
+            "state": "delinquent_90"
+          },
+          {
+            "date": "2026-08-10",
+            "state": "default_recommended"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 10500,
+          "interest": 17071,
+          "principal": 176610
+        },
+        "interest_income_cents": 21215,
+        "accrual_entries": 353
+      },
+      {
+        "n": 13,
+        "payments": [
+          {
+            "date": "2026-02-13",
+            "cents": 26329,
+            "allocation": {
+              "fees": 0,
+              "interest": 2293,
+              "principal": 24036
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-03-13",
+            "cents": 26329,
+            "allocation": {
+              "fees": 0,
+              "interest": 1739,
+              "principal": 24590
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-04-13",
+            "cents": 26329,
+            "allocation": {
+              "fees": 0,
+              "interest": 1550,
+              "principal": 24779
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-05-13",
+            "cents": 26329,
+            "allocation": {
+              "fees": 0,
+              "interest": 1133,
+              "principal": 25196
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-06-13",
+            "cents": 26329,
+            "allocation": {
+              "fees": 0,
+              "interest": 786,
+              "principal": 25543
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-07-13",
+            "cents": 26239,
+            "allocation": {
+              "fees": 0,
+              "interest": 383,
+              "principal": 25856
+            },
+            "loan_closed": true
+          }
+        ],
+        "fees": [],
+        "states": [
+          {
+            "date": "2026-01-13",
+            "state": "current"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 0,
+          "interest": 0,
+          "principal": 0
+        },
+        "interest_income_cents": 7884,
+        "accrual_entries": 181
+      },
+      {
+        "n": 14,
+        "payments": [
+          {
+            "date": "2026-03-07",
+            "cents": 7092,
+            "allocation": {
+              "fees": 1500,
+              "interest": 2564,
+              "principal": 3028
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-03-18",
+            "cents": 7092,
+            "allocation": {
+              "fees": 0,
+              "interest": 521,
+              "principal": 6571
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-04-25",
+            "cents": 7092,
+            "allocation": {
+              "fees": 1500,
+              "interest": 1634,
+              "principal": 3958
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-06-01",
+            "cents": 7092,
+            "allocation": {
+              "fees": 1500,
+              "interest": 1495,
+              "principal": 4097
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-07-09",
+            "cents": 7092,
+            "allocation": {
+              "fees": 1500,
+              "interest": 1433,
+              "principal": 4159
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-07-22",
+            "cents": 7092,
+            "allocation": {
+              "fees": 0,
+              "interest": 455,
+              "principal": 6637
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-08-29",
+            "cents": 7092,
+            "allocation": {
+              "fees": 1500,
+              "interest": 1163,
+              "principal": 4429
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-10-06",
+            "cents": 7092,
+            "allocation": {
+              "fees": 1500,
+              "interest": 1052,
+              "principal": 4540
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-10-19",
+            "cents": 7092,
+            "allocation": {
+              "fees": 0,
+              "interest": 321,
+              "principal": 6771
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-11-26",
+            "cents": 7092,
+            "allocation": {
+              "fees": 1500,
+              "interest": 770,
+              "principal": 4822
+            },
+            "loan_closed": false
+          }
+        ],
+        "fees": [
+          {
+            "installment": 1,
+            "date": "2026-02-25",
+            "cents": 1500
+          },
+          {
+            "installment": 3,
+            "date": "2026-04-25",
+            "cents": 1500
+          },
+          {
+            "installment": 4,
+            "date": "2026-05-25",
+            "cents": 1500
+          },
+          {
+            "installment": 5,
+            "date": "2026-06-25",
+            "cents": 1500
+          },
+          {
+            "installment": 7,
+            "date": "2026-08-25",
+            "cents": 1500
+          },
+          {
+            "installment": 8,
+            "date": "2026-09-25",
+            "cents": 1500
+          },
+          {
+            "installment": 10,
+            "date": "2026-11-25",
+            "cents": 1500
+          },
+          {
+            "installment": 11,
+            "date": "2026-12-25",
+            "cents": 1500
+          }
+        ],
+        "states": [
+          {
+            "date": "2026-01-14",
+            "state": "current"
+          },
+          {
+            "date": "2026-02-15",
+            "state": "grace"
+          },
+          {
+            "date": "2026-02-25",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-03-07",
+            "state": "current"
+          },
+          {
+            "date": "2026-03-15",
+            "state": "grace"
+          },
+          {
+            "date": "2026-03-18",
+            "state": "current"
+          },
+          {
+            "date": "2026-04-15",
+            "state": "grace"
+          },
+          {
+            "date": "2026-04-25",
+            "state": "current"
+          },
+          {
+            "date": "2026-05-15",
+            "state": "grace"
+          },
+          {
+            "date": "2026-05-25",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-06-01",
+            "state": "current"
+          },
+          {
+            "date": "2026-06-15",
+            "state": "grace"
+          },
+          {
+            "date": "2026-06-25",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-07-09",
+            "state": "current"
+          },
+          {
+            "date": "2026-07-15",
+            "state": "grace"
+          },
+          {
+            "date": "2026-07-22",
+            "state": "current"
+          },
+          {
+            "date": "2026-08-15",
+            "state": "grace"
+          },
+          {
+            "date": "2026-08-25",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-08-29",
+            "state": "current"
+          },
+          {
+            "date": "2026-09-15",
+            "state": "grace"
+          },
+          {
+            "date": "2026-09-25",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-10-06",
+            "state": "current"
+          },
+          {
+            "date": "2026-10-15",
+            "state": "grace"
+          },
+          {
+            "date": "2026-10-19",
+            "state": "current"
+          },
+          {
+            "date": "2026-11-15",
+            "state": "grace"
+          },
+          {
+            "date": "2026-11-25",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-11-26",
+            "state": "current"
+          },
+          {
+            "date": "2026-12-15",
+            "state": "grace"
+          },
+          {
+            "date": "2026-12-25",
+            "state": "delinquent_30"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 1500,
+          "interest": 598,
+          "principal": 25988
+        },
+        "interest_income_cents": 12006,
+        "accrual_entries": 351
+      },
+      {
+        "n": 15,
+        "payments": [
+          {
+            "date": "2026-02-15",
+            "cents": 32108,
+            "allocation": {
+              "fees": 0,
+              "interest": 7644,
+              "principal": 24464
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-03-15",
+            "cents": 32108,
+            "allocation": {
+              "fees": 0,
+              "interest": 6229,
+              "principal": 25879
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-04-15",
+            "cents": 32108,
+            "allocation": {
+              "fees": 0,
+              "interest": 6105,
+              "principal": 26003
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-05-15",
+            "cents": 32108,
+            "allocation": {
+              "fees": 0,
+              "interest": 5138,
+              "principal": 26970
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-05-29",
+            "cents": 148709,
+            "allocation": {
+              "fees": 0,
+              "interest": 2025,
+              "principal": 146684
+            },
+            "loan_closed": true
+          }
+        ],
+        "fees": [],
+        "states": [
+          {
+            "date": "2026-01-15",
+            "state": "current"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 0,
+          "interest": 0,
+          "principal": 0
+        },
+        "interest_income_cents": 27141,
+        "accrual_entries": 134
+      },
+      {
+        "n": 16,
+        "payments": [],
+        "fees": [
+          {
+            "installment": 1,
+            "date": "2026-02-27",
+            "cents": 1500
+          },
+          {
+            "installment": 2,
+            "date": "2026-03-27",
+            "cents": 1500
+          },
+          {
+            "installment": 3,
+            "date": "2026-04-27",
+            "cents": 1500
+          },
+          {
+            "installment": 4,
+            "date": "2026-05-27",
+            "cents": 1500
+          },
+          {
+            "installment": 5,
+            "date": "2026-06-27",
+            "cents": 1500
+          },
+          {
+            "installment": 6,
+            "date": "2026-07-27",
+            "cents": 1500
+          }
+        ],
+        "states": [
+          {
+            "date": "2026-01-16",
+            "state": "current"
+          },
+          {
+            "date": "2026-02-17",
+            "state": "grace"
+          },
+          {
+            "date": "2026-02-27",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-04-17",
+            "state": "delinquent_60"
+          },
+          {
+            "date": "2026-05-17",
+            "state": "delinquent_90"
+          },
+          {
+            "date": "2026-06-16",
+            "state": "default_recommended"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 9000,
+          "interest": 15060,
+          "principal": 175000
+        },
+        "interest_income_cents": 15060,
+        "accrual_entries": 349
+      },
+      {
+        "n": 17,
+        "payments": [
+          {
+            "date": "2026-02-17",
+            "cents": 8885,
+            "allocation": {
+              "fees": 0,
+              "interest": 1019,
+              "principal": 7866
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-03-17",
+            "cents": 8885,
+            "allocation": {
+              "fees": 0,
+              "interest": 848,
+              "principal": 8037
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-04-17",
+            "cents": 8885,
+            "allocation": {
+              "fees": 0,
+              "interest": 857,
+              "principal": 8028
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-05-17",
+            "cents": 8885,
+            "allocation": {
+              "fees": 0,
+              "interest": 750,
+              "principal": 8135
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-06-17",
+            "cents": 8885,
+            "allocation": {
+              "fees": 0,
+              "interest": 692,
+              "principal": 8193
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-07-17",
+            "cents": 8885,
+            "allocation": {
+              "fees": 0,
+              "interest": 589,
+              "principal": 8296
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-08-17",
+            "cents": 8885,
+            "allocation": {
+              "fees": 0,
+              "interest": 524,
+              "principal": 8361
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-09-17",
+            "cents": 8885,
+            "allocation": {
+              "fees": 0,
+              "interest": 439,
+              "principal": 8446
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-10-17",
+            "cents": 8885,
+            "allocation": {
+              "fees": 0,
+              "interest": 342,
+              "principal": 8543
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-11-17",
+            "cents": 8885,
+            "allocation": {
+              "fees": 0,
+              "interest": 266,
+              "principal": 8619
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-12-17",
+            "cents": 8885,
+            "allocation": {
+              "fees": 0,
+              "interest": 172,
+              "principal": 8713
+            },
+            "loan_closed": false
+          }
+        ],
+        "fees": [],
+        "states": [
+          {
+            "date": "2026-01-17",
+            "state": "current"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 0,
+          "interest": 40,
+          "principal": 8763
+        },
+        "interest_income_cents": 6538,
+        "accrual_entries": 348
+      },
+      {
+        "n": 18,
+        "payments": [
+          {
+            "date": "2026-03-15",
+            "cents": 32893,
+            "allocation": {
+              "fees": 1500,
+              "interest": 7595,
+              "principal": 23798
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-03-26",
+            "cents": 32893,
+            "allocation": {
+              "fees": 0,
+              "interest": 1363,
+              "principal": 31530
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-05-03",
+            "cents": 32893,
+            "allocation": {
+              "fees": 1500,
+              "interest": 4117,
+              "principal": 27276
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-06-09",
+            "cents": 32893,
+            "allocation": {
+              "fees": 1500,
+              "interest": 3511,
+              "principal": 27882
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-06-23",
+            "cents": 32893,
+            "allocation": {
+              "fees": 0,
+              "interest": 1136,
+              "principal": 31757
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-07-30",
+            "cents": 32893,
+            "allocation": {
+              "fees": 1500,
+              "interest": 2422,
+              "principal": 28971
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-09-06",
+            "cents": 32893,
+            "allocation": {
+              "fees": 1500,
+              "interest": 1945,
+              "principal": 29448
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-10-14",
+            "cents": 32893,
+            "allocation": {
+              "fees": 1500,
+              "interest": 1393,
+              "principal": 30000
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-10-27",
+            "cents": 44622,
+            "allocation": {
+              "fees": 0,
+              "interest": 284,
+              "principal": 44338
+            },
+            "loan_closed": true
+          }
+        ],
+        "fees": [
+          {
+            "installment": 1,
+            "date": "2026-03-01",
+            "cents": 1500
+          },
+          {
+            "installment": 3,
+            "date": "2026-04-29",
+            "cents": 1500
+          },
+          {
+            "installment": 4,
+            "date": "2026-05-29",
+            "cents": 1500
+          },
+          {
+            "installment": 6,
+            "date": "2026-07-29",
+            "cents": 1500
+          },
+          {
+            "installment": 7,
+            "date": "2026-08-29",
+            "cents": 1500
+          },
+          {
+            "installment": 8,
+            "date": "2026-09-29",
+            "cents": 1500
+          }
+        ],
+        "states": [
+          {
+            "date": "2026-01-18",
+            "state": "current"
+          },
+          {
+            "date": "2026-02-19",
+            "state": "grace"
+          },
+          {
+            "date": "2026-03-01",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-03-15",
+            "state": "current"
+          },
+          {
+            "date": "2026-03-19",
+            "state": "grace"
+          },
+          {
+            "date": "2026-03-26",
+            "state": "current"
+          },
+          {
+            "date": "2026-04-19",
+            "state": "grace"
+          },
+          {
+            "date": "2026-04-29",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-05-03",
+            "state": "current"
+          },
+          {
+            "date": "2026-05-19",
+            "state": "grace"
+          },
+          {
+            "date": "2026-05-29",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-06-09",
+            "state": "current"
+          },
+          {
+            "date": "2026-06-19",
+            "state": "grace"
+          },
+          {
+            "date": "2026-06-23",
+            "state": "current"
+          },
+          {
+            "date": "2026-07-19",
+            "state": "grace"
+          },
+          {
+            "date": "2026-07-29",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-07-30",
+            "state": "current"
+          },
+          {
+            "date": "2026-08-19",
+            "state": "grace"
+          },
+          {
+            "date": "2026-08-29",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-09-06",
+            "state": "current"
+          },
+          {
+            "date": "2026-09-19",
+            "state": "grace"
+          },
+          {
+            "date": "2026-09-29",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-10-14",
+            "state": "current"
+          },
+          {
+            "date": "2026-10-19",
+            "state": "grace"
+          },
+          {
+            "date": "2026-10-27",
+            "state": "current"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 0,
+          "interest": 0,
+          "principal": 0
+        },
+        "interest_income_cents": 23766,
+        "accrual_entries": 282
+      },
+      {
+        "n": 19,
+        "payments": [
+          {
+            "date": "2026-02-19",
+            "cents": 35705,
+            "allocation": {
+              "fees": 0,
+              "interest": 4077,
+              "principal": 31628
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-03-19",
+            "cents": 35705,
+            "allocation": {
+              "fees": 0,
+              "interest": 3100,
+              "principal": 32605
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-04-06",
+            "cents": 137374,
+            "allocation": {
+              "fees": 0,
+              "interest": 1607,
+              "principal": 135767
+            },
+            "loan_closed": true
+          }
+        ],
+        "fees": [],
+        "states": [
+          {
+            "date": "2026-01-19",
+            "state": "current"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 0,
+          "interest": 0,
+          "principal": 0
+        },
+        "interest_income_cents": 8784,
+        "accrual_entries": 77
+      },
+      {
+        "n": 20,
+        "payments": [
+          {
+            "date": "2026-02-20",
+            "cents": 12558,
+            "allocation": {
+              "fees": 0,
+              "interest": 3822,
+              "principal": 8736
+            },
+            "loan_closed": false
+          }
+        ],
+        "fees": [
+          {
+            "installment": 2,
+            "date": "2026-03-31",
+            "cents": 1500
+          },
+          {
+            "installment": 3,
+            "date": "2026-05-01",
+            "cents": 1500
+          },
+          {
+            "installment": 4,
+            "date": "2026-05-31",
+            "cents": 1500
+          },
+          {
+            "installment": 5,
+            "date": "2026-07-01",
+            "cents": 1500
+          },
+          {
+            "installment": 6,
+            "date": "2026-07-31",
+            "cents": 1500
+          },
+          {
+            "installment": 7,
+            "date": "2026-08-31",
+            "cents": 1500
+          },
+          {
+            "installment": 8,
+            "date": "2026-10-01",
+            "cents": 1500
+          },
+          {
+            "installment": 9,
+            "date": "2026-10-31",
+            "cents": 1500
+          },
+          {
+            "installment": 10,
+            "date": "2026-12-01",
+            "cents": 1500
+          },
+          {
+            "installment": 11,
+            "date": "2026-12-31",
+            "cents": 1500
+          }
+        ],
+        "states": [
+          {
+            "date": "2026-01-20",
+            "state": "current"
+          },
+          {
+            "date": "2026-03-21",
+            "state": "grace"
+          },
+          {
+            "date": "2026-03-31",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-05-19",
+            "state": "delinquent_60"
+          },
+          {
+            "date": "2026-06-18",
+            "state": "delinquent_90"
+          },
+          {
+            "date": "2026-07-18",
+            "state": "default_recommended"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 15000,
+          "interest": 36007,
+          "principal": 116264
+        },
+        "interest_income_cents": 39829,
+        "accrual_entries": 345
+      },
+      {
+        "n": 21,
+        "payments": [
+          {
+            "date": "2026-02-21",
+            "cents": 5766,
+            "allocation": {
+              "fees": 0,
+              "interest": 382,
+              "principal": 5384
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-03-21",
+            "cents": 5766,
+            "allocation": {
+              "fees": 0,
+              "interest": 308,
+              "principal": 5458
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-04-21",
+            "cents": 5766,
+            "allocation": {
+              "fees": 0,
+              "interest": 299,
+              "principal": 5467
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-05-21",
+            "cents": 5766,
+            "allocation": {
+              "fees": 0,
+              "interest": 249,
+              "principal": 5517
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-06-21",
+            "cents": 5766,
+            "allocation": {
+              "fees": 0,
+              "interest": 215,
+              "principal": 5551
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-07-21",
+            "cents": 5766,
+            "allocation": {
+              "fees": 0,
+              "interest": 167,
+              "principal": 5599
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-08-21",
+            "cents": 5766,
+            "allocation": {
+              "fees": 0,
+              "interest": 130,
+              "principal": 5636
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-09-21",
+            "cents": 5766,
+            "allocation": {
+              "fees": 0,
+              "interest": 87,
+              "principal": 5679
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-10-21",
+            "cents": 5751,
+            "allocation": {
+              "fees": 0,
+              "interest": 42,
+              "principal": 5709
+            },
+            "loan_closed": true
+          }
+        ],
+        "fees": [],
+        "states": [
+          {
+            "date": "2026-01-21",
+            "state": "current"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 0,
+          "interest": 0,
+          "principal": 0
+        },
+        "interest_income_cents": 1879,
+        "accrual_entries": 273
+      },
+      {
+        "n": 22,
+        "payments": [
+          {
+            "date": "2026-02-27",
+            "cents": 38823,
+            "allocation": {
+              "fees": 0,
+              "interest": 2663,
+              "principal": 36160
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-04-03",
+            "cents": 38823,
+            "allocation": {
+              "fees": 1500,
+              "interest": 2173,
+              "principal": 35150
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-05-11",
+            "cents": 38823,
+            "allocation": {
+              "fees": 1500,
+              "interest": 1920,
+              "principal": 35403
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-06-17",
+            "cents": 38823,
+            "allocation": {
+              "fees": 1500,
+              "interest": 1439,
+              "principal": 35884
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-07-01",
+            "cents": 38823,
+            "allocation": {
+              "fees": 0,
+              "interest": 379,
+              "principal": 38444
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-08-07",
+            "cents": 45994,
+            "allocation": {
+              "fees": 1500,
+              "interest": 535,
+              "principal": 43959
+            },
+            "loan_closed": true
+          }
+        ],
+        "fees": [
+          {
+            "installment": 2,
+            "date": "2026-04-02",
+            "cents": 1500
+          },
+          {
+            "installment": 3,
+            "date": "2026-05-03",
+            "cents": 1500
+          },
+          {
+            "installment": 4,
+            "date": "2026-06-02",
+            "cents": 1500
+          },
+          {
+            "installment": 6,
+            "date": "2026-08-02",
+            "cents": 1500
+          }
+        ],
+        "states": [
+          {
+            "date": "2026-01-22",
+            "state": "current"
+          },
+          {
+            "date": "2026-02-23",
+            "state": "grace"
+          },
+          {
+            "date": "2026-02-27",
+            "state": "current"
+          },
+          {
+            "date": "2026-03-23",
+            "state": "grace"
+          },
+          {
+            "date": "2026-04-02",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-04-03",
+            "state": "current"
+          },
+          {
+            "date": "2026-04-23",
+            "state": "grace"
+          },
+          {
+            "date": "2026-05-03",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-05-11",
+            "state": "current"
+          },
+          {
+            "date": "2026-05-23",
+            "state": "grace"
+          },
+          {
+            "date": "2026-06-02",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-06-17",
+            "state": "current"
+          },
+          {
+            "date": "2026-06-23",
+            "state": "grace"
+          },
+          {
+            "date": "2026-07-01",
+            "state": "current"
+          },
+          {
+            "date": "2026-07-23",
+            "state": "grace"
+          },
+          {
+            "date": "2026-08-02",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-08-07",
+            "state": "current"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 0,
+          "interest": 0,
+          "principal": 0
+        },
+        "interest_income_cents": 9109,
+        "accrual_entries": 197
+      },
+      {
+        "n": 23,
+        "payments": [
+          {
+            "date": "2026-02-23",
+            "cents": 13752,
+            "allocation": {
+              "fees": 0,
+              "interest": 2293,
+              "principal": 11459
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-03-23",
+            "cents": 13752,
+            "allocation": {
+              "fees": 0,
+              "interest": 1913,
+              "principal": 11839
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-04-23",
+            "cents": 13752,
+            "allocation": {
+              "fees": 0,
+              "interest": 1937,
+              "principal": 11815
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-05-05",
+            "cents": 115567,
+            "allocation": {
+              "fees": 0,
+              "interest": 680,
+              "principal": 114887
+            },
+            "loan_closed": true
+          }
+        ],
+        "fees": [],
+        "states": [
+          {
+            "date": "2026-01-23",
+            "state": "current"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 0,
+          "interest": 0,
+          "principal": 0
+        },
+        "interest_income_cents": 6823,
+        "accrual_entries": 102
+      },
+      {
+        "n": 24,
+        "payments": [
+          {
+            "date": "2026-02-24",
+            "cents": 9189,
+            "allocation": {
+              "fees": 0,
+              "interest": 1529,
+              "principal": 7660
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-03-24",
+            "cents": 9189,
+            "allocation": {
+              "fees": 0,
+              "interest": 1240,
+              "principal": 7949
+            },
+            "loan_closed": false
+          }
+        ],
+        "fees": [
+          {
+            "installment": 3,
+            "date": "2026-05-05",
+            "cents": 1500
+          },
+          {
+            "installment": 4,
+            "date": "2026-06-04",
+            "cents": 1500
+          },
+          {
+            "installment": 5,
+            "date": "2026-07-05",
+            "cents": 1500
+          },
+          {
+            "installment": 6,
+            "date": "2026-08-04",
+            "cents": 1500
+          },
+          {
+            "installment": 7,
+            "date": "2026-09-04",
+            "cents": 1500
+          },
+          {
+            "installment": 8,
+            "date": "2026-10-05",
+            "cents": 1500
+          },
+          {
+            "installment": 9,
+            "date": "2026-11-04",
+            "cents": 1500
+          }
+        ],
+        "states": [
+          {
+            "date": "2026-01-24",
+            "state": "current"
+          },
+          {
+            "date": "2026-04-25",
+            "state": "grace"
+          },
+          {
+            "date": "2026-05-05",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-06-23",
+            "state": "delinquent_60"
+          },
+          {
+            "date": "2026-07-23",
+            "state": "delinquent_90"
+          },
+          {
+            "date": "2026-08-22",
+            "state": "default_recommended"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 10500,
+          "interest": 11013,
+          "principal": 59391
+        },
+        "interest_income_cents": 13782,
+        "accrual_entries": 341
+      },
+      {
+        "n": 25,
+        "payments": [
+          {
+            "date": "2026-02-25",
+            "cents": 46149,
+            "allocation": {
+              "fees": 0,
+              "interest": 7644,
+              "principal": 38505
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-03-25",
+            "cents": 46149,
+            "allocation": {
+              "fees": 0,
+              "interest": 5841,
+              "principal": 40308
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-04-25",
+            "cents": 46149,
+            "allocation": {
+              "fees": 0,
+              "interest": 5234,
+              "principal": 40915
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-05-25",
+            "cents": 46149,
+            "allocation": {
+              "fees": 0,
+              "interest": 3855,
+              "principal": 42294
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-06-25",
+            "cents": 46149,
+            "allocation": {
+              "fees": 0,
+              "interest": 2690,
+              "principal": 43459
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-07-25",
+            "cents": 45836,
+            "allocation": {
+              "fees": 0,
+              "interest": 1317,
+              "principal": 44519
+            },
+            "loan_closed": true
+          }
+        ],
+        "fees": [],
+        "states": [
+          {
+            "date": "2026-01-25",
+            "state": "current"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 0,
+          "interest": 0,
+          "principal": 0
+        },
+        "interest_income_cents": 26581,
+        "accrual_entries": 181
+      },
+      {
+        "n": 26,
+        "payments": [
+          {
+            "date": "2026-03-07",
+            "cents": 15304,
+            "allocation": {
+              "fees": 0,
+              "interest": 1726,
+              "principal": 13578
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-04-11",
+            "cents": 15304,
+            "allocation": {
+              "fees": 1500,
+              "interest": 1393,
+              "principal": 12411
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-05-19",
+            "cents": 15304,
+            "allocation": {
+              "fees": 1500,
+              "interest": 1396,
+              "principal": 12408
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-06-01",
+            "cents": 15304,
+            "allocation": {
+              "fees": 0,
+              "interest": 438,
+              "principal": 14866
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-07-09",
+            "cents": 15304,
+            "allocation": {
+              "fees": 1500,
+              "interest": 1141,
+              "principal": 12663
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-08-15",
+            "cents": 15304,
+            "allocation": {
+              "fees": 1500,
+              "interest": 995,
+              "principal": 12809
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-08-29",
+            "cents": 15304,
+            "allocation": {
+              "fees": 0,
+              "interest": 332,
+              "principal": 14972
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-10-06",
+            "cents": 15304,
+            "allocation": {
+              "fees": 0,
+              "interest": 762,
+              "principal": 14542
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-11-12",
+            "cents": 15304,
+            "allocation": {
+              "fees": 1500,
+              "interest": 609,
+              "principal": 13195
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-12-20",
+            "cents": 15304,
+            "allocation": {
+              "fees": 1500,
+              "interest": 502,
+              "principal": 13302
+            },
+            "loan_closed": false
+          }
+        ],
+        "fees": [
+          {
+            "installment": 2,
+            "date": "2026-04-06",
+            "cents": 1500
+          },
+          {
+            "installment": 3,
+            "date": "2026-05-07",
+            "cents": 1500
+          },
+          {
+            "installment": 5,
+            "date": "2026-07-07",
+            "cents": 1500
+          },
+          {
+            "installment": 6,
+            "date": "2026-08-06",
+            "cents": 1500
+          },
+          {
+            "installment": 9,
+            "date": "2026-11-06",
+            "cents": 1500
+          },
+          {
+            "installment": 10,
+            "date": "2026-12-07",
+            "cents": 1500
+          }
+        ],
+        "states": [
+          {
+            "date": "2026-01-26",
+            "state": "current"
+          },
+          {
+            "date": "2026-02-27",
+            "state": "grace"
+          },
+          {
+            "date": "2026-03-07",
+            "state": "current"
+          },
+          {
+            "date": "2026-03-27",
+            "state": "grace"
+          },
+          {
+            "date": "2026-04-06",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-04-11",
+            "state": "current"
+          },
+          {
+            "date": "2026-04-27",
+            "state": "grace"
+          },
+          {
+            "date": "2026-05-07",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-05-19",
+            "state": "current"
+          },
+          {
+            "date": "2026-05-27",
+            "state": "grace"
+          },
+          {
+            "date": "2026-06-01",
+            "state": "current"
+          },
+          {
+            "date": "2026-06-27",
+            "state": "grace"
+          },
+          {
+            "date": "2026-07-07",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-07-09",
+            "state": "current"
+          },
+          {
+            "date": "2026-07-27",
+            "state": "grace"
+          },
+          {
+            "date": "2026-08-06",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-08-15",
+            "state": "current"
+          },
+          {
+            "date": "2026-08-27",
+            "state": "grace"
+          },
+          {
+            "date": "2026-08-29",
+            "state": "current"
+          },
+          {
+            "date": "2026-09-27",
+            "state": "grace"
+          },
+          {
+            "date": "2026-10-06",
+            "state": "current"
+          },
+          {
+            "date": "2026-10-27",
+            "state": "grace"
+          },
+          {
+            "date": "2026-11-06",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-11-12",
+            "state": "current"
+          },
+          {
+            "date": "2026-11-27",
+            "state": "grace"
+          },
+          {
+            "date": "2026-12-07",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-12-20",
+            "state": "current"
+          },
+          {
+            "date": "2026-12-27",
+            "state": "grace"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 0,
+          "interest": 109,
+          "principal": 40254
+        },
+        "interest_income_cents": 9403,
+        "accrual_entries": 339
+      },
+      {
+        "n": 27,
+        "payments": [
+          {
+            "date": "2026-02-27",
+            "cents": 11674,
+            "allocation": {
+              "fees": 0,
+              "interest": 1019,
+              "principal": 10655
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-03-27",
+            "cents": 11674,
+            "allocation": {
+              "fees": 0,
+              "interest": 822,
+              "principal": 10852
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-04-27",
+            "cents": 11674,
+            "allocation": {
+              "fees": 0,
+              "interest": 800,
+              "principal": 10874
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-05-27",
+            "cents": 11674,
+            "allocation": {
+              "fees": 0,
+              "interest": 667,
+              "principal": 11007
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-06-12",
+            "cents": 56910,
+            "allocation": {
+              "fees": 0,
+              "interest": 298,
+              "principal": 56612
+            },
+            "loan_closed": true
+          }
+        ],
+        "fees": [],
+        "states": [
+          {
+            "date": "2026-01-27",
+            "state": "current"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 0,
+          "interest": 0,
+          "principal": 0
+        },
+        "interest_income_cents": 3606,
+        "accrual_entries": 136
+      },
+      {
+        "n": 28,
+        "payments": [],
+        "fees": [
+          {
+            "installment": 1,
+            "date": "2026-03-11",
+            "cents": 1500
+          },
+          {
+            "installment": 2,
+            "date": "2026-04-08",
+            "cents": 1500
+          },
+          {
+            "installment": 3,
+            "date": "2026-05-09",
+            "cents": 1500
+          },
+          {
+            "installment": 4,
+            "date": "2026-06-08",
+            "cents": 1500
+          },
+          {
+            "installment": 5,
+            "date": "2026-07-09",
+            "cents": 1500
+          },
+          {
+            "installment": 6,
+            "date": "2026-08-08",
+            "cents": 1500
+          }
+        ],
+        "states": [
+          {
+            "date": "2026-01-28",
+            "state": "current"
+          },
+          {
+            "date": "2026-03-01",
+            "state": "grace"
+          },
+          {
+            "date": "2026-03-11",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-04-29",
+            "state": "delinquent_60"
+          },
+          {
+            "date": "2026-05-29",
+            "state": "delinquent_90"
+          },
+          {
+            "date": "2026-06-28",
+            "state": "default_recommended"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 9000,
+          "interest": 45703,
+          "principal": 275000
+        },
+        "interest_income_cents": 45703,
+        "accrual_entries": 337
+      },
+      {
+        "n": 29,
+        "payments": [
+          {
+            "date": "2026-02-01",
+            "cents": 18912,
+            "allocation": {
+              "fees": 0,
+              "interest": 4077,
+              "principal": 14835
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-03-01",
+            "cents": 18912,
+            "allocation": {
+              "fees": 0,
+              "interest": 3409,
+              "principal": 15503
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-04-01",
+            "cents": 18912,
+            "allocation": {
+              "fees": 0,
+              "interest": 3458,
+              "principal": 15454
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-05-01",
+            "cents": 18912,
+            "allocation": {
+              "fees": 0,
+              "interest": 3042,
+              "principal": 15870
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-06-01",
+            "cents": 18912,
+            "allocation": {
+              "fees": 0,
+              "interest": 2820,
+              "principal": 16092
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-07-01",
+            "cents": 18912,
+            "allocation": {
+              "fees": 0,
+              "interest": 2411,
+              "principal": 16501
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-08-01",
+            "cents": 18912,
+            "allocation": {
+              "fees": 0,
+              "interest": 2155,
+              "principal": 16757
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-09-01",
+            "cents": 18912,
+            "allocation": {
+              "fees": 0,
+              "interest": 1814,
+              "principal": 17098
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-10-01",
+            "cents": 18912,
+            "allocation": {
+              "fees": 0,
+              "interest": 1418,
+              "principal": 17494
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-11-01",
+            "cents": 18912,
+            "allocation": {
+              "fees": 0,
+              "interest": 1109,
+              "principal": 17803
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-12-01",
+            "cents": 18912,
+            "allocation": {
+              "fees": 0,
+              "interest": 722,
+              "principal": 18190
+            },
+            "loan_closed": false
+          }
+        ],
+        "fees": [],
+        "states": [
+          {
+            "date": "2026-01-01",
+            "state": "current"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 0,
+          "interest": 363,
+          "principal": 18403
+        },
+        "interest_income_cents": 26798,
+        "accrual_entries": 364
+      },
+      {
+        "n": 30,
+        "payments": [
+          {
+            "date": "2026-02-15",
+            "cents": 16054,
+            "allocation": {
+              "fees": 1500,
+              "interest": 5425,
+              "principal": 9129
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-03-22",
+            "cents": 16054,
+            "allocation": {
+              "fees": 1500,
+              "interest": 4000,
+              "principal": 10554
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-04-05",
+            "cents": 16054,
+            "allocation": {
+              "fees": 0,
+              "interest": 1454,
+              "principal": 14600
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-05-12",
+            "cents": 16054,
+            "allocation": {
+              "fees": 0,
+              "interest": 3311,
+              "principal": 12743
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-06-19",
+            "cents": 16054,
+            "allocation": {
+              "fees": 1500,
+              "interest": 2922,
+              "principal": 11632
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-07-26",
+            "cents": 16054,
+            "allocation": {
+              "fees": 1500,
+              "interest": 2421,
+              "principal": 12133
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-08-09",
+            "cents": 16054,
+            "allocation": {
+              "fees": 0,
+              "interest": 749,
+              "principal": 15305
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-09-16",
+            "cents": 16054,
+            "allocation": {
+              "fees": 1500,
+              "interest": 1458,
+              "principal": 13096
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-10-23",
+            "cents": 28250,
+            "allocation": {
+              "fees": 1500,
+              "interest": 942,
+              "principal": 25808
+            },
+            "loan_closed": true
+          }
+        ],
+        "fees": [
+          {
+            "installment": 1,
+            "date": "2026-02-13",
+            "cents": 1500
+          },
+          {
+            "installment": 2,
+            "date": "2026-03-13",
+            "cents": 1500
+          },
+          {
+            "installment": 5,
+            "date": "2026-06-13",
+            "cents": 1500
+          },
+          {
+            "installment": 6,
+            "date": "2026-07-13",
+            "cents": 1500
+          },
+          {
+            "installment": 8,
+            "date": "2026-09-13",
+            "cents": 1500
+          },
+          {
+            "installment": 9,
+            "date": "2026-10-13",
+            "cents": 1500
+          }
+        ],
+        "states": [
+          {
+            "date": "2026-01-02",
+            "state": "current"
+          },
+          {
+            "date": "2026-02-03",
+            "state": "grace"
+          },
+          {
+            "date": "2026-02-13",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-02-15",
+            "state": "current"
+          },
+          {
+            "date": "2026-03-03",
+            "state": "grace"
+          },
+          {
+            "date": "2026-03-13",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-03-22",
+            "state": "current"
+          },
+          {
+            "date": "2026-04-03",
+            "state": "grace"
+          },
+          {
+            "date": "2026-04-05",
+            "state": "current"
+          },
+          {
+            "date": "2026-05-03",
+            "state": "grace"
+          },
+          {
+            "date": "2026-05-12",
+            "state": "current"
+          },
+          {
+            "date": "2026-06-03",
+            "state": "grace"
+          },
+          {
+            "date": "2026-06-13",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-06-19",
+            "state": "current"
+          },
+          {
+            "date": "2026-07-03",
+            "state": "grace"
+          },
+          {
+            "date": "2026-07-13",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-07-26",
+            "state": "current"
+          },
+          {
+            "date": "2026-08-03",
+            "state": "grace"
+          },
+          {
+            "date": "2026-08-09",
+            "state": "current"
+          },
+          {
+            "date": "2026-09-03",
+            "state": "grace"
+          },
+          {
+            "date": "2026-09-13",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-09-16",
+            "state": "current"
+          },
+          {
+            "date": "2026-10-03",
+            "state": "grace"
+          },
+          {
+            "date": "2026-10-13",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-10-23",
+            "state": "current"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 0,
+          "interest": 0,
+          "principal": 0
+        },
+        "interest_income_cents": 22682,
+        "accrual_entries": 294
+      },
+      {
+        "n": 31,
+        "payments": [
+          {
+            "date": "2026-02-03",
+            "cents": 8553,
+            "allocation": {
+              "fees": 0,
+              "interest": 382,
+              "principal": 8171
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-03-03",
+            "cents": 8553,
+            "allocation": {
+              "fees": 0,
+              "interest": 289,
+              "principal": 8264
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-03-13",
+            "cents": 33648,
+            "allocation": {
+              "fees": 0,
+              "interest": 83,
+              "principal": 33565
+            },
+            "loan_closed": true
+          }
+        ],
+        "fees": [],
+        "states": [
+          {
+            "date": "2026-01-03",
+            "state": "current"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 0,
+          "interest": 0,
+          "principal": 0
+        },
+        "interest_income_cents": 754,
+        "accrual_entries": 69
+      },
+      {
+        "n": 32,
+        "payments": [
+          {
+            "date": "2026-02-04",
+            "cents": 19991,
+            "allocation": {
+              "fees": 0,
+              "interest": 2293,
+              "principal": 17698
+            },
+            "loan_closed": false
+          }
+        ],
+        "fees": [
+          {
+            "installment": 2,
+            "date": "2026-03-15",
+            "cents": 1500
+          },
+          {
+            "installment": 3,
+            "date": "2026-04-15",
+            "cents": 1500
+          },
+          {
+            "installment": 4,
+            "date": "2026-05-15",
+            "cents": 1500
+          },
+          {
+            "installment": 5,
+            "date": "2026-06-15",
+            "cents": 1500
+          },
+          {
+            "installment": 6,
+            "date": "2026-07-15",
+            "cents": 1500
+          },
+          {
+            "installment": 7,
+            "date": "2026-08-15",
+            "cents": 1500
+          },
+          {
+            "installment": 8,
+            "date": "2026-09-15",
+            "cents": 1500
+          },
+          {
+            "installment": 9,
+            "date": "2026-10-15",
+            "cents": 1500
+          },
+          {
+            "installment": 10,
+            "date": "2026-11-15",
+            "cents": 1500
+          },
+          {
+            "installment": 11,
+            "date": "2026-12-15",
+            "cents": 1500
+          }
+        ],
+        "states": [
+          {
+            "date": "2026-01-04",
+            "state": "current"
+          },
+          {
+            "date": "2026-03-05",
+            "state": "grace"
+          },
+          {
+            "date": "2026-03-15",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-05-03",
+            "state": "delinquent_60"
+          },
+          {
+            "date": "2026-06-02",
+            "state": "delinquent_90"
+          },
+          {
+            "date": "2026-07-02",
+            "state": "default_recommended"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 15000,
+          "interest": 22491,
+          "principal": 207302
+        },
+        "interest_income_cents": 24784,
+        "accrual_entries": 361
+      },
+      {
+        "n": 33,
+        "payments": [
+          {
+            "date": "2026-02-05",
+            "cents": 17941,
+            "allocation": {
+              "fees": 0,
+              "interest": 2293,
+              "principal": 15648
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-03-05",
+            "cents": 17941,
+            "allocation": {
+              "fees": 0,
+              "interest": 1855,
+              "principal": 16086
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-04-05",
+            "cents": 17941,
+            "allocation": {
+              "fees": 0,
+              "interest": 1808,
+              "principal": 16133
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-05-05",
+            "cents": 17941,
+            "allocation": {
+              "fees": 0,
+              "interest": 1511,
+              "principal": 16430
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-06-05",
+            "cents": 17941,
+            "allocation": {
+              "fees": 0,
+              "interest": 1310,
+              "principal": 16631
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-07-05",
+            "cents": 17941,
+            "allocation": {
+              "fees": 0,
+              "interest": 1022,
+              "principal": 16919
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-08-05",
+            "cents": 17941,
+            "allocation": {
+              "fees": 0,
+              "interest": 797,
+              "principal": 17144
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-09-05",
+            "cents": 17941,
+            "allocation": {
+              "fees": 0,
+              "interest": 535,
+              "principal": 17406
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-10-05",
+            "cents": 17863,
+            "allocation": {
+              "fees": 0,
+              "interest": 260,
+              "principal": 17603
+            },
+            "loan_closed": true
+          }
+        ],
+        "fees": [],
+        "states": [
+          {
+            "date": "2026-01-05",
+            "state": "current"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 0,
+          "interest": 0,
+          "principal": 0
+        },
+        "interest_income_cents": 11391,
+        "accrual_entries": 273
+      },
+      {
+        "n": 34,
+        "payments": [
+          {
+            "date": "2026-02-23",
+            "cents": 13389,
+            "allocation": {
+              "fees": 1500,
+              "interest": 2367,
+              "principal": 9522
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-03-30",
+            "cents": 13389,
+            "allocation": {
+              "fees": 1500,
+              "interest": 1507,
+              "principal": 10382
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-04-13",
+            "cents": 13389,
+            "allocation": {
+              "fees": 0,
+              "interest": 507,
+              "principal": 12882
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-05-20",
+            "cents": 13389,
+            "allocation": {
+              "fees": 1500,
+              "interest": 1027,
+              "principal": 10862
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-06-27",
+            "cents": 13389,
+            "allocation": {
+              "fees": 1500,
+              "interest": 783,
+              "principal": 11106
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-07-10",
+            "cents": 20419,
+            "allocation": {
+              "fees": 0,
+              "interest": 173,
+              "principal": 20246
+            },
+            "loan_closed": true
+          }
+        ],
+        "fees": [
+          {
+            "installment": 1,
+            "date": "2026-02-17",
+            "cents": 1500
+          },
+          {
+            "installment": 2,
+            "date": "2026-03-17",
+            "cents": 1500
+          },
+          {
+            "installment": 4,
+            "date": "2026-05-17",
+            "cents": 1500
+          },
+          {
+            "installment": 5,
+            "date": "2026-06-17",
+            "cents": 1500
+          }
+        ],
+        "states": [
+          {
+            "date": "2026-01-06",
+            "state": "current"
+          },
+          {
+            "date": "2026-02-07",
+            "state": "grace"
+          },
+          {
+            "date": "2026-02-17",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-02-23",
+            "state": "current"
+          },
+          {
+            "date": "2026-03-07",
+            "state": "grace"
+          },
+          {
+            "date": "2026-03-17",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-03-30",
+            "state": "current"
+          },
+          {
+            "date": "2026-04-07",
+            "state": "grace"
+          },
+          {
+            "date": "2026-04-13",
+            "state": "current"
+          },
+          {
+            "date": "2026-05-07",
+            "state": "grace"
+          },
+          {
+            "date": "2026-05-17",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-05-20",
+            "state": "current"
+          },
+          {
+            "date": "2026-06-07",
+            "state": "grace"
+          },
+          {
+            "date": "2026-06-17",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-06-27",
+            "state": "current"
+          },
+          {
+            "date": "2026-07-07",
+            "state": "grace"
+          },
+          {
+            "date": "2026-07-10",
+            "state": "current"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 0,
+          "interest": 0,
+          "principal": 0
+        },
+        "interest_income_cents": 6364,
+        "accrual_entries": 185
+      },
+      {
+        "n": 35,
+        "payments": [
+          {
+            "date": "2026-02-07",
+            "cents": 25116,
+            "allocation": {
+              "fees": 0,
+              "interest": 7644,
+              "principal": 17472
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-03-07",
+            "cents": 25116,
+            "allocation": {
+              "fees": 0,
+              "interest": 6422,
+              "principal": 18694
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-04-07",
+            "cents": 25116,
+            "allocation": {
+              "fees": 0,
+              "interest": 6538,
+              "principal": 18578
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-04-21",
+            "cents": 197952,
+            "allocation": {
+              "fees": 0,
+              "interest": 2696,
+              "principal": 195256
+            },
+            "loan_closed": true
+          }
+        ],
+        "fees": [],
+        "states": [
+          {
+            "date": "2026-01-07",
+            "state": "current"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 0,
+          "interest": 0,
+          "principal": 0
+        },
+        "interest_income_cents": 23300,
+        "accrual_entries": 104
+      },
+      {
+        "n": 36,
+        "payments": [
+          {
+            "date": "2026-02-08",
+            "cents": 20181,
+            "allocation": {
+              "fees": 0,
+              "interest": 1338,
+              "principal": 18843
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-03-08",
+            "cents": 20181,
+            "allocation": {
+              "fees": 0,
+              "interest": 1078,
+              "principal": 19103
+            },
+            "loan_closed": false
+          }
+        ],
+        "fees": [
+          {
+            "installment": 3,
+            "date": "2026-04-19",
+            "cents": 1500
+          },
+          {
+            "installment": 4,
+            "date": "2026-05-19",
+            "cents": 1500
+          },
+          {
+            "installment": 5,
+            "date": "2026-06-19",
+            "cents": 1500
+          },
+          {
+            "installment": 6,
+            "date": "2026-07-19",
+            "cents": 1500
+          },
+          {
+            "installment": 7,
+            "date": "2026-08-19",
+            "cents": 1500
+          },
+          {
+            "installment": 8,
+            "date": "2026-09-19",
+            "cents": 1500
+          },
+          {
+            "installment": 9,
+            "date": "2026-10-19",
+            "cents": 1500
+          }
+        ],
+        "states": [
+          {
+            "date": "2026-01-08",
+            "state": "current"
+          },
+          {
+            "date": "2026-04-09",
+            "state": "grace"
+          },
+          {
+            "date": "2026-04-19",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-06-07",
+            "state": "delinquent_60"
+          },
+          {
+            "date": "2026-07-07",
+            "state": "delinquent_90"
+          },
+          {
+            "date": "2026-08-06",
+            "state": "default_recommended"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 10500,
+          "interest": 10071,
+          "principal": 137054
+        },
+        "interest_income_cents": 12487,
+        "accrual_entries": 357
+      },
+      {
+        "n": 37,
+        "payments": [
+          {
+            "date": "2026-02-09",
+            "cents": 17255,
+            "allocation": {
+              "fees": 0,
+              "interest": 1019,
+              "principal": 16236
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-03-09",
+            "cents": 17255,
+            "allocation": {
+              "fees": 0,
+              "interest": 771,
+              "principal": 16484
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-04-09",
+            "cents": 17255,
+            "allocation": {
+              "fees": 0,
+              "interest": 686,
+              "principal": 16569
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-05-09",
+            "cents": 17255,
+            "allocation": {
+              "fees": 0,
+              "interest": 500,
+              "principal": 16755
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-06-09",
+            "cents": 17255,
+            "allocation": {
+              "fees": 0,
+              "interest": 346,
+              "principal": 16909
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-07-09",
+            "cents": 17215,
+            "allocation": {
+              "fees": 0,
+              "interest": 168,
+              "principal": 17047
+            },
+            "loan_closed": true
+          }
+        ],
+        "fees": [],
+        "states": [
+          {
+            "date": "2026-01-09",
+            "state": "current"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 0,
+          "interest": 0,
+          "principal": 0
+        },
+        "interest_income_cents": 3490,
+        "accrual_entries": 181
+      },
+      {
+        "n": 38,
+        "payments": [
+          {
+            "date": "2026-03-03",
+            "cents": 25212,
+            "allocation": {
+              "fees": 1500,
+              "interest": 7052,
+              "principal": 16660
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-03-14",
+            "cents": 25212,
+            "allocation": {
+              "fees": 0,
+              "interest": 1401,
+              "principal": 23811
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-04-21",
+            "cents": 25212,
+            "allocation": {
+              "fees": 1500,
+              "interest": 4395,
+              "principal": 19317
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-05-28",
+            "cents": 25212,
+            "allocation": {
+              "fees": 1500,
+              "interest": 3927,
+              "principal": 19785
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-07-05",
+            "cents": 25212,
+            "allocation": {
+              "fees": 1500,
+              "interest": 3662,
+              "principal": 20050
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-07-18",
+            "cents": 25212,
+            "allocation": {
+              "fees": 0,
+              "interest": 1124,
+              "principal": 24088
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-08-25",
+            "cents": 25212,
+            "allocation": {
+              "fees": 1500,
+              "interest": 2835,
+              "principal": 20877
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-10-02",
+            "cents": 25212,
+            "allocation": {
+              "fees": 1500,
+              "interest": 2444,
+              "principal": 21268
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-10-15",
+            "cents": 25212,
+            "allocation": {
+              "fees": 0,
+              "interest": 700,
+              "principal": 24512
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-11-22",
+            "cents": 25212,
+            "allocation": {
+              "fees": 1500,
+              "interest": 1586,
+              "principal": 22126
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-12-29",
+            "cents": 25212,
+            "allocation": {
+              "fees": 1500,
+              "interest": 1141,
+              "principal": 22571
+            },
+            "loan_closed": false
+          }
+        ],
+        "fees": [
+          {
+            "installment": 1,
+            "date": "2026-02-21",
+            "cents": 1500
+          },
+          {
+            "installment": 3,
+            "date": "2026-04-21",
+            "cents": 1500
+          },
+          {
+            "installment": 4,
+            "date": "2026-05-21",
+            "cents": 1500
+          },
+          {
+            "installment": 5,
+            "date": "2026-06-21",
+            "cents": 1500
+          },
+          {
+            "installment": 7,
+            "date": "2026-08-21",
+            "cents": 1500
+          },
+          {
+            "installment": 8,
+            "date": "2026-09-21",
+            "cents": 1500
+          },
+          {
+            "installment": 10,
+            "date": "2026-11-21",
+            "cents": 1500
+          },
+          {
+            "installment": 11,
+            "date": "2026-12-21",
+            "cents": 1500
+          }
+        ],
+        "states": [
+          {
+            "date": "2026-01-10",
+            "state": "current"
+          },
+          {
+            "date": "2026-02-11",
+            "state": "grace"
+          },
+          {
+            "date": "2026-02-21",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-03-03",
+            "state": "current"
+          },
+          {
+            "date": "2026-03-11",
+            "state": "grace"
+          },
+          {
+            "date": "2026-03-14",
+            "state": "current"
+          },
+          {
+            "date": "2026-04-11",
+            "state": "grace"
+          },
+          {
+            "date": "2026-04-21",
+            "state": "current"
+          },
+          {
+            "date": "2026-05-11",
+            "state": "grace"
+          },
+          {
+            "date": "2026-05-21",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-05-28",
+            "state": "current"
+          },
+          {
+            "date": "2026-06-11",
+            "state": "grace"
+          },
+          {
+            "date": "2026-06-21",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-07-05",
+            "state": "current"
+          },
+          {
+            "date": "2026-07-11",
+            "state": "grace"
+          },
+          {
+            "date": "2026-07-18",
+            "state": "current"
+          },
+          {
+            "date": "2026-08-11",
+            "state": "grace"
+          },
+          {
+            "date": "2026-08-21",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-08-25",
+            "state": "current"
+          },
+          {
+            "date": "2026-09-11",
+            "state": "grace"
+          },
+          {
+            "date": "2026-09-21",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-10-02",
+            "state": "current"
+          },
+          {
+            "date": "2026-10-11",
+            "state": "grace"
+          },
+          {
+            "date": "2026-10-15",
+            "state": "current"
+          },
+          {
+            "date": "2026-11-11",
+            "state": "grace"
+          },
+          {
+            "date": "2026-11-21",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-11-22",
+            "state": "current"
+          },
+          {
+            "date": "2026-12-11",
+            "state": "grace"
+          },
+          {
+            "date": "2026-12-21",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-12-29",
+            "state": "current"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 0,
+          "interest": 39,
+          "principal": 39935
+        },
+        "interest_income_cents": 30306,
+        "accrual_entries": 355
+      },
+      {
+        "n": 39,
+        "payments": [
+          {
+            "date": "2026-02-11",
+            "cents": 24503,
+            "allocation": {
+              "fees": 0,
+              "interest": 4077,
+              "principal": 20426
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-03-11",
+            "cents": 24503,
+            "allocation": {
+              "fees": 0,
+              "interest": 3306,
+              "principal": 21197
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-04-11",
+            "cents": 24503,
+            "allocation": {
+              "fees": 0,
+              "interest": 3228,
+              "principal": 21275
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-05-11",
+            "cents": 24503,
+            "allocation": {
+              "fees": 0,
+              "interest": 2704,
+              "principal": 21799
+            },
+            "loan_closed": false
+          },
+          {
+            "date": "2026-05-29",
+            "cents": 116668,
+            "allocation": {
+              "fees": 0,
+              "interest": 1365,
+              "principal": 115303
+            },
+            "loan_closed": true
+          }
+        ],
+        "fees": [],
+        "states": [
+          {
+            "date": "2026-01-11",
+            "state": "current"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 0,
+          "interest": 0,
+          "principal": 0
+        },
+        "interest_income_cents": 14680,
+        "accrual_entries": 138
+      },
+      {
+        "n": 40,
+        "payments": [],
+        "fees": [
+          {
+            "installment": 1,
+            "date": "2026-02-23",
+            "cents": 1500
+          },
+          {
+            "installment": 2,
+            "date": "2026-03-23",
+            "cents": 1500
+          },
+          {
+            "installment": 3,
+            "date": "2026-04-23",
+            "cents": 1500
+          },
+          {
+            "installment": 4,
+            "date": "2026-05-23",
+            "cents": 1500
+          },
+          {
+            "installment": 5,
+            "date": "2026-06-23",
+            "cents": 1500
+          },
+          {
+            "installment": 6,
+            "date": "2026-07-23",
+            "cents": 1500
+          }
+        ],
+        "states": [
+          {
+            "date": "2026-01-12",
+            "state": "current"
+          },
+          {
+            "date": "2026-02-13",
+            "state": "grace"
+          },
+          {
+            "date": "2026-02-23",
+            "state": "delinquent_30"
+          },
+          {
+            "date": "2026-04-13",
+            "state": "delinquent_60"
+          },
+          {
+            "date": "2026-05-13",
+            "state": "delinquent_90"
+          },
+          {
+            "date": "2026-06-12",
+            "state": "default_recommended"
+          }
+        ],
+        "owed_at_end": {
+          "fees": 9000,
+          "interest": 43521,
+          "principal": 125000
+        },
+        "interest_income_cents": 43521,
+        "accrual_entries": 353
+      }
+    ],
+    "totals": {
+      "cash_received_cents": 5221728,
+      "interest_income_cents": 686054,
+      "fees_income_cents": 199500,
+      "accrual_entries": 10041,
+      "states_at_end": {
+        "current": 28,
+        "grace": 1,
+        "delinquent_30": 1,
+        "delinquent_60": 0,
+        "delinquent_90": 0,
+        "default_recommended": 10
+      }
+    }
+  }
+}

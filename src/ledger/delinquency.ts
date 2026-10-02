@@ -1,4 +1,4 @@
-// Delinquency status (task 4.2, D18/D19): pure functions of the schedule, the cash received and the date.
+// Delinquency status (task 4.2, D18/D19, D23): pure functions of the schedule, the cash received and the date.
 // Nothing is stored; the state is recomputed from the ledger and the loan's terms on every read.
 
 import type { ClientBase } from 'pg';
@@ -31,6 +31,26 @@ export function stateFromDpd(days: number): LoanState {
   return DELINQUENCY_BANDS.reduce((s, b) => (days >= b.minDpd ? b.state : s), DELINQUENCY_BANDS[0]!.state);
 }
 
+type DayTotals = Payment & { principalCents: number };
+
+/** Per posting date for one loan: cash received (Dr cash) and the net change in principal (loans_receivable). */
+async function ledgerByDate(db: Pick<ClientBase, 'query'>, loanId: string): Promise<DayTotals[]> {
+  const { rows } = await db.query<{ date: string; cash: string; principal: string }>(
+    `SELECT e."date"::text AS date,
+            coalesce(sum(l."debitCents") FILTER (WHERE l."account" = 'cash'), 0)::text AS cash,
+            coalesce(sum(l."debitCents" - l."creditCents") FILTER (WHERE l."account" = 'loans_receivable'), 0)::text AS principal
+       FROM "LedgerLine" l JOIN "LedgerEntry" e ON e."id" = l."entryId"
+      WHERE e."loanId" = $1 GROUP BY e."date"`,
+    [loanId],
+  );
+  return rows.map((r) => ({ date: r.date, cents: Number(r.cash), principalCents: Number(r.principal) }));
+}
+
+/** D23: a loan whose principal is repaid through `date` is closed: DPD 0 and no late fee, whatever the schedule says. */
+function closedBy(days: readonly DayTotals[], date: string): boolean {
+  return days.filter((d) => d.date <= date).reduce((sum, d) => sum + d.principalCents, 0) === 0;
+}
+
 export type LoanStatus = { loanId: string; asOf: string; dpd: number; state: LoanState };
 
 /** Cash received (Dr cash lines) and the schedule rebuilt from the loan's terms, in one read-only snapshot. */
@@ -43,14 +63,8 @@ export async function loanStatus(db: Pick<ClientBase, 'query'>, { loanId, asOf }
       [loanId],
     );
     if (!loans[0]) throw new EntryError('unknown_loan');
-    const { rows } = await db.query<{ date: string; cents: string }>(
-      `SELECT e."date"::text AS date, sum(l."debitCents")::text AS cents
-         FROM "LedgerLine" l JOIN "LedgerEntry" e ON e."id" = l."entryId"
-        WHERE e."loanId" = $1 AND l."account" = 'cash' AND e."date" <= $2
-        GROUP BY e."date"`,
-      [loanId, asOf],
-    );
-    const days = dpd(buildSchedule(loans[0]).rows, rows.map((r) => ({ date: r.date, cents: Number(r.cents) })), asOf);
+    const byDate = await ledgerByDate(db, loanId);
+    const days = closedBy(byDate, asOf) ? 0 : dpd(buildSchedule(loans[0]).rows, byDate.filter((r) => r.date <= asOf), asOf);
     return { loanId, asOf, dpd: days, state: stateFromDpd(days) };
   } finally {
     await db.query('ROLLBACK');
@@ -72,12 +86,7 @@ export async function runStatus(db: Pick<ClientBase, 'query'>, { asOf }: { asOf:
   );
   const out: FeeAssessed[] = [];
   for (const loan of loans) {
-    const { rows: cash } = await db.query<{ date: string; cents: string }>(
-      `SELECT e."date"::text AS date, sum(l."debitCents")::text AS cents
-         FROM "LedgerLine" l JOIN "LedgerEntry" e ON e."id" = l."entryId"
-        WHERE e."loanId" = $1 AND l."account" = 'cash' GROUP BY e."date"`,
-      [loan.id],
-    );
+    const cash = await ledgerByDate(db, loan.id);
     const { rows: done } = await db.query<{ installment: number }>(
       `SELECT "installment" FROM "LedgerEntry" WHERE "loanId" = $1 AND "kind" = 'late_fee'`,
       [loan.id],
@@ -87,8 +96,8 @@ export async function runStatus(db: Pick<ClientBase, 'query'>, { asOf }: { asOf:
     for (const row of buildSchedule(loan).rows) {
       dueCents += row.paymentCents;
       const date = addDays(row.dueDate, GRACE_EXIT_DPD);
-      if (date > asOf || assessed.has(row.n)) continue;
-      const paid = cash.filter((c) => c.date <= date).reduce((sum, c) => sum + Number(c.cents), 0);
+      if (date > asOf || assessed.has(row.n) || closedBy(cash, date)) continue;
+      const paid = cash.filter((c) => c.date <= date).reduce((sum, c) => sum + c.cents, 0);
       if (paid >= dueCents) continue;
       try {
         const entryId = await postEntry(db, {

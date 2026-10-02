@@ -6,7 +6,7 @@ arithmetic (fractions.Fraction) so the product implementation can be tested agai
 numbers it did not produce. Do not import it from the product; do not port it line by
 line -- write the product test-first against the frozen fixtures instead.
 
-Rules encoded here are defined in docs/decisions.md (D1-D9, D17-D20, D22). Stdlib only, Python >= 3.9.
+Rules encoded here are defined in docs/decisions.md (D1-D9, D17-D20, D22, D23). Stdlib only, Python >= 3.9.
 """
 import calendar, csv, datetime as dt, json, os
 from fractions import Fraction
@@ -360,6 +360,78 @@ dump("capstone/CP1.json", dict(
                     accrual_entries=sum(1 for e in cp_entries if e["kind"] == "accrual")),
         owed_at_end=cp_owed,
         statement=statement(cp_entries, cp_owed, CP_LAST.isoformat()))))
+
+# ---------------------------------------------------------------- simulated book (D23)
+def life(P0, apr, rows, disb, pays, last):
+    """One loan day by day, disbursement through `last`, in job order: accrual for D, then a fee dated D (cash and
+    principal as posted before D's payment), then any payment on D (None = the D17 quote). D23: once principal is
+    repaid the loan is closed: DPD 0 and no fee, whatever the schedule says."""
+    owed, P, start, posted, cash, fees, paid, states, n_acc = st(0, 0, P0), P0, disb, 0, [], [], [], [], 0
+    D = disb
+    while D <= last:
+        c = cum_interest(P, apr, (D - start).days)
+        if c > posted:
+            owed["interest"] += c - posted; posted = c; n_acc += 1
+        cum = 0
+        for r in rows:
+            cum += r["payment_cents"]
+            if P > 0 and dt.date.fromisoformat(r["due_date"]) + dt.timedelta(days=GRACE_EXIT) == D and sum(x for _, x in cash) < cum:
+                fees.append(dict(installment=r["n"], date=D.isoformat(), cents=LATE_FEE)); owed["fees"] += LATE_FEE
+        for d, c in pays:
+            if d != D: continue
+            amt = sum(owed.values()) if c is None else c
+            a = allocate(owed, amt, CFG_A)
+            assert "error" not in a, (D, a)
+            paid.append(dict(date=D.isoformat(), cents=amt, allocation=a["allocation"], loan_closed=a["loan_closed"]))
+            owed, cash = dict(a["remaining"]), cash + [(D, amt)]
+            if a["allocation"]["principal"] > 0:
+                P, start, posted = P - a["allocation"]["principal"], D, 0
+        s = band(0 if P == 0 else dq_day(rows, cash, D))
+        if not states or states[-1]["state"] != s: states.append(dict(date=D.isoformat(), state=s))
+        D += dt.timedelta(days=1)
+    return dict(payments=paid, fees=fees, states=states, owed_at_end=owed,
+                interest_income_cents=sum(p["allocation"]["interest"] for p in paid) + owed["interest"], accrual_entries=n_acc)
+
+
+BK_START, BK_END = dt.date(2026, 1, 1), dt.date(2026, 12, 31)
+BEHAVIORS = ["on_time", "chronic_late", "payoff_early", "default"]
+
+
+def book_loan(i):
+    """Loan i of 40: terms and behavior vary by index, nothing random, so the fixture is stable byte for byte."""
+    beh, P, apr, n = BEHAVIORS[i % 4], 50000 + (i * 7 % 10) * 25000, [900, 1200, 1800, 2400, 3600][i % 5], [6, 12, 9][i % 3]
+    disb = BK_START + dt.timedelta(days=i % 28)
+    rows = schedule(P, apr, n, disb)[1]
+    due = [dt.date.fromisoformat(r["due_date"]) for r in rows]
+    on_time = [(d, r["payment_cents"]) for d, r in zip(due, rows)]
+    if beh == "on_time": pays = on_time[:-1] + [(due[-1], None)]                                   # D9: the last one is the quote
+    if beh == "chronic_late":                                                                      # 3-26 days late, fee from 11
+        late = [dt.timedelta(days=3 + (5 + 7 * k + i) % 24) for k in range(n)]
+        pays = [(d + l, c) for (d, c), l in zip(on_time[:-1], late)] + [(due[-1] + late[-1], None)]
+    if beh == "payoff_early": m = 2 + i % 3; pays = on_time[:m] + [(due[m - 1] + dt.timedelta(days=10 + i % 10), None)]
+    if beh == "default": pays = on_time[:i % 3]                                                    # then nothing, ever
+    pays = [(d, c) for d, c in pays if d <= BK_END]
+    return dict(behavior=beh, principal_cents=P, apr_bps=apr, term_months=n, disbursement_date=disb.isoformat(),
+                payments=[dict(date=d.isoformat(), cents=c) if c is not None else dict(date=d.isoformat(), payoff=True) for d, c in pays]), rows, pays
+
+
+bk_in, bk_out = [], []
+for i in range(40):
+    loan, rows, pays = book_loan(i)
+    bk_in.append(dict(n=i + 1, **loan))
+    bk_out.append(dict(n=i + 1, **life(loan["principal_cents"], loan["apr_bps"], rows, dt.date.fromisoformat(loan["disbursement_date"]), pays, BK_END)))
+dump("book/BK1.json", dict(
+    id="BK1", description="Simulated book (PRD success metric): 40 loans over 2026, ten each on_time, chronic_late (3-26 days late, the last "
+                          "payment the quote), payoff_early (quote 10-19 days after installment 2-4) and default (0-2 payments, then none). "
+                          "Run day by day: create loans on their disbursement day, accrual, the late-fee job, then payments. States are "
+                          "transitions (a new row only when the state changes). D23: a repaid loan is closed, current, and takes no fee.",
+    input=dict(start=BK_START.isoformat(), run_through=BK_END.isoformat(), waterfall_order=CFG_A, late_fee_cents=LATE_FEE, loans=bk_in),
+    expected=dict(loans=bk_out, totals=dict(
+        cash_received_cents=sum(p["cents"] for l in bk_out for p in l["payments"]),
+        interest_income_cents=sum(l["interest_income_cents"] for l in bk_out),
+        fees_income_cents=sum(f["cents"] for l in bk_out for f in l["fees"]),
+        accrual_entries=sum(l["accrual_entries"] for l in bk_out),
+        states_at_end={s: sum(1 for l in bk_out if l["states"][-1]["state"] == s) for _, s in reversed(BANDS)}))))
 
 # ---------------------------------------------------------------- ledger
 COA = [

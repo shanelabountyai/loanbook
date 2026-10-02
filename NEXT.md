@@ -1,6 +1,11 @@
 # NEXT
 
-## Pick up here: task 4.6 (simulated book: 40 loans, 12 months, mixed behaviors), see docs/phase-4-tasks.md; model Opus 5.5. Natural place to seed the demo book (scripts/seed-demo.ts has no loans yet).
+## Pick up here: task 4.7 (P1, each its own item: fee waiver, write-off, CSV export, aging report), see docs/phase-4-tasks.md; model Opus 5.5 for waiver/write-off (money). Or run the Phase 4 exit check first if P1 is skipped. Demo seed still has no loans (`scripts/seed-demo.ts`); BK1's `book_loan` terms are a ready source.
+
+4.6 done (2026-10-02, D23): fixture `fixtures/book/BK1.json` (oracle `life()`/`book_loan()` in build_fixtures.py; independent Decimal/bisect re-derivation in verify_fixtures.py, 38 files OK). 40 loans over 2026, 10 each on_time/chronic_late/payoff_early/default; states as transitions. End: 28 current, 1 grace, 1 delinquent_30, 10 default_recommended; 10041 accrual entries.
+Bug found by the book (D23): a loan closed at the quote (early payoff, or the D9 final payment) paid less than the schedule sums to, so `loanStatus` read it past due and `runStatus` charged it late fees. Fix in delinquency.ts: `ledgerByDate` + `closedBy` (loans_receivable through the date is 0 → DPD 0, no fee). Tamper proven on the oracle (verify red without D23).
+Test `tests/integration/book.test.ts` (3): per-loan payments/allocations, fees, state transitions; owed at year end; totals, end-state buckets via `bookOverview`, verify clean. ~57s locally (hook timeout 900s).
+Mutants killed: no D23 in loanStatus (2 red), no D23 in runStatus (3 red). Local: lint, typecheck, both gates, book + status + late-fee + capstone + views + delinquency unit 33/33. No local full sweep; CI owns it.
 
 4.5 done (2026-10-02, D22): fixture `fixtures/capstone/CP1.json` (oracle `capstone()`/`statement()` in build_fixtures.py; independent running-balance re-derivation in verify_fixtures.py, 37 files OK; tamper proven red).
 L1 day by day (accrual, then runStatus, then payment): 02-15 17255; 03-15 10000 short; 03-20 7255 in grace; fee 04-26, 05-01 17255; fee 05-26, 06-20 34510 (inst 4+5); 07-01 payoff 20507 at the quote. Totals: cash 106782 = 100000 + interest 3782 + fees 3000; 167 accrual entries.
