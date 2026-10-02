@@ -433,6 +433,64 @@ dump("book/BK1.json", dict(
         accrual_entries=sum(l["accrual_entries"] for l in bk_out),
         states_at_end={s: sum(1 for l in bk_out if l["states"][-1]["state"] == s) for _, s in reversed(BANDS)}))))
 
+# ---------------------------------------------------------------- fee waiver (D24)
+def waivers(events, last):
+    """L1 day by day: the fee for D, then what is posted on D in order. Only fees_receivable is tracked: a payment
+    takes fees first (CFG_A), a waiver reverses one whole fee if the pooled balance covers it on its date and after."""
+    cash = [(dt.date.fromisoformat(e["posted_on"]), e["payment"]) for e in events if "payment" in e]
+    fees = dq_fees(AM1_ROWS, cash, last)
+    pool, waived, out = [], set(), []   # (date, change in fees_receivable), in posting order
+
+    def owed(through=None): return sum(c for d, c in pool if through is None or d <= through)
+    D = L1D
+    while D < last:
+        D += dt.timedelta(days=1)
+        pool += [(f["date"], f["cents"]) for f in fees if f["date"] == D.isoformat()]
+        for e in (e for e in events if e["posted_on"] == D.isoformat()):
+            if "payment" in e:
+                take = min(e["payment"], owed()); pool.append((e["posted_on"], -take))
+                out.append(dict(fees_paid=take, fees_owed_after=owed())); continue
+            fee = next((f for f in fees if f["installment"] == e["waive"].get("fee")), None)
+            err = ("reason_required" if not e["reason"].strip() else "not_a_fee" if fee is None
+                   else "before_fee" if e["date"] < fee["date"] else "already_reversed" if fee["installment"] in waived
+                   else "fee_paid" if any(owed(d) < fee["cents"] for d in {e["date"]} | {d for d, _ in pool if d >= e["date"]})
+                   else None)
+            if err:
+                out.append(dict(error=err, fees_owed_after=owed())); continue
+            waived.add(fee["installment"]); pool.append((e["date"], -fee["cents"]))
+            out.append(dict(memo=f"Fee waived {money(fee['cents'])} (installment {fee['installment']}): {e['reason'].strip()}", fees_owed_after=owed()))
+    return fees, out, len(waived) * LATE_FEE
+
+
+WV_LAST = dt.date(2026, 6, 10)
+WV_EVENTS = [  # a waiver names its fee by installment, or a non-fee entry by the payment's date
+    dict(posted_on="2026-02-15", payment=X),
+    dict(posted_on="2026-03-27", waive=dict(fee=2), date="2026-03-27", reason="   "),
+    dict(posted_on="2026-03-27", waive=dict(payment="2026-02-15"), date="2026-03-27", reason="goodwill"),
+    dict(posted_on="2026-04-01", payment=1000),
+    dict(posted_on="2026-04-01", waive=dict(fee=2), date="2026-04-01", reason="partly paid"),
+    dict(posted_on="2026-04-27", waive=dict(fee=2), date="2026-04-27", reason="hardship"),
+    dict(posted_on="2026-04-27", waive=dict(fee=2), date="2026-04-27", reason="hardship again"),
+    dict(posted_on="2026-04-27", waive=dict(fee=3), date="2026-04-27", reason="pool too small"),
+    dict(posted_on="2026-05-01", payment=X),
+    dict(posted_on="2026-05-27", waive=dict(fee=3), date="2026-04-28", reason="back-dated"),
+    dict(posted_on="2026-05-27", waive=dict(fee=4), date="2026-05-20", reason="before the fee"),
+    dict(posted_on="2026-05-27", waive=dict(fee=4), date="2026-05-27", reason="servicer error"),
+]
+wv_fees, wv_out, wv_waived = waivers(WV_EVENTS, WV_LAST)
+dump("waiver/WV1.json", dict(
+    id="WV1", description="Fee waivers on L1 (AM1 terms), run day by day (accrual, the late-fee job, then what is posted that day in order). "
+                          "Fees for installments 2, 3, 4. Refused: blank reason; a payment is not a fee; fee 2 partly paid (1000 of 1500) "
+                          "with nothing else owed; fee 2 a second time; fee 3 when the pool holds 500; fee 3 back-dated to 04-28, which "
+                          "the pool covers today (1500) but not on 04-28 (500); fee 4 dated before it was assessed. Waived: fee 2 once fee 3 "
+                          "makes the pool 2000, fee 4 on 05-27. The late-fee job never re-assesses a waived installment (4 is still unpaid at 06-10).",
+    input=dict(loan="AM1", principal_cents=100000, apr_bps=1200, term_months=6, disbursement_date=L1D.isoformat(),
+               waterfall_order=CFG_A, late_fee_cents=LATE_FEE, run_through=WV_LAST.isoformat(), events=WV_EVENTS),
+    expected=dict(fees=wv_fees, results=wv_out, totals=dict(
+        fees_assessed_cents=sum(f["cents"] for f in wv_fees), fees_waived_cents=wv_waived,
+        fees_paid_cents=sum(r.get("fees_paid", 0) for r in wv_out), fees_owed_at_end=wv_out[-1]["fees_owed_after"],
+        fees_income_cents=sum(f["cents"] for f in wv_fees) - wv_waived))))
+
 # ---------------------------------------------------------------- ledger
 COA = [
     dict(account="cash", type="asset", normal="debit"),

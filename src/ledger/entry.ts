@@ -15,7 +15,11 @@ export type EntryErrorCode =
   | 'already_reversed'
   | 'dangling_reversal'
   | 'accrual_pending'
-  | 'unknown_loan';
+  | 'unknown_loan'
+  | 'reason_required'
+  | 'not_a_fee'
+  | 'before_fee'
+  | 'fee_paid';
 
 /** Codes match `fixtures/ledger/entry_validation.json`. `non_integer_amount` arrives as a MoneyError. */
 export class EntryError extends Error {

@@ -1,0 +1,180 @@
+{
+  "id": "WV1",
+  "description": "Fee waivers on L1 (AM1 terms), run day by day (accrual, the late-fee job, then what is posted that day in order). Fees for installments 2, 3, 4. Refused: blank reason; a payment is not a fee; fee 2 partly paid (1000 of 1500) with nothing else owed; fee 2 a second time; fee 3 when the pool holds 500; fee 3 back-dated to 04-28, which the pool covers today (1500) but not on 04-28 (500); fee 4 dated before it was assessed. Waived: fee 2 once fee 3 makes the pool 2000, fee 4 on 05-27. The late-fee job never re-assesses a waived installment (4 is still unpaid at 06-10).",
+  "input": {
+    "loan": "AM1",
+    "principal_cents": 100000,
+    "apr_bps": 1200,
+    "term_months": 6,
+    "disbursement_date": "2026-01-15",
+    "waterfall_order": [
+      "fees",
+      "interest",
+      "principal"
+    ],
+    "late_fee_cents": 1500,
+    "run_through": "2026-06-10",
+    "events": [
+      {
+        "posted_on": "2026-02-15",
+        "payment": 17255
+      },
+      {
+        "posted_on": "2026-03-27",
+        "waive": {
+          "fee": 2
+        },
+        "date": "2026-03-27",
+        "reason": "   "
+      },
+      {
+        "posted_on": "2026-03-27",
+        "waive": {
+          "payment": "2026-02-15"
+        },
+        "date": "2026-03-27",
+        "reason": "goodwill"
+      },
+      {
+        "posted_on": "2026-04-01",
+        "payment": 1000
+      },
+      {
+        "posted_on": "2026-04-01",
+        "waive": {
+          "fee": 2
+        },
+        "date": "2026-04-01",
+        "reason": "partly paid"
+      },
+      {
+        "posted_on": "2026-04-27",
+        "waive": {
+          "fee": 2
+        },
+        "date": "2026-04-27",
+        "reason": "hardship"
+      },
+      {
+        "posted_on": "2026-04-27",
+        "waive": {
+          "fee": 2
+        },
+        "date": "2026-04-27",
+        "reason": "hardship again"
+      },
+      {
+        "posted_on": "2026-04-27",
+        "waive": {
+          "fee": 3
+        },
+        "date": "2026-04-27",
+        "reason": "pool too small"
+      },
+      {
+        "posted_on": "2026-05-01",
+        "payment": 17255
+      },
+      {
+        "posted_on": "2026-05-27",
+        "waive": {
+          "fee": 3
+        },
+        "date": "2026-04-28",
+        "reason": "back-dated"
+      },
+      {
+        "posted_on": "2026-05-27",
+        "waive": {
+          "fee": 4
+        },
+        "date": "2026-05-20",
+        "reason": "before the fee"
+      },
+      {
+        "posted_on": "2026-05-27",
+        "waive": {
+          "fee": 4
+        },
+        "date": "2026-05-27",
+        "reason": "servicer error"
+      }
+    ]
+  },
+  "expected": {
+    "fees": [
+      {
+        "installment": 2,
+        "date": "2026-03-26",
+        "cents": 1500
+      },
+      {
+        "installment": 3,
+        "date": "2026-04-26",
+        "cents": 1500
+      },
+      {
+        "installment": 4,
+        "date": "2026-05-26",
+        "cents": 1500
+      }
+    ],
+    "results": [
+      {
+        "fees_paid": 0,
+        "fees_owed_after": 0
+      },
+      {
+        "error": "reason_required",
+        "fees_owed_after": 1500
+      },
+      {
+        "error": "not_a_fee",
+        "fees_owed_after": 1500
+      },
+      {
+        "fees_paid": 1000,
+        "fees_owed_after": 500
+      },
+      {
+        "error": "fee_paid",
+        "fees_owed_after": 500
+      },
+      {
+        "memo": "Fee waived $15.00 (installment 2): hardship",
+        "fees_owed_after": 500
+      },
+      {
+        "error": "already_reversed",
+        "fees_owed_after": 500
+      },
+      {
+        "error": "fee_paid",
+        "fees_owed_after": 500
+      },
+      {
+        "fees_paid": 500,
+        "fees_owed_after": 0
+      },
+      {
+        "error": "fee_paid",
+        "fees_owed_after": 1500
+      },
+      {
+        "error": "before_fee",
+        "fees_owed_after": 1500
+      },
+      {
+        "memo": "Fee waived $15.00 (installment 4): servicer error",
+        "fees_owed_after": 0
+      }
+    ],
+    "totals": {
+      "fees_assessed_cents": 4500,
+      "fees_waived_cents": 3000,
+      "fees_paid_cents": 1500,
+      "fees_owed_at_end": 0,
+      "fees_income_cents": 1500
+    }
+  }
+}

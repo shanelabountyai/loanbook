@@ -1,4 +1,4 @@
-// Delinquency status (task 4.2, D18/D19, D23): pure functions of the schedule, the cash received and the date.
+// Delinquency status (task 4.2, D18/D19, D23), late fees (D20) and fee waivers (D24): pure functions of the schedule, the cash received and the date.
 // Nothing is stored; the state is recomputed from the ledger and the loan's terms on every read.
 
 import type { ClientBase } from 'pg';
@@ -6,7 +6,9 @@ import type { DatabaseError } from 'pg';
 import { addDays, assertDate, daysBetween } from './calendar';
 import { DELINQUENCY_BANDS, GRACE_EXIT_DPD, LATE_FEE_CENTS, type LoanState } from './config';
 import { EntryError } from './entry';
-import { postEntry } from './post';
+import { formatCents } from './money';
+import { postEntry, reverseEntryInTx } from './post';
+import { readEntry } from './read';
 import { buildSchedule } from './schedule';
 
 export type Installment = { dueDate: string; paymentCents: number };
@@ -118,4 +120,51 @@ export async function runStatus(db: Pick<ClientBase, 'query'>, { asOf }: { asOf:
     }
   }
   return out;
+}
+
+export type FeeWaived = { loanId: string; installment: number; feeEntryId: string; entryId: string; cents: number };
+
+/**
+ * D24: waives a late fee by reversing its entry, with a reason. Under the D16 row lock on the loan, refuses a fee
+ * already reversed, and one the loan's pooled fees_receivable would not cover on the waiver date or any later posted
+ * date. The fee entry stays, so its installment stays assessed and `runStatus` never charges it again.
+ */
+export async function waiveFee(db: Pick<ClientBase, 'query'>, { entryId, date, reason }: { entryId: string; date: string; reason: string }): Promise<FeeWaived> {
+  assertDate(date);
+  const why = reason.trim();
+  if (!why) throw new EntryError('reason_required');
+  const fee = await readEntry(db, entryId);
+  if (!fee) throw new EntryError('dangling_reversal');
+  const { rows } = await db.query<{ kind: string | null; installment: number | null }>('SELECT "kind", "installment" FROM "LedgerEntry" WHERE "id" = $1', [entryId]);
+  if (rows[0]!.kind !== 'late_fee') throw new EntryError('not_a_fee');
+  if (date < fee.date) throw new EntryError('before_fee');
+  const loanId = fee.loanId!;
+  const installment = rows[0]!.installment!;
+  const cents = fee.lines.find((l) => l.account === 'fees_receivable')!.debitCents;
+
+  await db.query('BEGIN');
+  try {
+    await db.query('SELECT 1 FROM "Loan" WHERE "id" = $1 FOR UPDATE', [loanId]);
+    const { rowCount } = await db.query('SELECT 1 FROM "LedgerEntry" WHERE "reversesEntryId" = $1', [entryId]);
+    if (rowCount) throw new EntryError('already_reversed');
+    // running fees_receivable per date (the window's default frame takes a date's peers together) with the waiver in it
+    const { rows: pool } = await db.query<{ covered: boolean }>(
+      `SELECT coalesce(min(bal) >= 0, true) AS covered FROM (
+         SELECT d, sum(delta) OVER (ORDER BY d) AS bal FROM (
+           SELECT e."date" AS d, l."debitCents" - l."creditCents" AS delta
+             FROM "LedgerLine" l JOIN "LedgerEntry" e ON e."id" = l."entryId"
+            WHERE e."loanId" = $1 AND l."account" = 'fees_receivable'
+           UNION ALL SELECT $2::date, -$3::numeric) x) y
+        WHERE d >= $2::date`,
+      [loanId, date, cents],
+    );
+    if (!pool[0]!.covered) throw new EntryError('fee_paid');
+    const id = await reverseEntryInTx(db, fee, { date, memo: `Fee waived ${formatCents(cents)} (installment ${installment}): ${why}` });
+    await db.query('COMMIT');
+    return { loanId, installment, feeEntryId: entryId, entryId: id, cents };
+  } catch (err) {
+    await db.query('ROLLBACK');
+    if ((err as DatabaseError).constraint === 'already_reversed') throw new EntryError('already_reversed');
+    throw err;
+  }
 }

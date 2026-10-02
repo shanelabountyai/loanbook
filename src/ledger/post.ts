@@ -7,7 +7,7 @@
 
 import type { ClientBase, DatabaseError } from 'pg';
 import { assertValidEntry, EntryError, type EntryInput } from './entry';
-import { readEntry } from './read';
+import { readEntry, type StoredEntry } from './read';
 
 type Db = Pick<ClientBase, 'query'>;
 /** `kind: 'accrual'` puts the entry under the database's one-per-(loan, day) rule (D15); `kind: 'late_fee'` with its `installment`, one-per-(loan, installment) (D20). */
@@ -31,13 +31,24 @@ export function postEntry(db: Db, entry: PostInput): Promise<string> {
 export async function reverseEntry(db: Db, { entryId, date, memo }: { entryId: string; date: string; memo?: string | null }) {
   const original = await readEntry(db, entryId);
   if (!original) throw new EntryError('dangling_reversal');
-  const lines = original.lines.map((l) => ({ account: l.account, debitCents: l.creditCents, creditCents: l.debitCents }));
   try {
-    return await write(db, { date, memo, loanId: original.loanId, lines }, entryId);
+    return await write(db, mirror(original, date, memo), entryId);
   } catch (err) {
     if ((err as DatabaseError).constraint === 'already_reversed') throw new EntryError('already_reversed');
     throw err;
   }
+}
+
+/** `reverseEntry` inside a transaction the caller opened and will end (D16), for a check-then-reverse that must be atomic (D24). */
+export async function reverseEntryInTx(db: Db, original: StoredEntry, { date, memo }: { date: string; memo: string }): Promise<string> {
+  const entry = mirror(original, date, memo);
+  assertValidEntry(entry);
+  return insert(db, entry, original.id);
+}
+
+function mirror(original: StoredEntry, date: string, memo?: string | null): PostInput {
+  const lines = original.lines.map((l) => ({ account: l.account, debitCents: l.creditCents, creditCents: l.debitCents }));
+  return { date, memo, loanId: original.loanId, lines };
 }
 
 async function write(db: Db, entry: PostInput, reversesEntryId: string | null): Promise<string> {

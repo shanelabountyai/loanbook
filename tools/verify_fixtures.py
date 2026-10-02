@@ -205,6 +205,51 @@ for row in e["days"]:
 chk({r["state"] for r in e["days"]} == {"current", "grace", "delinquent_30"}, "CP1 visits current, grace, delinquent_30")
 chk(got_pays[-1]["payoff"] and dt.date.fromisoformat(got_pays[-1]["date"]) < due[-1], "CP1 payoff is early")
 
+# ---- fee waiver (independent: fees by the day-by-day grace-exit check, the pool as a date-sorted ledger,
+#      a waiver tried as a candidate line and kept only if every running balance from its date on stays >= 0)
+wv = load("waiver/WV1.json"); i, e = wv["input"], wv["expected"]
+d0, last, fee_amt = dt.date.fromisoformat(i["disbursement_date"]), dt.date.fromisoformat(i["run_through"]), i["late_fee_cents"]
+pays = [(dt.date.fromisoformat(x["posted_on"]), x["payment"]) for x in i["events"] if "payment" in x]
+sched = load("amortization/AM1.json")["expected"]["schedule"]
+due = [dt.date.fromisoformat(r["due_date"]) for r in sched]
+cum_due = [sum(r["payment_cents"] for r in sched[:k + 1]) for k in range(len(sched))]
+book, charged, fees, waived, got = [], set(), [], {}, []
+def ok_from(lines, start):
+    totals, run = {}, 0
+    for d, c in lines: totals[d] = totals.get(d, 0) + c
+    for d in sorted(totals):
+        run += totals[d]
+        if d >= start and run < 0: return False
+    return True
+D = d0
+while D < last:
+    D += dt.timedelta(days=1)
+    for k in range(len(due)):
+        if k not in charged and (D - due[k]).days == 11 and sum(c for d, c in pays if d <= D) < cum_due[k]:
+            charged.add(k); fees.append(dict(installment=k + 1, date=D.isoformat(), cents=fee_amt)); book.append((D.isoformat(), fee_amt))
+    for x in (x for x in i["events"] if x["posted_on"] == D.isoformat()):
+        if "payment" in x:
+            take = min(x["payment"], sum(c for _, c in book)); book.append((x["posted_on"], -take))
+            got.append(dict(fees_paid=take, fees_owed_after=sum(c for _, c in book))); continue
+        f = next((f for f in fees if f["installment"] == x["waive"].get("fee")), None)
+        if x["reason"].strip() == "": err = "reason_required"
+        elif f is None: err = "not_a_fee"
+        elif x["date"] < f["date"]: err = "before_fee"
+        elif f["installment"] in waived: err = "already_reversed"
+        elif not ok_from(book + [(x["date"], -f["cents"])], x["date"]): err = "fee_paid"
+        else: err = None
+        if err: got.append(dict(error=err, fees_owed_after=sum(c for _, c in book))); continue
+        waived[f["installment"]] = x["date"]; book.append((x["date"], -f["cents"]))
+        got.append(dict(memo=f"Fee waived {m(f['cents'])} (installment {f['installment']}): {x['reason'].strip()}", fees_owed_after=sum(c for _, c in book)))
+chk(e["fees"] == fees, "WV1 fees")
+chk(e["results"] == got, "WV1 results")
+chk(e["totals"] == dict(fees_assessed_cents=len(fees) * fee_amt, fees_waived_cents=len(waived) * fee_amt,
+                        fees_paid_cents=sum(r.get("fees_paid", 0) for r in got), fees_owed_at_end=sum(c for _, c in book),
+                        fees_income_cents=(len(fees) - len(waived)) * fee_amt), "WV1 totals")
+chk({r.get("error") for r in got} >= {"reason_required", "not_a_fee", "fee_paid", "already_reversed", "before_fee"}, "WV1 every refusal")
+chk(sum(c for d, c in book if d <= "2026-04-28") == 500 and sum(c for d, c in book if d <= "2026-05-26") == 1500, "WV1 back-dated case is real")
+chk(any(f["installment"] == 4 for f in fees) and 4 in waived and len(fees) == 3, "WV1 a waived installment is not fined again")
+
 # ---- simulated book (independent: Decimal schedule, running balances, bisect DPD; D23 closed = principal 0)
 bk = load("book/BK1.json"); bi, be = bk["input"], bk["expected"]
 names = ["current", "grace", "delinquent_30", "delinquent_60", "delinquent_90", "default_recommended"]
