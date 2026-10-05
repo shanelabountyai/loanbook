@@ -21,7 +21,7 @@ type Plan = { borrower: string; principalCents: number; aprBps: number; termMont
 const LOANS: Plan[] = [
   { borrower: 'mara', principalCents: 100_000, aprBps: 1200, termMonths: 6, disbursementDate: '2026-02-15', pays: 'all' }, // paid off on schedule
   { borrower: 'mara', principalCents: 200_000, aprBps: 1800, termMonths: 12, disbursementDate: '2026-07-01', pays: 'all' }, // current
-  { borrower: 'devon', principalCents: 150_000, aprBps: 1500, termMonths: 9, disbursementDate: '2026-05-10', pays: 2 }, // two on time, then stopped
+  { borrower: 'devon', principalCents: 150_000, aprBps: 1400, termMonths: 9, disbursementDate: '2026-05-10', pays: 2 }, // two on time, then stopped
   { borrower: 'priya', principalCents: 80_000, aprBps: 2400, termMonths: 6, disbursementDate: '2026-04-01', pays: 0 }, // never paid: default recommended
   { borrower: 'tomas', principalCents: 120_000, aprBps: 1200, termMonths: 6, disbursementDate: '2026-08-25', pays: 0 }, // first installment just missed: grace
   { borrower: 'ines', principalCents: 70_000, aprBps: 2400, termMonths: 6, disbursementDate: '2026-01-20', pays: 0, writeOffOn: '2026-08-01' }, // written off

@@ -1,3 +1,4 @@
+// public: renders no data (fonts, banner); every page below calls requireOrg itself
 import { IBM_Plex_Mono, IBM_Plex_Sans, Source_Serif_4 } from 'next/font/google';
 import './ledger.css';
 
