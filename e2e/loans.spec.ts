@@ -121,3 +121,18 @@ test('role boundary: a servicer of another org sees nothing of this book', async
   await notFound(page, `/o/${s.elsewhere.slug}/loans/${s.a}/statement`); // their own org, this book's loan id
   await notFound(page, `/o/${s.elsewhere.slug}/loans/${s.a}`);
 });
+
+test('aging report: loans regrouped by band, reconciles to the book, expands to loans, servicer only', async ({ page, context }) => {
+  await as(context, s.owner);
+  await page.goto(`/o/${s.lender.slug}/loans/aging?asOf=${AS_OF}`);
+  await expect(page.getByRole('heading', { name: 'Aging report' })).toBeVisible();
+  await expect(row(page, 'Aging', 'delinquent_30').getByRole('cell').first()).toHaveText('1');
+  await expect(page.getByRole('status')).toContainText('Reconciles.');
+  await expect(page.getByRole('link', { name: s.b })).toHaveCount(0); // bands start collapsed
+  await page.getByRole('button', { name: 'Expand all' }).click();
+  await expect(row(page, 'Aging', s.b)).toContainText('Delinquent 30+');
+  await page.getByRole('button', { name: 'Collapse all' }).click();
+  await expect(page.getByRole('link', { name: s.b })).toHaveCount(0);
+  await as(context, s.alice);
+  await notFound(page, `/o/${s.lender.slug}/loans/aging`);
+});

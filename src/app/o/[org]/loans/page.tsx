@@ -50,7 +50,7 @@ export default async function Loans({ params, searchParams }: { params: Promise<
           <div className="stat big">
             <div className="label">Total outstanding</div>
             <div className="n">{formatCents(total)}</div>
-            <div className="kicker">{open} open of {book.loans.length} loans</div>
+            <div className="kicker">{open} open of {book.loans.length} loans · <Link href={`${base}/aging?asOf=${asOf}`}>Trace by age ›</Link></div>
           </div>
           {([['Principal', o.principal, 'loans_receivable'], ['Interest', o.interest, 'interest_receivable'], ['Fees', o.fees, 'fees_receivable']] as const).map(([label, cents, acct]) => (
             <div className="stat" key={label}>

@@ -120,7 +120,7 @@ export function statementText(lines: readonly LedgerRow[], asOf: string): string
   return out;
 }
 
-export type BookLoan ={ loanId: string; state: LoanState; dpd: number; outstandingCents: number };
+export type BookLoan = { loanId: string; state: LoanState; dpd: number; outstandingCents: number; owed: Buckets };
 export type Book = { asOf: string; loans: BookLoan[]; outstanding: Buckets; buckets: { state: LoanState; count: number; outstandingCents: number }[] };
 
 /**
@@ -138,7 +138,7 @@ export async function bookOverview(db: Db, { loanIds, asOf }: { loanIds: readonl
     outstanding.interest += owed.interest;
     outstanding.principal += owed.principal;
     const s = await loanStatus(db, { loanId, asOf });
-    loans.push({ loanId, state: s.state, dpd: s.dpd, outstandingCents: owed.fees + owed.interest + owed.principal });
+    loans.push({ loanId, state: s.state, dpd: s.dpd, outstandingCents: owed.fees + owed.interest + owed.principal, owed });
   }
   const states: LoanState[] = [...DELINQUENCY_BANDS.map((b) => b.state), 'written_off'];
   const buckets = states.map((state) => {

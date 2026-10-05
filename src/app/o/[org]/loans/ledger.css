@@ -94,3 +94,20 @@
 .lb .asof .msg p { margin: 0 }
 .lb .asof .home { height: 36px; padding: 0 14px; border-radius: 4px; background: var(--pastink); color: var(--past); font-weight: 600; display: inline-flex; align-items: center; text-decoration: none }
 .lb .asof .home:hover { color: var(--past) }
+
+/* Aging report */
+.lb .tools-head { padding: 14px 16px 10px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap }
+.lb .legend { display: flex; gap: 14px; font-size: 12px }
+.lb .legend i { display: inline-block; width: 10px; height: 10px; margin-right: 5px }
+.lb .tools { display: flex; gap: 8px; justify-content: flex-end; padding: 0 16px 10px }
+.lb .tools button { font-size: 12.5px; padding: 4px 10px; border: 1px solid var(--rule); border-radius: 4px; background: transparent }
+.lb .twisty { background: none; border: 0; padding: 0; font-weight: 600; font-size: 14px; display: inline-flex; gap: 8px; align-items: center }
+.lb .twisty:disabled { cursor: not-allowed; opacity: 0.6 }
+.lb tr.band > * { padding-top: 8px; padding-bottom: 8px; border-bottom-color: var(--rule) }
+.lb tr.fold { background: var(--fold) }
+.lb tr.fold > :first-child { padding-left: 36px }
+.lb tr.fold td, .lb tr.fold th { font-size: 13px }
+.lb .fold-note { padding-left: 36px; font-size: 12.5px }
+.lb .share { display: flex; align-items: center; gap: 8px }
+.lb .bar { flex: 1; height: 10px; display: flex; background: var(--rule2) }
+.lb .share .mono { font-size: 12px; color: var(--ink2); width: 48px; text-align: right }
