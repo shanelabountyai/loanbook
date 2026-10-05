@@ -3,6 +3,7 @@ import { now } from '@/core/clock';
 import { sealSecret } from '@/core/auth/secret-box';
 import { db } from '@/core/db'; // importing it is what refuses a cloud database (INV-18, INV-27)
 import type { Role } from '@/generated/prisma/enums';
+import { seedDemoBook } from './seed-demo-book';
 
 // Demo data (spec §7, D-8): two orgs, an owner, admin and member in each. Only this script sets `isDemo`,
 // and the cloud guard in `@/core/db` refuses a non-local database unless ALLOW_CLOUD_DB=1.
@@ -45,6 +46,7 @@ export async function seedDemo() {
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const lines = await seedDemo();
   console.log(`Seeded demo accounts. Sign in at /demo (DEMO_MODE=1):\n  ${lines.join('\n  ')}`);
+  console.log(await seedDemoBook());
   console.log(`TOTP secret for the (TOTP) accounts, for an authenticator app: ${DEMO_TOTP_SECRET}`);
   await db.$disconnect();
 }
