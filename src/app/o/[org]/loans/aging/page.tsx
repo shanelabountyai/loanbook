@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { requireOrg } from '@/core/authz/guards';
 import { db } from '@/core/db';
-import { formatCents } from '@/ledger/money';
+import { formatMoney } from '@/ledger/money';
 import { bookOverview } from '@/ledger/views';
 import { viewDate, withLedger } from '../access';
 import { AsOfBar } from '../AsOfBar';
@@ -48,7 +48,7 @@ export default async function AgingPage({ params, searchParams }: { params: Prom
           <AgingTable bands={bands} base={base} asOf={asOf} />
           <p className="owed" role="status">
             <strong>{bandSum === total ? 'Reconciles.' : 'Does not reconcile.'}</strong>{' '}
-            <span className="muted">Sum of bands {formatCents(bandSum)} {bandSum === total ? 'equals' : 'vs'} the book overview total {formatCents(total)} as of {asOf}.</span>
+            <span className="muted">Sum of bands {formatMoney(bandSum)} {bandSum === total ? 'equals' : 'vs'} the book overview total {formatMoney(total)} as of {asOf}.</span>
           </p>
         </section>
       </main>

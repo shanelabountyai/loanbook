@@ -1,5 +1,5 @@
 import { requireOrg } from '@/core/authz/guards';
-import { formatCents } from '@/ledger/money';
+import { formatMoney } from '@/ledger/money';
 import { loanStatement } from '@/ledger/views';
 import { requireLoan, withLedger } from '../../access';
 
@@ -14,7 +14,10 @@ export default async function StatementPage({ params }: { params: Promise<{ org:
   const o = s.owed;
   return (
     <main>
-      <div className="head"><h1>Statement for loan {loanId}</h1></div>
+      <div className="head">
+        <h1>Statement for loan {loanId}</h1>
+        <a className="dl" href={`/o/${ctx.slug}/loans/${loanId}/statement/csv`} download>Download CSV</a>
+      </div>
       <section className="card scroll">
         <h2>Payments</h2>
         <table aria-label="Payments">
@@ -22,13 +25,13 @@ export default async function StatementPage({ params }: { params: Promise<{ org:
           <tbody>
             {s.payments.map((p) => (
               <tr key={p.entryId}>
-                <td className="mono">{p.date}</td><td className="n">{formatCents(p.cents)}</td><td className="n">{formatCents(p.split.fees)}</td><td className="n">{formatCents(p.split.interest)}</td><td className="n">{formatCents(p.split.principal)}</td>
+                <td className="mono">{p.date}</td><td className="n">{formatMoney(p.cents)}</td><td className="n">{formatMoney(p.split.fees)}</td><td className="n">{formatMoney(p.split.interest)}</td><td className="n">{formatMoney(p.split.principal)}</td>
               </tr>
             ))}
           </tbody>
         </table>
         {s.payments.length === 0 && <p className="empty">No payments yet.</p>}
-        <p className="owed">Balance owed <strong className="n">{formatCents(o.principal + o.interest + o.fees)}</strong>: principal <span className="n">{formatCents(o.principal)}</span>, interest <span className="n">{formatCents(o.interest)}</span>, fees <span className="n">{formatCents(o.fees)}</span>.</p>
+        <p className="owed">Balance owed <strong className="n">{formatMoney(o.principal + o.interest + o.fees)}</strong>: principal <span className="n">{formatMoney(o.principal)}</span>, interest <span className="n">{formatMoney(o.interest)}</span>, fees <span className="n">{formatMoney(o.fees)}</span>.</p>
       </section>
     </main>
   );

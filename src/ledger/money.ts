@@ -46,3 +46,9 @@ export function formatCents(value: number): string {
   const digits = String(Math.abs(assertCents(value))).padStart(3, '0');
   return `${value < 0 ? '-' : ''}$${digits.slice(0, -2)}.${digits.slice(-2)}`;
 }
+
+/** Display only, for screens: formatCents with thousands separators ("$1,067.82"). Statement text keeps the plain form (frozen fixtures). */
+export const formatMoney = (value: number): string => formatCents(value).replace(/\B(?=(\d{3})+\.)/g, ',');
+
+/** Plain decimal dollars for CSV ("1067.82", "-12.05"): no symbol, no separators. */
+export const decimalCents = (value: number): string => formatCents(value).replace('$', '');

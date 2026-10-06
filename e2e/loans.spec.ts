@@ -136,3 +136,15 @@ test('aging report: loans regrouped by band, reconciles to the book, expands to 
   await as(context, s.alice);
   await notFound(page, `/o/${s.lender.slug}/loans/aging`);
 });
+
+test('statement CSV: the borrower downloads their own payments; another loan is a 404', async ({ page, context }) => {
+  await as(context, s.alice);
+  const res = await context.request.get(`/o/${s.lender.slug}/loans/${s.a}/statement/csv`);
+  expect(res.status()).toBe(200);
+  expect(res.headers()['content-type']).toContain('text/csv');
+  const lines = (await res.text()).trim().split('\r\n');
+  expect(lines[0]).toBe('date,paid,fees,interest,principal');
+  expect(lines).toContain('2026-02-15,100.00,0.00,10.19,89.81'); // DQ3's short payment: 31 days of interest first, then principal
+  expect(lines).toHaveLength(1 + dq3.input.payments.length);
+  await notFound(page, `/o/${s.lender.slug}/loans/${s.b}/statement/csv`);
+});

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { requireOrg } from '@/core/authz/guards';
-import { formatCents } from '@/ledger/money';
+import { formatMoney } from '@/ledger/money';
 import { loanDetail } from '@/ledger/views';
 import { requireLoan, viewDate, withLedger } from '../access';
 import { AsOfBar } from '../AsOfBar';
@@ -31,11 +31,11 @@ export default async function LoanDetailPage({ params, searchParams }: { params:
         </div>
         <section className="card" style={{ padding: '14px 16px' }}>
           <p style={{ margin: 0 }}>
-            <span className="n">{formatCents(d.terms.principalCents)}</span> at <span className="n">{(d.terms.aprBps / 100).toFixed(2)}%</span> APR ({d.terms.aprBps} bps) over {d.terms.termMonths} months, disbursed <span className="mono">{d.terms.disbursementDate}</span>.{' '}
+            <span className="n">{formatMoney(d.terms.principalCents)}</span> at <span className="n">{(d.terms.aprBps / 100).toFixed(2)}%</span> APR ({d.terms.aprBps} bps) over {d.terms.termMonths} months, disbursed <span className="mono">{d.terms.disbursementDate}</span>.{' '}
             <Link href={`/o/${ctx.slug}/loans/${loanId}/statement`}>Statement</Link>
           </p>
           <p>As of {asOf}: <strong>{d.status.state}</strong>, {d.status.dpd} days past due.</p>
-          <p style={{ margin: 0 }}>Owed: principal <span className="n">{formatCents(o.principal)}</span>, interest <span className="n">{formatCents(o.interest)}</span>, fees <span className="n">{formatCents(o.fees)}</span>.</p>
+          <p style={{ margin: 0 }}>Owed: principal <span className="n">{formatMoney(o.principal)}</span>, interest <span className="n">{formatMoney(o.interest)}</span>, fees <span className="n">{formatMoney(o.fees)}</span>.</p>
         </section>
         <section className="card scroll">
           <h2>Schedule</h2>
@@ -46,7 +46,7 @@ export default async function LoanDetailPage({ params, searchParams }: { params:
                 const [glyph, word, cls] = status(r);
                 return (
                   <tr key={r.n}>
-                    <td>{r.n}</td><td className="mono">{r.dueDate}</td><td className="n">{formatCents(r.paymentCents)}</td><td className="n">{formatCents(r.coveredCents)}</td>
+                    <td>{r.n}</td><td className="mono">{r.dueDate}</td><td className="n">{formatMoney(r.paymentCents)}</td><td className="n">{formatMoney(r.coveredCents)}</td>
                     <td className={cls}><span aria-hidden="true">{glyph}</span> {word}</td>
                   </tr>
                 );
@@ -62,7 +62,7 @@ export default async function LoanDetailPage({ params, searchParams }: { params:
               {d.ledger.map((l, i) => (
                 <tr key={i}>
                   <td className="mono">{l.date}</td><td>{l.memo}</td><td className={`mono${l.creditCents ? ' acct-credit' : ''}`}>{l.account}</td>
-                  <td className="n">{l.debitCents ? formatCents(l.debitCents) : ''}</td><td className="n">{l.creditCents ? formatCents(l.creditCents) : ''}</td>
+                  <td className="n">{l.debitCents ? formatMoney(l.debitCents) : ''}</td><td className="n">{l.creditCents ? formatMoney(l.creditCents) : ''}</td>
                 </tr>
               ))}
             </tbody>

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { requireOrg } from '@/core/authz/guards';
 import { db } from '@/core/db';
-import { formatCents } from '@/ledger/money';
+import { formatMoney } from '@/ledger/money';
 import { bookOverview } from '@/ledger/views';
 import { viewDate, withLedger } from './access';
 import { AsOfBar } from './AsOfBar';
@@ -49,13 +49,13 @@ export default async function Loans({ params, searchParams }: { params: Promise<
         <section className="card stats" aria-label="Total outstanding">
           <div className="stat big">
             <div className="label">Total outstanding</div>
-            <div className="n">{formatCents(total)}</div>
+            <div className="n">{formatMoney(total)}</div>
             <div className="kicker">{open} open of {book.loans.length} loans · <Link href={`${base}/aging?asOf=${asOf}`}>Trace by age ›</Link></div>
           </div>
           {([['Principal', o.principal, 'loans_receivable'], ['Interest', o.interest, 'interest_receivable'], ['Fees', o.fees, 'fees_receivable']] as const).map(([label, cents, acct]) => (
             <div className="stat" key={label}>
               <div className="label">{label}</div>
-              <div className="n">{formatCents(cents)}</div>
+              <div className="n">{formatMoney(cents)}</div>
               <div className="acct mono">{acct}</div>
             </div>
           ))}
@@ -66,10 +66,10 @@ export default async function Loans({ params, searchParams }: { params: Promise<
             <thead><tr><th>State</th><th className="n">Loans</th><th className="n">Outstanding</th></tr></thead>
             <tbody>
               {book.buckets.map((b) => (
-                <tr key={b.state}><th scope="row"><StateBadge state={b.state} showKey /></th><td className="n">{b.count}</td><td className="n">{formatCents(b.outstandingCents)}</td></tr>
+                <tr key={b.state}><th scope="row"><StateBadge state={b.state} showKey /></th><td className="n">{b.count}</td><td className="n">{formatMoney(b.outstandingCents)}</td></tr>
               ))}
             </tbody>
-            <tfoot><tr><th scope="row">Total</th><td className="n">{book.loans.length}</td><td className="n">{formatCents(total)}</td></tr></tfoot>
+            <tfoot><tr><th scope="row">Total</th><td className="n">{book.loans.length}</td><td className="n">{formatMoney(total)}</td></tr></tfoot>
           </table>
         </section>
         <section className="card scroll">
@@ -80,7 +80,7 @@ export default async function Loans({ params, searchParams }: { params: Promise<
               {book.loans.map((l) => (
                 <tr key={l.loanId}>
                   <td><Link className="mono" href={`${base}/${l.loanId}?asOf=${asOf}`}>{l.loanId}</Link></td>
-                  <td><StateBadge state={l.state} showKey /></td><td className="n">{l.dpd}</td><td className="n">{formatCents(l.outstandingCents)}</td>
+                  <td><StateBadge state={l.state} showKey /></td><td className="n">{l.dpd}</td><td className="n">{formatMoney(l.outstandingCents)}</td>
                 </tr>
               ))}
             </tbody>

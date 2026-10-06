@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import type { LoanState } from '@/ledger/config';
-import { formatCents } from '@/ledger/money';
+import { formatMoney } from '@/ledger/money';
 import { StateBadge } from '../StateBadge';
 
 export type AgingLoan = { loanId: string; state: LoanState; dpd: number; principal: number; interest: number; fees: number };
@@ -38,7 +38,7 @@ export function AgingTable({ bands, base, asOf }: { bands: AgingBand[]; base: st
                     </button>
                     <span className="key mono">{b.state} · {b.range}</span>
                   </th>
-                  <td className="n">{b.loans.length}</td><td className="n">{formatCents(p)}</td><td className="n">{formatCents(i)}</td><td className="n">{formatCents(f)}</td><td className="n"><strong>{formatCents(p + i + f)}</strong></td>
+                  <td className="n">{b.loans.length}</td><td className="n">{formatMoney(p)}</td><td className="n">{formatMoney(i)}</td><td className="n">{formatMoney(f)}</td><td className="n"><strong>{formatMoney(p + i + f)}</strong></td>
                   <td>
                     <div className="share"><div className="bar" aria-hidden="true"><i style={{ width: pct(p), background: 'var(--ink2)' }} /><i style={{ width: pct(i), background: 'var(--accent)' }} /><i style={{ width: pct(f), background: 'var(--paststripe)' }} /></div><span className="mono">{total ? (((p + i + f) / total) * 100).toFixed(1) : '0.0'}%</span></div>
                   </td>
@@ -47,14 +47,14 @@ export function AgingTable({ bands, base, asOf }: { bands: AgingBand[]; base: st
                 {isOpen && b.loans.map((l) => (
                   <tr key={l.loanId} className="fold">
                     <th scope="row"><Link className="mono" href={`${base}/${l.loanId}?asOf=${asOf}`}>{l.loanId}</Link></th>
-                    <td className="n muted">{l.dpd} days</td><td className="n">{formatCents(l.principal)}</td><td className="n">{formatCents(l.interest)}</td><td className="n">{formatCents(l.fees)}</td><td className="n">{formatCents(l.principal + l.interest + l.fees)}</td>
+                    <td className="n muted">{l.dpd} days</td><td className="n">{formatMoney(l.principal)}</td><td className="n">{formatMoney(l.interest)}</td><td className="n">{formatMoney(l.fees)}</td><td className="n">{formatMoney(l.principal + l.interest + l.fees)}</td>
                     <td><StateBadge state={l.state} /></td>
                   </tr>
                 ))}
               </tbody>
             );
           })}
-          <tfoot><tr><th scope="row">Total outstanding</th><td className="n">{all.length}</td><td className="n">{formatCents(sum(all, 'principal'))}</td><td className="n">{formatCents(sum(all, 'interest'))}</td><td className="n">{formatCents(sum(all, 'fees'))}</td><td className="n">{formatCents(total)}</td><td>100.0%</td></tr></tfoot>
+          <tfoot><tr><th scope="row">Total outstanding</th><td className="n">{all.length}</td><td className="n">{formatMoney(sum(all, 'principal'))}</td><td className="n">{formatMoney(sum(all, 'interest'))}</td><td className="n">{formatMoney(sum(all, 'fees'))}</td><td className="n">{formatMoney(total)}</td><td>100.0%</td></tr></tfoot>
         </table>
       </div>
     </>

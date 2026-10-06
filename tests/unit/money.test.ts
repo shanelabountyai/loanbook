@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { MoneyError, assertBps, assertCents, centsFromNumeric, formatCents, roundHalfUp } from '@/ledger/money';
+import { MoneyError, assertBps, assertCents, centsFromNumeric, decimalCents, formatCents, formatMoney, roundHalfUp } from '@/ledger/money';
 
 const code = (fn: () => unknown) => {
   try {
@@ -107,4 +107,18 @@ describe('formatCents (display)', () => {
     [-1205, '-$12.05'],
   ])('%i is %s', (c, s) => expect(formatCents(c)).toBe(s));
   it('refuses a fraction', () => expect(() => formatCents(1.5)).toThrow(MoneyError));
+});
+
+describe('formatMoney and decimalCents (display)', () => {
+  it.each([
+    [0, '$0.00', '0.00'],
+    [99999, '$999.99', '999.99'],
+    [100000, '$1,000.00', '1000.00'],
+    [106782, '$1,067.82', '1067.82'],
+    [123456789, '$1,234,567.89', '1234567.89'],
+    [-100005, '-$1,000.05', '-1000.05'],
+  ])('%i is %s and %s', (c, m, d) => {
+    expect(formatMoney(c)).toBe(m);
+    expect(decimalCents(c)).toBe(d);
+  });
 });
