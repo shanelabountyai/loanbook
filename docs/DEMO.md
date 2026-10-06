@@ -29,7 +29,7 @@ The buckets change: a loan that is delinquent today is in grace. The bar shows y
 Balance by days-past-due band, split principal / interest / fees; the total equals the overview total. Expand a band for its loans.
 
 **4. Loan detail** (open the default-recommended loan, ~158 days past due).
-Terms, state badge, owed now, schedule vs actuals (paid / partly / missed distinguishable without colour), then the ledger. Point at the debit and credit columns and that each entry balances.
+Terms, state badge, owed now, schedule vs actuals (paid / partly / missed distinguishable without colour), then the ledger. Daily accruals fold into one row per run (click to expand). Point at the debit and credit columns and that each entry balances. Waive a late fee with a reason and watch the reversal appear, tagged with the entry it reverses.
 
 **5. Statement** (open one from the borrower side).
 Sign out, sign in as `mara@`: she sees only her two loans, with plain words (principal, interest, fees), never account names. Open a statement and click **Download CSV**. Say: *"A borrower can see where every dollar of every payment went."*
@@ -46,8 +46,8 @@ Say: *"This runs in CI on every push. If it fails, nothing merges."*
 ## What to concede before you're asked
 
 - Synthetic data only; not a lending product. Real lending adds TILA/Reg Z disclosures, usury caps and servicing rules that this does not model.
-- **Waive-fee and write-off exist as tested library functions, not buttons.** No UI entry point yet.
-- Not built from the design: folded accrual rows and reversal tags in the ledger, a borrower list with state and next-due columns, a light/dark toggle (follows the OS), a sortable or filterable loan list.
+- Not built from the design: a borrower list with state and next-due columns, a light/dark toggle (follows the OS), a sortable or filterable loan list.
+- Waive and write-off post dated today, whatever the as-of date shows. Write-off needs a reason and a confirm box and only appears when the loan is default_recommended; waive appears beside each unreversed late fee.
 - Not deployed. Local only, by design.
 - A written-off loan has no recovery path: a later payment is refused (`exceeds_payoff`).
 - The clock is injected everywhere, so "today" is whatever the as-of control says; the seed uses the machine date.

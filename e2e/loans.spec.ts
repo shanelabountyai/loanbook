@@ -89,6 +89,10 @@ test('loan detail: state, schedule covered against cash, ledger lines', async ({
   await expect(row(page, 'Schedule', '2026-02-15').getByRole('cell').nth(3)).toHaveText('$172.55');
   await expect(row(page, 'Schedule', '2026-03-15').getByRole('cell').nth(3)).toHaveText('$0.00');
   await expect(row(page, 'Ledger', 'fees_receivable').first()).toContainText('$15.00');
+  const fold = page.getByRole('button', { name: /Interest accrued .* days/ }).first();
+  await expect(fold).toHaveAttribute('aria-expanded', 'false');
+  await fold.click();
+  await expect(fold).toHaveAttribute('aria-expanded', 'true');
 });
 
 test('borrower statement: each payment with its split, the late fee first', async ({ page, context }) => {
@@ -147,4 +151,25 @@ test('statement CSV: the borrower downloads their own payments; another loan is 
   expect(lines).toContain('2026-02-15,100.00,0.00,10.19,89.81'); // DQ3's short payment: 31 days of interest first, then principal
   expect(lines).toHaveLength(1 + dq3.input.payments.length);
   await notFound(page, `/o/${s.lender.slug}/loans/${s.b}/statement/csv`);
+});
+
+test('waive a late fee: the reversal is tagged; a paid fee is refused; a borrower cannot post', async ({ page, context, request }) => {
+  await as(context, s.owner);
+  const url = `/o/${s.lender.slug}/loans/${s.b}`;
+  await page.goto(`${url}?asOf=${AS_OF}`);
+  const waive = page.getByRole('button', { name: 'Waive fee' });
+  const before = await waive.count();
+  await page.getByLabel('Reason for waiving').first().fill('Bank holiday delay');
+  await waive.first().click();
+  await expect(page.getByRole('status')).toHaveText('Fee waived.');
+  await expect(page.getByRole('button', { name: 'Waive fee' })).toHaveCount(before - 1);
+  await expect(row(page, 'Ledger', 'Bank holiday delay').first()).toContainText('reversal of the');
+  await page.goto(`/o/${s.lender.slug}/loans/${s.a}?asOf=${AS_OF}`); // loan A's fee was paid from cash
+  await page.getByLabel('Reason for waiving').first().fill('Goodwill');
+  await page.getByRole('button', { name: 'Waive fee' }).first().click();
+  await expect(page.getByRole('status')).toHaveText('Refused: fee_paid');
+  await as(context, s.alice);
+  await notFound(page, url);
+  const res = await request.post(`${url}/adjust`, { headers: { cookie: `__Host-session=${s.alice.token}`, origin: new URL(page.url()).origin }, form: { confirm: 'yes', reason: 'x' }, maxRedirects: 0 });
+  expect(res.status()).toBe(404);
 });

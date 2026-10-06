@@ -1,21 +1,27 @@
 import Link from 'next/link';
 import { requireOrg } from '@/core/authz/guards';
 import { formatMoney } from '@/ledger/money';
-import { loanDetail } from '@/ledger/views';
+import { foldLedger, loanDetail } from '@/ledger/views';
 import { requireLoan, viewDate, withLedger } from '../access';
 import { AsOfBar } from '../AsOfBar';
 import { StateBadge } from '../StateBadge';
+import { LedgerTable } from './LedgerTable';
 
 export const metadata = { title: 'Loan detail' };
 
 // Servicer only: schedule against cash received, every ledger line, state as of the day.
-export default async function LoanDetailPage({ params, searchParams }: { params: Promise<{ org: string; loanId: string }>; searchParams: Promise<{ asOf?: string }> }) {
+export default async function LoanDetailPage({ params, searchParams }: { params: Promise<{ org: string; loanId: string }>; searchParams: Promise<{ asOf?: string; msg?: string }> }) {
   const ctx = await requireOrg((await params).org);
   const { loanId } = await params;
   await requireLoan(ctx, loanId, 'servicer');
-  const asOf = viewDate((await searchParams).asOf);
+  const sp = await searchParams;
+  const asOf = viewDate(sp.asOf);
   const d = await withLedger((c) => loanDetail(c, { loanId, asOf }));
   const o = d.owed;
+  const dates = Object.fromEntries(d.ledger.map((l) => [l.entryId, l.date]));
+  const reversed = d.ledger.filter((l) => l.reversesEntryId).map((l) => l.reversesEntryId!);
+  const waivable = d.ledger.filter((l) => l.kind === 'late_fee' && !reversed.includes(l.entryId)).map((l) => l.entryId);
+  const action = `/o/${ctx.slug}/loans/${loanId}/adjust`;
   const status = (r: { dueDate: string; paymentCents: number; coveredCents: number }) =>
     r.coveredCents >= r.paymentCents ? ['●', 'Paid', ''] : r.coveredCents > 0 ? ['◐', 'Partly paid', ''] : r.dueDate < asOf ? ['○', 'Missed', 'missed'] : ['·', 'Upcoming', 'muted'];
   return (
@@ -37,6 +43,18 @@ export default async function LoanDetailPage({ params, searchParams }: { params:
           <p>As of {asOf}: <strong>{d.status.state}</strong>, {d.status.dpd} days past due.</p>
           <p style={{ margin: 0 }}>Owed: principal <span className="n">{formatMoney(o.principal)}</span>, interest <span className="n">{formatMoney(o.interest)}</span>, fees <span className="n">{formatMoney(o.fees)}</span>.</p>
         </section>
+        {sp.msg && <p role="status" className="card" style={{ padding: '10px 16px', margin: 0 }}>{sp.msg}</p>}
+        {d.status.state === 'default_recommended' && (
+          <section className="card" style={{ padding: '14px 16px' }}>
+            <h2>Write off</h2>
+            <form method="post" action={action}>
+              <p style={{ margin: '0 0 8px' }}>Moves principal, interest and fees out of receivables. It cannot be undone, and later payments are refused.</p>
+              <input name="reason" required placeholder="Reason" aria-label="Reason for write-off" />{' '}
+              <label><input type="checkbox" name="confirm" value="yes" required /> I understand this cannot be undone</label>{' '}
+              <button type="submit">Write off loan</button>
+            </form>
+          </section>
+        )}
         <section className="card scroll">
           <h2>Schedule</h2>
           <table aria-label="Schedule">
@@ -56,17 +74,7 @@ export default async function LoanDetailPage({ params, searchParams }: { params:
         </section>
         <section className="card scroll">
           <h2>Ledger</h2>
-          <table aria-label="Ledger">
-            <thead><tr><th>Date</th><th>Memo</th><th>Account</th><th className="n">Debit</th><th className="n">Credit</th></tr></thead>
-            <tbody>
-              {d.ledger.map((l, i) => (
-                <tr key={i}>
-                  <td className="mono">{l.date}</td><td>{l.memo}</td><td className={`mono${l.creditCents ? ' acct-credit' : ''}`}>{l.account}</td>
-                  <td className="n">{l.debitCents ? formatMoney(l.debitCents) : ''}</td><td className="n">{l.creditCents ? formatMoney(l.creditCents) : ''}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <LedgerTable items={foldLedger(d.ledger)} dates={dates} reversed={reversed} waivable={waivable} action={action} />
         </section>
       </main>
     </>

@@ -15,19 +15,39 @@ import type { Buckets } from './waterfall';
 
 type Db = Pick<ClientBase, 'query'>;
 
-export type LedgerRow = { entryId: string; date: string; memo: string | null; account: AccountName; debitCents: number; creditCents: number };
+export type LedgerRow = { entryId: string; date: string; memo: string | null; account: AccountName; debitCents: number; creditCents: number; kind: string | null; reversesEntryId: string | null };
 export type StatementPayment = { entryId: string; date: string; cents: number; split: Buckets };
 export type ScheduleActual = ScheduleRow & { coveredCents: number };
 
 /** Every line posted for the loan, oldest entry first, lines in posting order. */
 export async function loanLedger(db: Db, loanId: string): Promise<LedgerRow[]> {
-  const { rows } = await db.query<{ entryId: string; date: string; memo: string | null; account: AccountName; debit: string; credit: string }>(
-    `SELECT e."id" AS "entryId", e."date"::text AS date, e."memo", l."account", l."debitCents"::text AS debit, l."creditCents"::text AS credit
+  const { rows } = await db.query<{ entryId: string; date: string; memo: string | null; account: AccountName; debit: string; credit: string; kind: string | null; reversesEntryId: string | null }>(
+    `SELECT e."id" AS "entryId", e."date"::text AS date, e."memo", e."kind", e."reversesEntryId", l."account", l."debitCents"::text AS debit, l."creditCents"::text AS credit
        FROM "LedgerEntry" e JOIN "LedgerLine" l ON l."entryId" = e."id"
       WHERE e."loanId" = $1 ORDER BY e."date", e."createdAt", e."id", l."position"`,
     [loanId],
   );
   return rows.map((r) => ({ ...r, debitCents: centsFromNumeric(r.debit), creditCents: centsFromNumeric(r.credit) }));
+}
+
+export type LedgerItem = { type: 'line'; row: LedgerRow } | { type: 'fold'; from: string; to: string; days: number; cents: number; rows: LedgerRow[] };
+
+/** Display only: consecutive daily accrual entries (two or more) become one fold; the lines inside are untouched. */
+export function foldLedger(lines: readonly LedgerRow[]): LedgerItem[] {
+  const out: LedgerItem[] = [];
+  let run: LedgerRow[] = [];
+  const flush = () => {
+    const ids = new Set(run.map((r) => r.entryId));
+    if (ids.size >= 2) out.push({ type: 'fold', from: run[0]!.date, to: run[run.length - 1]!.date, days: ids.size, cents: run.filter((r) => r.account === 'interest_receivable').reduce((a, r) => a + r.debitCents, 0), rows: run });
+    else run.forEach((row) => out.push({ type: 'line', row }));
+    run = [];
+  };
+  for (const l of lines) {
+    if (l.kind === 'accrual') run.push(l);
+    else { flush(); out.push({ type: 'line', row: l }); }
+  }
+  flush();
+  return out;
 }
 
 const BUCKET_OF: Partial<Record<AccountName, keyof Buckets>> = { fees_receivable: 'fees', interest_receivable: 'interest', loans_receivable: 'principal' };
