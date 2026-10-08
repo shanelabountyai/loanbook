@@ -94,6 +94,13 @@ export async function loanDetail(db: Db, { loanId, asOf }: { loanId: string; asO
   return { loanId, terms, status, owed: await owedCents(db, loanId), schedule: scheduleActuals(buildSchedule(terms).rows, paid), ledger };
 }
 
+/** The oldest installment cash has not covered (D19's cumulative cover) and what is left of it; null once nothing is owed (paid off, or written off). */
+export function nextDue(d: Pick<LoanDetail, 'schedule' | 'owed'>): { dueDate: string; cents: number } | null {
+  if (d.owed.fees + d.owed.interest + d.owed.principal === 0) return null;
+  const row = d.schedule.find((r) => r.coveredCents < r.paymentCents);
+  return row ? { dueDate: row.dueDate, cents: row.paymentCents - row.coveredCents } : null;
+}
+
 export type Statement = { loanId: string; payments: StatementPayment[]; owed: Buckets };
 
 /** Borrower's statement: each payment with its split, and what is owed now. */

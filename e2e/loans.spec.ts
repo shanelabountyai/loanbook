@@ -81,6 +81,30 @@ test('book overview: both loans in their D18 bands, linked to their detail', asy
   await expect(page.getByRole('heading', { name: `Loan ${s.a}` })).toBeVisible();
 });
 
+test('book overview: the loan list sorts by a column and filters by state; the theme toggle survives a reload', async ({ page, context }) => {
+  await as(context, s.owner);
+  await page.goto(`/o/${s.lender.slug}/loans?asOf=${AS_OF}`);
+  const body = page.getByRole('table', { name: 'Loans' }).locator('tbody tr');
+  const dpd = page.getByRole('columnheader', { name: /Days past due/ });
+  await dpd.getByRole('link').click();
+  await expect(dpd).toHaveAttribute('aria-sort', 'ascending');
+  await expect(body.first()).toContainText(s.a);
+  await dpd.getByRole('link').click();
+  await expect(dpd).toHaveAttribute('aria-sort', 'descending');
+  await expect(body.first()).toContainText(s.b);
+  await page.getByRole('link', { name: 'delinquent_30 1' }).click();
+  await expect(body).toHaveCount(1);
+  await expect(body).toContainText(s.b);
+  await expect(page).toHaveURL(new RegExp(`asOf=${AS_OF}.*sort=-dpd`)); // the filter keeps the date and the sort
+  await page.getByRole('link', { name: 'all 2' }).click();
+  await expect(body).toHaveCount(2);
+
+  await page.getByRole('button', { name: 'Light / dark' }).click();
+  await expect(page.locator('.lb')).toHaveAttribute('data-theme', 'dark');
+  await page.reload();
+  await expect(page.locator('.lb')).toHaveAttribute('data-theme', 'dark');
+});
+
 test('loan detail: state, schedule covered against cash, ledger lines', async ({ page, context }) => {
   await as(context, s.owner);
   await page.goto(`/o/${s.lender.slug}/loans/${s.a}?asOf=${AS_OF}`);
@@ -112,6 +136,8 @@ test('role boundary: a borrower sees only their own loan, and only its statement
   await page.goto(`/o/${s.lender.slug}/loans`);
   await expect(page.getByRole('heading', { name: 'Your loans' })).toBeVisible();
   await expect(page.getByRole('link', { name: /^Statement for loan/ })).toHaveCount(1);
+  await expect(row(page, 'Your loans', s.a)).toContainText(/\d{4}-\d\d-\d\d.*\$\d/); // next uncovered installment: its due date and what is left
+  await expect(row(page, 'Your loans', s.a).locator('.key')).toHaveCount(0); // plain words, no state keys
   await expect(page.getByText('Book overview')).toHaveCount(0);
   await notFound(page, `/o/${s.lender.slug}/loans/${s.b}/statement`); // someone else's loan
   await notFound(page, `/o/${s.lender.slug}/loans/${s.a}`); // own loan, servicer view

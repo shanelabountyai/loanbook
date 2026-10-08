@@ -1,5 +1,5 @@
 /* LoanBook design system (Claude Design "LoanBook Board"): paper and ink, one ink-blue, amber only for "past date".
-   Scoped to .lb so the template's other pages stay untouched. Light by default, dark via the OS setting. */
+   Scoped to .lb so the template's other pages stay untouched. Light by default, dark via the OS setting or the toggle (data-theme, from the lb-theme cookie). */
 .lb {
   --paper: oklch(0.972 0.006 85); --sheet: oklch(0.995 0.003 85); --ink: oklch(0.23 0.012 70); --ink2: oklch(0.46 0.012 70);
   --rule: oklch(0.80 0.012 80); --rule2: oklch(0.91 0.008 80); --fold: oklch(0.975 0.006 85); --hl: oklch(0.93 0.06 92);
@@ -8,14 +8,22 @@
   --badge-l: 0.935; --badge-c: 0.045; --badge-fg-l: 0.40; --badge-fg-c: 0.09;
   min-height: 100vh; background: var(--paper); color: var(--ink); font: 14px/1.45 var(--font-sans), system-ui, sans-serif; -webkit-font-smoothing: antialiased;
 }
+/* Dark tokens twice: the OS setting unless the toggle chose light, and the toggle's own choice of dark. */
 @media (prefers-color-scheme: dark) {
-  .lb {
+  .lb:not([data-theme=light]) {
     --paper: oklch(0.185 0.008 75); --sheet: oklch(0.218 0.008 75); --ink: oklch(0.93 0.008 85); --ink2: oklch(0.74 0.012 85);
     --rule: oklch(0.40 0.01 75); --rule2: oklch(0.29 0.008 75); --fold: oklch(0.2 0.008 75); --hl: oklch(0.32 0.05 90);
     --accent: oklch(0.78 0.10 250); --past: oklch(0.36 0.07 75); --pastink: oklch(0.96 0.03 85); --paststripe: oklch(0.72 0.12 75);
     --danger: oklch(0.74 0.14 25); --hover: oklch(0.25 0.008 75);
     --badge-l: 0.33; --badge-c: 0.05; --badge-fg-l: 0.89; --badge-fg-c: 0.08;
   }
+}
+.lb[data-theme=dark] {
+  --paper: oklch(0.185 0.008 75); --sheet: oklch(0.218 0.008 75); --ink: oklch(0.93 0.008 85); --ink2: oklch(0.74 0.012 85);
+  --rule: oklch(0.40 0.01 75); --rule2: oklch(0.29 0.008 75); --fold: oklch(0.2 0.008 75); --hl: oklch(0.32 0.05 90);
+  --accent: oklch(0.78 0.10 250); --past: oklch(0.36 0.07 75); --pastink: oklch(0.96 0.03 85); --paststripe: oklch(0.72 0.12 75);
+  --danger: oklch(0.74 0.14 25); --hover: oklch(0.25 0.008 75);
+  --badge-l: 0.33; --badge-c: 0.05; --badge-fg-l: 0.89; --badge-fg-c: 0.08;
 }
 .lb a { color: var(--accent); text-underline-offset: 2px }
 .lb a:hover { color: var(--ink) }
@@ -25,7 +33,9 @@
 .lb .wrap { max-width: 1360px; margin: 0 auto; padding-left: 28px; padding-right: 28px }
 @media (max-width: 640px) { .lb .wrap { padding-left: 16px; padding-right: 16px } }
 .lb .scope { border-bottom: 1px solid var(--rule2); font-size: 12.5px; color: var(--ink2); text-wrap: pretty }
+.lb .scope .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px }
 .lb .scope p { margin: 0; padding-top: 7px; padding-bottom: 7px }
+.lb .scope button { font-size: 12px; padding: 3px 8px; border: 1px solid var(--rule); border-radius: 3px; background: transparent; white-space: nowrap }
 .lb .scope strong { color: var(--ink) }
 .lb main { max-width: 1360px; margin: 0 auto; padding: 24px 28px 72px }
 @media (max-width: 640px) { .lb main { padding-left: 16px; padding-right: 16px } }
@@ -38,6 +48,11 @@
 .lb .mono, .lb .n { font-family: var(--font-mono), monospace; font-variant-numeric: tabular-nums }
 .lb .chip { font-size: 13px; padding: 4px 10px; border-radius: 3px; border: 1px solid var(--rule) }
 .lb .chip.past { background: var(--past); color: var(--pastink) }
+.lb .filters { display: flex; gap: 6px; flex-wrap: wrap }
+.lb a.chip { font-size: 12.5px; padding: 2px 8px; text-decoration: none }
+.lb a.chip[aria-current] { background: var(--ink); border-color: var(--ink); color: var(--paper) }
+.lb th a { color: inherit; text-decoration: none }
+.lb th a:hover { text-decoration: underline }
 
 .lb .card { background: var(--sheet); border: 1px solid var(--rule); border-radius: 4px; margin-bottom: 20px; min-width: 0 }
 .lb .card > h2 { padding: 14px 16px 10px }

@@ -20,7 +20,7 @@ npm run dev                    # http://localhost:4700
 ## The walk (about 6 minutes)
 
 **1. Book overview** (sign in as `owner@`, then Loans in the nav).
-Total outstanding split into principal / interest / fees, each tagged with its ledger account. Seven loans: three current, delinquent, one default-recommended, one written off. Say: *"Nothing here is stored. Every number is the sum of ledger lines, computed when the page loads."*
+Total outstanding split into principal / interest / fees, each tagged with its ledger account. Seven loans: three current, delinquent, one default-recommended, one written off. Click a column heading to sort the list, a state chip to filter it; **Light / dark** in the banner flips the theme. Say: *"Nothing here is stored. Every number is the sum of ledger lines, computed when the page loads."*
 
 **2. Time travel.** Change the as-of date to `2026-09-30` (or click a quarter-end chip).
 The buckets change: a loan that is delinquent today is in grace. The bar shows you are not looking at today. Say: *"Same ledger, same code, a different day. State and days past due are derived, so nobody can set them by hand."*
@@ -32,7 +32,7 @@ Balance by days-past-due band, split principal / interest / fees; the total equa
 Terms, state badge, owed now, schedule vs actuals (paid / partly / missed distinguishable without colour), then the ledger. Daily accruals fold into one row per run (click to expand). Point at the debit and credit columns and that each entry balances. Waive a late fee with a reason and watch the reversal appear, tagged with the entry it reverses.
 
 **5. Statement** (open one from the borrower side).
-Sign out, sign in as `mara@`: she sees only her two loans, with plain words (principal, interest, fees), never account names. Open a statement and click **Download CSV**. Say: *"A borrower can see where every dollar of every payment went."*
+Sign out, sign in as `mara@`: she sees only her two loans, each with its state and next payment due, in plain words (principal, interest, fees), never account names. Open a statement and click **Download CSV**. Say: *"A borrower can see where every dollar of every payment went."*
 
 **6. The gates** (terminal).
 
@@ -46,7 +46,8 @@ Say: *"This runs in CI on every push. If it fails, nothing merges."*
 ## What to concede before you're asked
 
 - Synthetic data only; not a lending product. Real lending adds TILA/Reg Z disclosures, usury caps and servicing rules that this does not model.
-- Not built from the design: a borrower list with state and next-due columns, a light/dark toggle (follows the OS), a sortable or filterable loan list.
+- Changing the as-of date resets the loan list's sort and state filter.
+- "Next payment due" on the borrower's list is the oldest installment her cash has not covered (schedule against cash); fees and accrued interest are on the statement, not in that figure.
 - Waive and write-off post dated today, whatever the as-of date shows. Write-off needs a reason and a confirm box and only appears when the loan is default_recommended; waive appears beside each unreversed late fee.
 - Not deployed. Local only, by design.
 - A written-off loan has no recovery path: a later payment is refused (`exceeds_payoff`).
