@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { audit } from '@/core/audit';
 import { normalizeEmail } from '@/core/auth/link';
-import type { SessionCtx } from '@/core/auth/session';
+import { assertNotDemo, type SessionCtx } from '@/core/auth/session';
 import { AuthzError, inOrg, type OrgCtx } from '@/core/authz/guards';
 import { can, mayAssign } from '@/core/authz/permissions';
 import { now } from '@/core/clock';
@@ -19,6 +19,7 @@ const INVALID = 'This invite is not valid for your account. It may have expired 
 
 /** Hashed, 7-day, single-use (spec §7b). Replaces any pending invite to the same address. */
 export async function createInvite(ctx: OrgCtx, emailInput: string, role: Role) {
+  assertNotDemo(ctx.session);
   const email = normalizeEmail(emailInput);
   if (!email) throw new Refused('Enter a valid email address.');
   const token = newToken();

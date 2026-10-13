@@ -18,6 +18,22 @@ at request speed. The limit is now counted before the lookup, and a taken addres
 "check your new inbox" result, no link created, no mail sent. Cost: someone who types an address that already has an account
 is told to check that inbox and nothing arrives. INV-06's "taken address is refused" case now asserts the silent form.
 
+security: (review 2026-10-12 #2, INV-27, INV-26) A `/demo` session was born fresh and MFA-passed, so any visitor could delete
+the demo org, delete a demo account, or move the demo owner to an email they control — and since the demo TOTP seed is a
+public constant, that became a normal owner login that kept working after `DEMO_MODE` was turned off. Two rules now, both in
+`core/auth/session.ts`: (1) `sessionFor` resolves no session for an `isDemo` user unless `DEMO_MODE=1`, whether the session
+came from `/demo` or a sign-in link; (2) `assertNotDemo` refuses a demo session org deletion, account deletion, email change
+and TOTP enrol/confirm/disable (via `assertFresh`, which every INV-26 action already calls), inviting, re-roling, removing
+and leaving (`createInvite`, and `withMembers` in `core/tenancy/orgs.ts`), and sign-out-everywhere (the shared account would
+sign every other visitor out). `SessionCtx` gains `isDemo`. A demo session can still browse, add projects, create and revoke
+share links, create a new org, and use billing — a clone that wants more locked calls `assertNotDemo(ctx.session)` itself.
+
+Upgrade: no schema or config change. **Behaviour change for a deployed demo:** demo visitors can no longer invite or manage
+members or delete anything listed above, so a `DEMO.md` step that does one of those needs a real account. And any environment
+holding `isDemo` rows without `DEMO_MODE=1` (local dev without the flag included) can no longer sign those users in at all.
+Existing damage is not repaired: a demo row whose email was already changed still has it — re-run `seed:demo` or check the
+`isDemo` rows by hand.
+
 ## 1.2.0 (2026-09-28)
 
 F-03: a clone can now declare a module required in the clone-owned `src/app/required-modules.ts`. `foundation:check-modules`

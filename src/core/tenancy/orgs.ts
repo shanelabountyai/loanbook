@@ -1,7 +1,7 @@
 import { randomBytes } from 'node:crypto';
 import { notFound } from 'next/navigation';
 import { audit } from '@/core/audit';
-import type { SessionCtx } from '@/core/auth/session';
+import { assertNotDemo, type SessionCtx } from '@/core/auth/session';
 import { AuthzError, type OrgCtx } from '@/core/authz/guards';
 import { mayAssign } from '@/core/authz/permissions';
 import { now } from '@/core/clock';
@@ -52,6 +52,7 @@ export async function assertOwnerRemains(tx: Tx, orgId: string, losingUserId: st
  * the guard read them. A target outside this org is notFound, like any other id (INV-02/04).
  */
 async function withMembers(ctx: OrgCtx, userId: string, fn: (tx: Tx, actor: Role, target: Role) => Promise<void>) {
+  assertNotDemo(ctx.session);
   await db.$transaction(async (tx) => {
     await lockOrg(tx, ctx.orgId);
     const [actor, target] = await Promise.all(

@@ -437,6 +437,9 @@ currentSession(): Promise<SessionCtx | null>               // React cache(); one
 **Demo sign-in (D-8):** `/demo` exists only when `DEMO_MODE=1`, and otherwise returns 404. It lists `isDemo` users; a POST writes a
 Session row with `mfaAt` set. It refuses any user where `isDemo = false`. Only `scripts/seed-demo.ts` sets `isDemo`,
 and that script refuses a non-local database unless `ALLOW_CLOUD_DB=1` (INV-27).
+A demo account is shared by every visitor and its TOTP seed is public, so (2026-10-12): an `isDemo` user's session resolves
+only while `DEMO_MODE=1`, however it was made; and a demo session is refused org and account deletion, email change, TOTP
+changes, sign-out-everywhere, and inviting, re-roling or removing members (`assertNotDemo` in `core/auth/session.ts`).
 
 ### 7b. Authorization
 
