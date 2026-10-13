@@ -74,6 +74,12 @@ export async function acceptInvite(s: SessionCtx, token: string): Promise<string
     });
     if (spent.count !== 1) throw new Refused(INVALID);
     const invite = await tx.invite.findUniqueOrThrow({ where: { tokenHash: hashToken(token) }, include: { org: { select: { slug: true } } } });
+    // An invite carries its issuer's authority as it is now, not as it was when sent: once the issuer is
+    // removed, demoted or deleted, the invite must not grant a role they could no longer grant themselves.
+    const issuer = invite.invitedById
+      ? await tx.membership.findUnique({ where: { orgId_userId: { orgId: invite.orgId, userId: invite.invitedById } }, select: { role: true } })
+      : null;
+    if (!issuer || !mayAssign(issuer.role, null, invite.role)) throw new Refused(INVALID);
     const key = { orgId_userId: { orgId: invite.orgId, userId: s.userId } };
     // Already a member: keep the role they have. An invite never silently changes one.
     if (!(await tx.membership.findUnique({ where: key }))) {

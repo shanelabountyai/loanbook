@@ -2,6 +2,16 @@
 
 Entries prefixed `security:` are mandatory for anything touching an invariant. Clones must take a `security:` release within 7 days.
 
+## Unreleased (fixes from the 2026-10-12 review; not tagged, `FOUNDATION_VERSION` not bumped — the owner cuts the release)
+
+security: (review 2026-10-12 #1, INV-28) A pending invite outlived its issuer's authority: a removed owner could re-enter as
+owner through an owner invite they had sent to a spare address, and a demoted admin's `admin` invites stayed good.
+`acceptInvite` now reads the issuer's membership as it is at acceptance and refuses (same "not valid" answer) unless the
+issuer could still send that invite — so removal, demotion, leaving and account deletion are all covered at the one place an
+invite is honoured. `removeMember` and `changeRole` also revoke the invites the person can no longer back, in the same
+transaction, so they drop out of the pending lists. An `Invite` row with no `invitedById` (none is written by core) is no
+longer acceptable.
+
 ## 1.2.0 (2026-09-28)
 
 F-03: a clone can now declare a module required in the clone-owned `src/app/required-modules.ts`. `foundation:check-modules`
