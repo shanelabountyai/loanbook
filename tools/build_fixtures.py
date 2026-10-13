@@ -365,7 +365,8 @@ dump("capstone/CP1.json", dict(
 def life(P0, apr, rows, disb, pays, last):
     """One loan day by day, disbursement through `last`, in job order: accrual for D, then a fee dated D (cash and
     principal as posted before D's payment), then any payment on D (None = the D17 quote). D23: once principal is
-    repaid the loan is closed: DPD 0 and no fee, whatever the schedule says."""
+    repaid the loan is closed: DPD 0 and no fee, whatever the schedule says. D27: while principal is owed the final
+    installment is unsatisfied whatever cash covered (D9): DPD from the last due date, and its fee at grace exit."""
     owed, P, start, posted, cash, fees, paid, states, n_acc = st(0, 0, P0), P0, disb, 0, [], [], [], [], 0
     D = disb
     while D <= last:
@@ -375,7 +376,7 @@ def life(P0, apr, rows, disb, pays, last):
         cum = 0
         for r in rows:
             cum += r["payment_cents"]
-            if P > 0 and dt.date.fromisoformat(r["due_date"]) + dt.timedelta(days=GRACE_EXIT) == D and sum(x for _, x in cash) < cum:
+            if P > 0 and dt.date.fromisoformat(r["due_date"]) + dt.timedelta(days=GRACE_EXIT) == D and (sum(x for _, x in cash) < cum or r is rows[-1]):
                 fees.append(dict(installment=r["n"], date=D.isoformat(), cents=LATE_FEE)); owed["fees"] += LATE_FEE
         for d, c in pays:
             if d != D: continue
@@ -386,7 +387,7 @@ def life(P0, apr, rows, disb, pays, last):
             owed, cash = dict(a["remaining"]), cash + [(D, amt)]
             if a["allocation"]["principal"] > 0:
                 P, start, posted = P - a["allocation"]["principal"], D, 0
-        s = band(0 if P == 0 else dq_day(rows, cash, D))
+        s = band(0 if P == 0 else dq_day(rows, cash, D) or max(0, (D - dt.date.fromisoformat(rows[-1]["due_date"])).days))
         if not states or states[-1]["state"] != s: states.append(dict(date=D.isoformat(), state=s))
         D += dt.timedelta(days=1)
     return dict(payments=paid, fees=fees, states=states, owed_at_end=owed,

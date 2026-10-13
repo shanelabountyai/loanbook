@@ -309,7 +309,8 @@ for row in e["days"]:
 chk({r.get("error") for r in got} >= {"reason_required", "backdated", "not_in_default", "accrual_pending", "already_written_off", "exceeds_payoff"}, "WO1 every refusal")
 chk(not any(f["installment"] == 6 for f in fees) and not any(d > wo_date for d, a, _ in led if a == "interest_receivable"), "WO1 nothing accrues or is charged after")
 
-# ---- simulated book (independent: Decimal schedule, running balances, bisect DPD; D23 closed = principal 0)
+# ---- simulated book (independent: Decimal schedule, running balances, bisect DPD; D23 closed = principal 0;
+#      D27 principal owed keeps the final installment unsatisfied whatever cash covered)
 bk = load("book/BK1.json"); bi, be = bk["input"], bk["expected"]
 names = ["current", "grace", "delinquent_30", "delinquent_60", "delinquent_90", "default_recommended"]
 last, fee_amt = dt.date.fromisoformat(bi["run_through"]), bi["late_fee_cents"]
@@ -329,7 +330,7 @@ for l, x in zip(bi["loans"], be["loans"]):
         a_day = q(Decimal(P) * apr * (D - seg).days / (Decimal(10000) * 365)) - prev
         prev += a_day; intr += a_day; inc += a_day; n_acc += a_day > 0
         for k in range(n):
-            if P and k not in charged and (D - due[k]).days == 11 and paid_cash < cumd[k]:
+            if P and k not in charged and (D - due[k]).days == 11 and (paid_cash < cumd[k] or k == n - 1):
                 charged.add(k); fees += fee_amt; fl.append(dict(installment=k + 1, date=D.isoformat(), cents=fee_amt))
         w = want.get(D.isoformat())
         if w:
@@ -340,8 +341,8 @@ for l, x in zip(bi["loans"], be["loans"]):
             got.append(dict(date=D.isoformat(), cents=amt, allocation=a, loan_closed=amt == sum(before.values())))
             fees, intr, paid_cash = fees - a["fees"], intr - a["interest"], paid_cash + amt
             if a["principal"]: P, seg, prev = P - a["principal"], D, 0
-        k = bisect.bisect_right(cumd, paid_cash)
-        dd = 0 if P == 0 or k >= n or due[k] >= D else (D - due[k]).days
+        k = min(bisect.bisect_right(cumd, paid_cash), n - 1)
+        dd = 0 if P == 0 or due[k] >= D else (D - due[k]).days
         s = names[bisect.bisect_right([0, 1, 11, 60, 90, 120], dd) - 1]
         if not st_rows or st_rows[-1]["state"] != s: st_rows.append(dict(date=D.isoformat(), state=s))
         D += dt.timedelta(days=1)

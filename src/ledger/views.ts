@@ -94,11 +94,16 @@ export async function loanDetail(db: Db, { loanId, asOf }: { loanId: string; asO
   return { loanId, terms, status, owed: await owedCents(db, loanId), schedule: scheduleActuals(buildSchedule(terms).rows, paid), ledger };
 }
 
-/** The oldest installment cash has not covered (D19's cumulative cover) and what is left of it; null once nothing is owed (paid off, or written off). */
+/**
+ * The oldest installment cash has not covered (D19's cumulative cover) and what is left of it; null once nothing is owed (paid off, or written off).
+ * D27: every printed row covered and money still owed is the final installment unpaid: its due date, and all that is owed (D9).
+ */
 export function nextDue(d: Pick<LoanDetail, 'schedule' | 'owed'>): { dueDate: string; cents: number } | null {
   if (d.owed.fees + d.owed.interest + d.owed.principal === 0) return null;
   const row = d.schedule.find((r) => r.coveredCents < r.paymentCents);
-  return row ? { dueDate: row.dueDate, cents: row.paymentCents - row.coveredCents } : null;
+  if (row) return { dueDate: row.dueDate, cents: row.paymentCents - row.coveredCents };
+  const last = d.schedule.at(-1);
+  return last ? { dueDate: last.dueDate, cents: d.owed.fees + d.owed.interest + d.owed.principal } : null;
 }
 
 export type Statement = { loanId: string; payments: StatementPayment[]; owed: Buckets };

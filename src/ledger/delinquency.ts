@@ -20,8 +20,9 @@ export type Payment = { date: string; cents: number };
 /**
  * D19: days since the due date of the oldest installment not yet covered by cumulative payments received
  * through `asOf`. An installment is past due from the day after its due date; none past due and unpaid is 0.
+ * D27: the final installment is the payoff (D9), so with `owesPrincipal` it stays unsatisfied whatever cash covered.
  */
-export function dpd(schedule: readonly Installment[], payments: readonly Payment[], asOf: string): number {
+export function dpd(schedule: readonly Installment[], payments: readonly Payment[], asOf: string, owesPrincipal = false): number {
   const paid = payments.filter((p) => p.date <= asOf).reduce((sum, p) => sum + p.cents, 0);
   let due = 0;
   for (const row of schedule) {
@@ -29,7 +30,8 @@ export function dpd(schedule: readonly Installment[], payments: readonly Payment
     if (due > paid && row.dueDate < asOf) return daysBetween(row.dueDate, asOf);
     if (due > paid) return 0; // oldest unsatisfied is not past due yet, and later ones are due later
   }
-  return 0;
+  const last = schedule.at(-1);
+  return owesPrincipal && last && last.dueDate < asOf ? daysBetween(last.dueDate, asOf) : 0;
 }
 
 export function stateFromDpd(days: number): LoanState {
@@ -51,9 +53,14 @@ async function ledgerByDate(db: Pick<ClientBase, 'query'>, loanId: string): Prom
   return rows.map((r) => ({ date: r.date, cents: Number(r.cash), principalCents: Number(r.principal) }));
 }
 
+/** Principal (loans_receivable) still owed through `date`. */
+function principalBy(days: readonly DayTotals[], date: string): number {
+  return days.filter((d) => d.date <= date).reduce((sum, d) => sum + d.principalCents, 0);
+}
+
 /** D23: a loan whose principal is repaid through `date` is closed: DPD 0 and no late fee, whatever the schedule says. */
 function closedBy(days: readonly DayTotals[], date: string): boolean {
-  return days.filter((d) => d.date <= date).reduce((sum, d) => sum + d.principalCents, 0) === 0;
+  return principalBy(days, date) === 0;
 }
 
 export type LoanStatus = { loanId: string; asOf: string; dpd: number; state: LoanState };
@@ -82,8 +89,9 @@ async function statusIn(db: Pick<ClientBase, 'query'>, loanId: string, asOf: str
   );
   const byDate = await ledgerByDate(db, loanId);
   const schedule = buildSchedule(loans[0]).rows;
-  if (wo[0]) return { loanId, asOf, dpd: dpd(schedule, byDate.filter((r) => r.date <= wo[0]!.date), wo[0].date), state: 'written_off' };
-  const days = closedBy(byDate, asOf) ? 0 : dpd(schedule, byDate.filter((r) => r.date <= asOf), asOf);
+  // a written-off loan owed principal until the write-off entry itself (writeOff refuses any state but default)
+  if (wo[0]) return { loanId, asOf, dpd: dpd(schedule, byDate.filter((r) => r.date <= wo[0]!.date), wo[0].date, true), state: 'written_off' };
+  const days = closedBy(byDate, asOf) ? 0 : dpd(schedule, byDate.filter((r) => r.date <= asOf), asOf, principalBy(byDate, asOf) > 0);
   return { loanId, asOf, dpd: days, state: stateFromDpd(days) };
 }
 
@@ -91,7 +99,7 @@ export type FeeAssessed = { loanId: string; installment: number; date: string; c
 
 /**
  * Late-fee job (D19, D20): for every loan, one `LATE_FEE_CENTS` fee per installment still unsatisfied (cumulative
- * cash short of cumulative scheduled) on the day its DPD reaches `GRACE_EXIT_DPD`, dated that day: Dr fees_receivable /
+ * cash short of cumulative scheduled, or for the final one principal still owed, D27) on the day its DPD reaches `GRACE_EXIT_DPD`, dated that day: Dr fees_receivable /
  * Cr fees_income. Returns what it posted; a re-run posts nothing. The database keeps one fee per (loan, installment)
  * (`already_fee_assessed`), so a run that loses a race skips that installment: the winner posted it.
  */
@@ -109,12 +117,13 @@ export async function runStatus(db: Pick<ClientBase, 'query'>, { asOf }: { asOf:
     );
     const assessed = new Set(done.map((r) => r.installment));
     let dueCents = 0;
-    for (const row of buildSchedule(loan).rows) {
+    const rows = buildSchedule(loan).rows;
+    for (const row of rows) {
       dueCents += row.paymentCents;
       const date = addDays(row.dueDate, GRACE_EXIT_DPD);
       if (date > asOf || assessed.has(row.n) || closedBy(cash, date)) continue;
       const paid = cash.filter((c) => c.date <= date).reduce((sum, c) => sum + c.cents, 0);
-      if (paid >= dueCents) continue;
+      if (paid >= dueCents && !(row === rows.at(-1) && principalBy(cash, date) > 0)) continue;
       try {
         const entryId = await postEntry(db, {
           date,
