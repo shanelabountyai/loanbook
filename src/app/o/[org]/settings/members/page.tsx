@@ -1,3 +1,4 @@
+import { notFound } from 'next/navigation';
 import { inOrg, requireOrg } from '@/core/authz/guards';
 import { can, mayAssign } from '@/core/authz/permissions';
 import { now } from '@/core/clock';
@@ -11,6 +12,7 @@ export const metadata = { title: 'Members' };
 // Controls are hidden when the rules would refuse them; core/tenancy enforces the rules either way.
 export default async function Members({ params }: { params: Promise<{ org: string }> }) {
   const ctx = await requireOrg((await params).org);
+  if (ctx.role === 'member') notFound(); // loanbook D21: a member is a borrower, and this list is the lender's customer list
   const manage = can(ctx.role, 'members.manage');
   const [members, invites] = await Promise.all([
     db.membership.findMany({ where: inOrg(ctx), select: { userId: true, role: true, user: { select: { email: true } } }, orderBy: { createdAt: 'asc' } }),
