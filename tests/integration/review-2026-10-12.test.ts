@@ -1,7 +1,9 @@
 // One runnable check per finding fixed from the 2026-10-12 review (see CHANGELOG.md, Unreleased).
 import { beforeEach, describe, expect, it } from 'vitest';
 import { db } from '@/core/db';
+import { requestEmailChange } from '@/core/auth/link';
 import { currentSession } from '@/core/auth/session';
+import { LIMITS } from '@/core/rate-limit';
 import { acceptInvite, createInvite, pendingInvitesFor } from '@/core/tenancy/invites';
 import { changeRole, removeMember } from '@/core/tenancy/orgs';
 import { actAs, addMember, makeOrg, roleOf } from '../helpers/org';
@@ -65,5 +67,26 @@ describe('an invite grants no more than its issuer could grant now', () => {
     const { userId, result } = await accept('spare@example.test', token);
     await expect(result).rejects.toThrow('not valid');
     expect(await roleOf(org.id, userId)).toBeNull();
+  });
+});
+
+describe('requestEmailChange does not say whether an address has an account', () => {
+  it('a taken address gets the same answer as a free one, and no mail', async () => {
+    await makeUser('taken@example.test');
+    await signInAs((await makeUser('ada@example.test')).id);
+    const s = (await currentSession())!;
+    await expect(requestEmailChange(s, 'Taken@Example.test')).resolves.toBeUndefined();
+    await expect(requestEmailChange(s, 'free@example.test')).resolves.toBeUndefined();
+    expect(await db.capturedMessage.count({ where: { to: 'taken@example.test' } })).toBe(0);
+    expect(await db.loginToken.count({ where: { purpose: 'email_change', email: 'taken@example.test' } })).toBe(0);
+    expect(await db.capturedMessage.count({ where: { to: 'free@example.test' } })).toBe(1);
+  });
+
+  it('probes of taken addresses count against the rate limit', async () => {
+    await makeUser('taken@example.test');
+    await signInAs((await makeUser('ada@example.test')).id);
+    const s = (await currentSession())!;
+    for (let i = 0; i < LIMITS.linkPerEmail.limit; i++) await requestEmailChange(s, 'taken@example.test');
+    await expect(requestEmailChange(s, 'taken@example.test')).rejects.toThrow('Too many');
   });
 });

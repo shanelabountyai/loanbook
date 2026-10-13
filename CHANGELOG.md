@@ -12,6 +12,12 @@ invite is honoured. `removeMember` and `changeRole` also revoke the invites the 
 transaction, so they drop out of the pending lists. An `Invite` row with no `invitedById` (none is written by core) is no
 longer acceptable.
 
+security: (review 2026-10-12 #4, D-10, INV-09) `requestEmailChange` answered "That address belongs to another account" for a
+registered address, and returned before its rate limit counted the request — so any signed-in user could enumerate accounts
+at request speed. The limit is now counted before the lookup, and a taken address resolves exactly like a free one: same
+"check your new inbox" result, no link created, no mail sent. Cost: someone who types an address that already has an account
+is told to check that inbox and nothing arrives. INV-06's "taken address is refused" case now asserts the silent form.
+
 ## 1.2.0 (2026-09-28)
 
 F-03: a clone can now declare a module required in the clone-owned `src/app/required-modules.ts`. `foundation:check-modules`
