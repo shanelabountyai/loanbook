@@ -310,7 +310,7 @@ chk({r.get("error") for r in got} >= {"reason_required", "backdated", "not_in_de
 chk(not any(f["installment"] == 6 for f in fees) and not any(d > wo_date for d, a, _ in led if a == "interest_receivable"), "WO1 nothing accrues or is charged after")
 
 # ---- simulated book (independent: Decimal schedule, running balances, bisect DPD; D23 closed = principal 0;
-#      D27 principal owed keeps the final installment unsatisfied whatever cash covered)
+#      D27 principal owed keeps the final installment unsatisfied whatever cash covered; D28 its fee is at most that principal)
 bk = load("book/BK1.json"); bi, be = bk["input"], bk["expected"]
 names = ["current", "grace", "delinquent_30", "delinquent_60", "delinquent_90", "default_recommended"]
 last, fee_amt = dt.date.fromisoformat(bi["run_through"]), bi["late_fee_cents"]
@@ -331,7 +331,8 @@ for l, x in zip(bi["loans"], be["loans"]):
         prev += a_day; intr += a_day; inc += a_day; n_acc += a_day > 0
         for k in range(n):
             if P and k not in charged and (D - due[k]).days == 11 and (paid_cash < cumd[k] or k == n - 1):
-                charged.add(k); fees += fee_amt; fl.append(dict(installment=k + 1, date=D.isoformat(), cents=fee_amt))
+                fee = min(fee_amt, P) if k == n - 1 else fee_amt
+                charged.add(k); fees += fee; fl.append(dict(installment=k + 1, date=D.isoformat(), cents=fee))
         w = want.get(D.isoformat())
         if w:
             before = dict(fees=fees, interest=intr, principal=P)
@@ -349,12 +350,12 @@ for l, x in zip(bi["loans"], be["loans"]):
     chk(x["payments"] == got, f"{tag} payments"); chk(x["fees"] == fl, f"{tag} fees"); chk(x["states"] == st_rows, f"{tag} states")
     chk(x["owed_at_end"] == dict(fees=fees, interest=intr, principal=P), f"{tag} owed at end")
     chk(x["interest_income_cents"] == inc and x["accrual_entries"] == n_acc, f"{tag} interest income, accrual entries")
-    chk(sum(g["cents"] for g in got) == P0 - P + inc - intr + len(fl) * fee_amt - fees, f"{tag} cash = principal + interest + fees repaid")
+    chk(sum(g["cents"] for g in got) == P0 - P + inc - intr + sum(f["cents"] for f in fl) - fees, f"{tag} cash = principal + interest + fees repaid")
     if l["behavior"] == "default": chk(st_rows[-1]["state"] == "default_recommended", f"{tag} default reaches default_recommended")
     if l["behavior"] == "payoff_early": chk(P == 0 and got[-1]["date"] < due[-1].isoformat() and st_rows == [dict(date=l["disbursement_date"], state="current")], f"{tag} early payoff closes, current throughout")
     if P == 0: chk(st_rows[-1]["state"] == "current" and fees == intr == 0, f"{tag} closed loan current, owes nothing")
 T = be["totals"]
-chk(T["cash_received_cents"] == sum(p["cents"] for x in be["loans"] for p in x["payments"]) and T["fees_income_cents"] == fee_amt * sum(len(x["fees"]) for x in be["loans"]), "BK1 totals")
+chk(T["cash_received_cents"] == sum(p["cents"] for x in be["loans"] for p in x["payments"]) and T["fees_income_cents"] == sum(f["cents"] for x in be["loans"] for f in x["fees"]), "BK1 totals")
 chk(T["states_at_end"]["default_recommended"] == 10 and sum(T["states_at_end"].values()) == 40, "BK1 end states")
 chk(any(x["states"][-1]["state"] == "current" and sum(x["owed_at_end"].values()) == 0 and any(p["date"] < "2026-07-01" for p in x["payments"][-1:]) for x in be["loans"]), "BK1 a loan closed before July stays current to year end (D23)")
 

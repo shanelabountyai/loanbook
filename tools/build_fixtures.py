@@ -366,7 +366,8 @@ def life(P0, apr, rows, disb, pays, last):
     """One loan day by day, disbursement through `last`, in job order: accrual for D, then a fee dated D (cash and
     principal as posted before D's payment), then any payment on D (None = the D17 quote). D23: once principal is
     repaid the loan is closed: DPD 0 and no fee, whatever the schedule says. D27: while principal is owed the final
-    installment is unsatisfied whatever cash covered (D9): DPD from the last due date, and its fee at grace exit."""
+    installment is unsatisfied whatever cash covered (D9): DPD from the last due date, and its fee at grace exit.
+    D28: that final fee is capped at the principal still owed."""
     owed, P, start, posted, cash, fees, paid, states, n_acc = st(0, 0, P0), P0, disb, 0, [], [], [], [], 0
     D = disb
     while D <= last:
@@ -377,7 +378,8 @@ def life(P0, apr, rows, disb, pays, last):
         for r in rows:
             cum += r["payment_cents"]
             if P > 0 and dt.date.fromisoformat(r["due_date"]) + dt.timedelta(days=GRACE_EXIT) == D and (sum(x for _, x in cash) < cum or r is rows[-1]):
-                fees.append(dict(installment=r["n"], date=D.isoformat(), cents=LATE_FEE)); owed["fees"] += LATE_FEE
+                fee = min(LATE_FEE, P) if r is rows[-1] else LATE_FEE
+                fees.append(dict(installment=r["n"], date=D.isoformat(), cents=fee)); owed["fees"] += fee
         for d, c in pays:
             if d != D: continue
             amt = sum(owed.values()) if c is None else c

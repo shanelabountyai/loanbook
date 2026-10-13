@@ -102,6 +102,7 @@ export type FeeAssessed = { loanId: string; installment: number; date: string; c
  * cash short of cumulative scheduled, or for the final one principal still owed, D27) on the day its DPD reaches `GRACE_EXIT_DPD`, dated that day: Dr fees_receivable /
  * Cr fees_income. Returns what it posted; a re-run posts nothing. The database keeps one fee per (loan, installment)
  * (`already_fee_assessed`), so a run that loses a race skips that installment: the winner posted it.
+ * D28: the final installment's fee is capped at the principal still owed that day.
  */
 export async function runStatus(db: Pick<ClientBase, 'query'>, { asOf }: { asOf: string }): Promise<FeeAssessed[]> {
   assertDate(asOf);
@@ -123,7 +124,9 @@ export async function runStatus(db: Pick<ClientBase, 'query'>, { asOf }: { asOf:
       const date = addDays(row.dueDate, GRACE_EXIT_DPD);
       if (date > asOf || assessed.has(row.n) || closedBy(cash, date)) continue;
       const paid = cash.filter((c) => c.date <= date).reduce((sum, c) => sum + c.cents, 0);
-      if (paid >= dueCents && !(row === rows.at(-1) && principalBy(cash, date) > 0)) continue;
+      const last = row === rows.at(-1);
+      if (paid >= dueCents && !(last && principalBy(cash, date) > 0)) continue;
+      const cents = last ? Math.min(LATE_FEE_CENTS, principalBy(cash, date)) : LATE_FEE_CENTS; // D28; above zero, the loan is not closed
       try {
         const entryId = await postEntry(db, {
           date,
@@ -132,11 +135,11 @@ export async function runStatus(db: Pick<ClientBase, 'query'>, { asOf }: { asOf:
           installment: row.n,
           memo: `Late fee ${loan.id} installment ${row.n}`,
           lines: [
-            { account: 'fees_receivable', debitCents: LATE_FEE_CENTS, creditCents: 0 },
-            { account: 'fees_income', debitCents: 0, creditCents: LATE_FEE_CENTS },
+            { account: 'fees_receivable', debitCents: cents, creditCents: 0 },
+            { account: 'fees_income', debitCents: 0, creditCents: cents },
           ],
         });
-        out.push({ loanId: loan.id, installment: row.n, date, cents: LATE_FEE_CENTS, entryId });
+        out.push({ loanId: loan.id, installment: row.n, date, cents, entryId });
       } catch (err) {
         if ((err as DatabaseError).constraint !== 'already_fee_assessed') throw err;
       }
