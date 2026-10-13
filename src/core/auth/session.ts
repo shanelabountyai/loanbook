@@ -81,7 +81,8 @@ export async function requireUser(opts: { allowPendingMfa?: boolean } = {}): Pro
 /**
  * A demo account is shared by every /demo visitor, so nothing it does may destroy the demo or change who
  * holds it. `assertFresh` calls this, which covers every INV-26 action (org and account deletion, email
- * change, TOTP changes); membership changes in core/tenancy call it directly.
+ * change, TOTP changes); membership changes and org creation in core/tenancy call it directly, and so do the
+ * billing module's own actions.
  */
 export function assertNotDemo(s: SessionCtx) {
   if (s.isDemo) throw new Refused('This is a shared demo account, so that is switched off here.');

@@ -2,7 +2,9 @@
 
 Entries prefixed `security:` are mandatory for anything touching an invariant. Clones must take a `security:` release within 7 days.
 
-## Unreleased (fixes from the 2026-10-12 review; not tagged, `FOUNDATION_VERSION` not bumped — the owner cuts the release)
+## 1.2.1 (2026-10-13)
+
+The four fixes from the 2026-10-12 review. No schema change, no migration, no new env var.
 
 security: (review 2026-10-12 #1, INV-28) A pending invite outlived its issuer's authority: a removed owner could re-enter as
 owner through an owner invite they had sent to a spare address, and a demoted admin's `admin` invites stayed good.
@@ -25,11 +27,19 @@ public constant, that became a normal owner login that kept working after `DEMO_
 came from `/demo` or a sign-in link; (2) `assertNotDemo` refuses a demo session org deletion, account deletion, email change
 and TOTP enrol/confirm/disable (via `assertFresh`, which every INV-26 action already calls), inviting, re-roling, removing
 and leaving (`createInvite`, and `withMembers` in `core/tenancy/orgs.ts`), and sign-out-everywhere (the shared account would
-sign every other visitor out). `SessionCtx` gains `isDemo`. A demo session can still browse, add projects, create and revoke
-share links, create a new org, and use billing — a clone that wants more locked calls `assertNotDemo(ctx.session)` itself.
+sign every other visitor out). `SessionCtx` gains `isDemo`. A demo session can still browse, add projects, and create and
+revoke share links — a clone that wants more locked calls `assertNotDemo(ctx.session)` itself.
+
+security: (owner decision 2026-10-13, INV-27) A demo session is also refused creating an org and using billing. `createOrg`
+(`core/tenancy/orgs.ts`) calls `assertNotDemo`: an org made by the shared account was owned by every visitor and never
+cleaned up. `startCheckout` and `openPortal` call it too, in the billing module's own
+`src/app/o/[org]/settings/billing/actions.ts`, so a visitor cannot subscribe the shared demo org or open its Stripe customer
+portal; the guard is removed with the module and core imports nothing from it. Tests: the org half in
+`tests/integration/review-2026-10-12-demo.test.ts`, the billing half in `tests/invariants/inv-12-webhooks.test.ts`.
 
 Upgrade: no schema or config change. **Behaviour change for a deployed demo:** demo visitors can no longer invite or manage
-members or delete anything listed above, so a `DEMO.md` step that does one of those needs a real account. And any environment
+members, create an org, subscribe or open the billing portal, or delete anything listed above, so a `DEMO.md` step that does
+one of those needs a real account. And any environment
 holding `isDemo` rows without `DEMO_MODE=1` (local dev without the flag included) can no longer sign those users in at all.
 Existing damage is not repaired: a demo row whose email was already changed still has it — re-run `seed:demo` or check the
 `isDemo` rows by hand.

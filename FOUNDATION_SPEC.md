@@ -440,6 +440,9 @@ and that script refuses a non-local database unless `ALLOW_CLOUD_DB=1` (INV-27).
 A demo account is shared by every visitor and its TOTP seed is public, so (2026-10-12): an `isDemo` user's session resolves
 only while `DEMO_MODE=1`, however it was made; and a demo session is refused org and account deletion, email change, TOTP
 changes, sign-out-everywhere, and inviting, re-roling or removing members (`assertNotDemo` in `core/auth/session.ts`).
+Since 2026-10-13 it is also refused creating an org (`createOrg`) and, where the billing module is present, checkout and the
+billing portal (the guard is in the module's own `settings/billing/actions.ts`, so it goes with the module). Adding projects
+and creating or revoking share links stay open to it.
 
 ### 7b. Authorization
 

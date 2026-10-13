@@ -17,6 +17,7 @@ const slugify = (name: string) =>
 
 /** Creates an org with the caller as its owner; returns the slug. A taken slug gets a random suffix. */
 export async function createOrg(s: SessionCtx, name: string): Promise<string> {
+  assertNotDemo(s); // an org made by the shared account belongs to every /demo visitor and is never cleaned up
   const base = slugify(name);
   for (let i = 0; i < 5; i++) {
     const slug = i === 0 ? base : `${base}-${randomBytes(3).toString('hex')}`;

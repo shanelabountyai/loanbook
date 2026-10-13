@@ -13,7 +13,7 @@ import { disableTotp, enrolTotp } from '@/core/auth/totp';
 import { requireOrg } from '@/core/authz/guards';
 import { deleteAccount, deleteOrg } from '@/core/tenancy/delete';
 import { createInvite } from '@/core/tenancy/invites';
-import { changeRole, removeMember } from '@/core/tenancy/orgs';
+import { changeRole, createOrg, removeMember } from '@/core/tenancy/orgs';
 import { seedDemo } from '../../scripts/seed-demo';
 import { makeUser, resetAuthTables, signInAs } from '../helpers/auth';
 import { jar } from '../helpers/next';
@@ -72,11 +72,28 @@ describe('a demo session cannot destroy the demo or change who owns it', () => {
     expect(await db.membership.count({ where: { userId: member.id, role: 'member' } })).toBe(1);
   });
 
+  // Owner decision 2026-10-13. Billing is a removable module, so its half is in tests/invariants/inv-12-webhooks.test.ts.
+  it('creating an org is refused; adding a project and sharing it still work', async () => {
+    await seedDemo();
+    await viaDemo('owner@acme.demo.test');
+    const orgs = await db.org.count();
+    await expect(createOrg((await currentSession())!, 'Mine')).rejects.toThrow(DEMO);
+    const { startOrg } = await import('@/app/onboarding/actions');
+    expect(await startOrg({ name: 'Mine' })).toEqual({ error: expect.stringMatching(DEMO) });
+    expect(await db.org.count()).toBe(orgs);
+
+    const { addProject, shareProject } = await import('@/app/o/[org]/projects/actions');
+    await expect(addProject('acme', { name: 'Demo project' })).rejects.toThrow('redirect /o/acme/projects');
+    const p = await db.project.findFirstOrThrow({ where: { name: 'Demo project' } });
+    expect(await shareProject('acme', { id: p.id, days: '7' })).toEqual({ notice: expect.stringContaining('/s/') });
+  });
+
   it('a real account is not affected', async () => {
     const u = await makeUser('real@example.test');
     await signInAs(u.id);
     await requestEmailChange((await currentSession())!, 'real2@example.test');
     expect(await db.loginToken.count({ where: { purpose: 'email_change' } })).toBe(1);
+    expect(await createOrg((await currentSession())!, 'Real')).toBe('real');
   });
 });
 
