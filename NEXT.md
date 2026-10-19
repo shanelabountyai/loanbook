@@ -291,3 +291,5 @@ Next: 2.4 accrual math, pure. Model: **Opus 5.5** (money rounding, D4/D5).
 - Reusable start file: `~/.claude/docs/project-start.md`
 - Not deployed. No Vercel project, no Neon project, nothing that can bill.
 - The old folder `~/Projects/loanbookmicroloan` is retired and safe to delete. Open sessions in `~/Projects/loanbook`.
+
+2026-10-19: saas-foundation v1.2.1 → v1.3.0 (security release, due 2026-10-21) is on branch `foundation-v1.3.0`, PR open, awaiting merge. After merge: run `npm run db:migrate` (migration `20261014000000_role_scorekeeper`), then update loanbook's row in the template's CLONES.md. Open for the owner: loanbook treats every non-`member` role as a servicer (`loans/access.ts`, loans/aging pages, org layout), so the new `scorekeeper` role would get servicer access (book, statements, waive/write-off) without MFA.

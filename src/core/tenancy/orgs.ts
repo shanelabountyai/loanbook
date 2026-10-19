@@ -8,7 +8,7 @@ import { now } from '@/core/clock';
 import { db } from '@/core/db';
 import { Refused } from '@/core/errors';
 import type { Prisma } from '@/generated/prisma/client';
-import type { Role } from '@/generated/prisma/enums';
+import { Role } from '@/generated/prisma/enums';
 
 type Tx = Prisma.TransactionClient;
 
@@ -70,7 +70,7 @@ async function withMembers(ctx: OrgCtx, userId: string, fn: (tx: Tx, actor: Role
  */
 const revokeInvitesBeyond = (tx: Tx, orgId: string, userId: string, role: Role | null) =>
   tx.invite.updateMany({
-    where: { orgId, invitedById: userId, acceptedAt: null, revokedAt: null, ...(role && { role: { in: (['owner', 'admin', 'member'] as const).filter((r) => !mayAssign(role, null, r)) } }) },
+    where: { orgId, invitedById: userId, acceptedAt: null, revokedAt: null, ...(role && { role: { in: Object.values(Role).filter((r) => !mayAssign(role, null, r)) } }) },
     data: { revokedAt: now() },
   });
 

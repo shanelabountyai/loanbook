@@ -5,6 +5,7 @@ import { now } from '@/core/clock';
 import { db } from '@/core/db';
 import { ActionForm } from '@/core/ui/action-form';
 import { Role } from '@/generated/prisma/enums';
+import { isServicer } from '../../loans/roles';
 import { cancelInvite, inviteMember, leaveOrg, removeFromOrg, setRole } from './actions';
 
 export const metadata = { title: 'Members' };
@@ -12,7 +13,7 @@ export const metadata = { title: 'Members' };
 // Controls are hidden when the rules would refuse them; core/tenancy enforces the rules either way.
 export default async function Members({ params }: { params: Promise<{ org: string }> }) {
   const ctx = await requireOrg((await params).org);
-  if (ctx.role === 'member') notFound(); // loanbook D21: a member is a borrower, and this list is the lender's customer list
+  if (!isServicer(ctx.role)) notFound(); // loanbook D29/D30: the lender's customer list, servicers (owner/admin) only
   const manage = can(ctx.role, 'members.manage');
   const [members, invites] = await Promise.all([
     db.membership.findMany({ where: inOrg(ctx), select: { userId: true, role: true, user: { select: { email: true } } }, orderBy: { createdAt: 'asc' } }),

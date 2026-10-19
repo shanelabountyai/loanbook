@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { can } from '@/core/authz/permissions';
 import { requireOrg } from '@/core/authz/guards';
 import { db } from '@/core/db';
+import { isServicer } from './loans/roles';
 
 // Navigation only. Layouts do not re-run on every navigation, so each page calls requireOrg itself.
 export default async function OrgLayout({ children, params }: { children: React.ReactNode; params: Promise<{ org: string }> }) {
@@ -12,7 +13,7 @@ export default async function OrgLayout({ children, params }: { children: React.
     <>
       <nav>
         <strong>{org.name}</strong> · <Link href={base}>Home</Link> · <Link href={`${base}/loans`}>Loans</Link> · <Link href={`${base}/projects`}>Projects</Link>
-        {ctx.role !== 'member' && <> · <Link href={`${base}/settings/members`}>Members</Link></>}
+        {isServicer(ctx.role) && <> · <Link href={`${base}/settings/members`}>Members</Link></>}
         {can(ctx.role, 'billing.manage') && <> · <Link href={`${base}/settings/billing`}>Billing</Link></>} {/* billing */}
         {can(ctx.role, 'org.delete') && <> · <Link href={`${base}/settings/danger`}>Delete org</Link></>}
         {' · '}<Link href="/onboarding">Your orgs</Link> · <Link href="/account/security">Account</Link>

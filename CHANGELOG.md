@@ -2,6 +2,26 @@
 
 Entries prefixed `security:` are mandatory for anything touching an invariant. Clones must take a `security:` release within 7 days.
 
+## 1.3.0 (2026-10-14)
+
+A `scorekeeper` role that holds only a new `results.write` permission (D-21), asked for by bracketry so a volunteer can enter
+and correct scores without `org.update`. Owner and admin hold `results.write` too; member does not. Core checks it nowhere:
+a clone gates its own result entry on it. One migration (`20261014000000_role_scorekeeper`, `ALTER TYPE "Role" ADD VALUE`),
+additive. No new env var.
+
+security: (INV-22) The guard's MFA line was `role !== 'member'`, so any role added later would have been MFA-gated by
+accident and the rule's wording ("an owner or admin without MFA") was not what the code said. It is now an explicit
+owner/admin list; behaviour for the three existing roles is unchanged. A scorekeeper is not MFA-gated, by decision.
+
+security: (INV-28) `revokeInvitesBeyond` listed the roles by hand (`owner`, `admin`, `member`), so a demoted issuer's pending
+invite for any newer role would have stayed live. It now reads `Object.values(Role)`. Tests in
+`tests/integration/scorekeeper-role.test.ts` (4); both fixes were reverted one at a time and each turned its test red.
+
+Upgrade: merge, then `npm run db:migrate` (the enum value arrives with the merge). The members page and `z.enum(Role)` offer
+the new role with no clone change. A clone that does not want it simply never checks `results.write`; an admin can still
+assign the role, and it grants nothing there. Clones owe this within 7 days (by 2026-10-21); it can be taken together with
+v1.2.1.
+
 ## 1.2.1 (2026-10-13)
 
 The four fixes from the 2026-10-12 review. No schema change, no migration, no new env var.
