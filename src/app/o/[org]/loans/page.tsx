@@ -3,7 +3,8 @@ import { requireOrg } from '@/core/authz/guards';
 import { db } from '@/core/db';
 import { formatMoney } from '@/ledger/money';
 import { bookOverview, loanDetail, nextDue, type BookLoan } from '@/ledger/views';
-import { viewDate, withLedger } from './access';
+import { notFound } from 'next/navigation';
+import { isBorrowerRole, isServicer, viewDate, withLedger } from './access';
 import { AsOfBar } from './AsOfBar';
 import { StateBadge } from './StateBadge';
 
@@ -19,7 +20,7 @@ export default async function Loans({ params, searchParams }: { params: Promise<
   const asOf = viewDate(sp.asOf);
   const base = `/o/${ctx.slug}/loans`;
 
-  if (ctx.role === 'member') {
+  if (isBorrowerRole(ctx.role)) {
     const mine = await db.loanAccess.findMany({ where: { orgId: ctx.orgId, borrowerUserId: ctx.userId }, orderBy: { createdAt: 'asc' } });
     const today = viewDate(undefined);
     const loans = await withLedger(async (c) => {
@@ -53,6 +54,7 @@ export default async function Loans({ params, searchParams }: { params: Promise<
       </main>
     );
   }
+  if (!isServicer(ctx.role)) notFound(); // D30: a role that is neither borrower nor servicer (scorekeeper) sees no book
 
   const access = await db.loanAccess.findMany({ where: { orgId: ctx.orgId }, orderBy: { createdAt: 'asc' }, select: { loanId: true } });
   const book = await withLedger((c) => bookOverview(c, { loanIds: access.map((a) => a.loanId), asOf }));

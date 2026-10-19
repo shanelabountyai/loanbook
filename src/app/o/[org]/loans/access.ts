@@ -5,15 +5,13 @@ import { now } from '@/core/clock';
 import { db } from '@/core/db';
 import { env } from '@/core/env';
 import { assertDate } from '@/ledger/calendar';
+import { loanRole, type LoanRole } from './roles';
+
+export { isBorrowerRole, isServicer, loanRole, type LoanRole } from './roles';
 
 // The borrower/servicer split (task 4.4, D21), on the template's roles: an org's owner and admins service its
-// loans; a member sees a loan only as the borrower named on its LoanAccess row. "Not yours" is notFound.
-
-export type LoanRole = 'servicer' | 'borrower';
-
-/** Pure. A loan outside the org (no row) is no one's; a member who is not the borrower gets nothing. */
-export const loanRole = (ctx: Pick<OrgCtx, 'role' | 'userId'>, access: { borrowerUserId: string } | null): LoanRole | null =>
-  !access ? null : ctx.role !== 'member' ? 'servicer' : access.borrowerUserId === ctx.userId ? 'borrower' : null;
+// loans; a member sees a loan only as the borrower named on its LoanAccess row; any other role (D30: scorekeeper)
+// sees nothing. "Not yours" is notFound. The role lists live in ./roles (pure).
 
 /** Right after requireOrg on every loan page (FR-06 wants requireOrg first). `need: 'servicer'` refuses a borrower too. */
 export async function requireLoan(ctx: OrgCtx, loanId: string, need?: LoanRole): Promise<LoanRole> {

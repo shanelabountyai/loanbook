@@ -3,7 +3,7 @@ import { requireOrg } from '@/core/authz/guards';
 import { db } from '@/core/db';
 import { formatMoney } from '@/ledger/money';
 import { bookOverview } from '@/ledger/views';
-import { viewDate, withLedger } from '../access';
+import { isServicer, viewDate, withLedger } from '../access';
 import { AsOfBar } from '../AsOfBar';
 import { AgingTable, type AgingBand } from './AgingTable';
 import { notFound } from 'next/navigation';
@@ -18,7 +18,7 @@ const BANDS: Record<string, [string, string]> = {
 // Servicer only. The bands are the D18 states, so this is the book overview's loans regrouped with each loan's principal/interest/fees split.
 export default async function AgingPage({ params, searchParams }: { params: Promise<{ org: string }>; searchParams: Promise<{ asOf?: string }> }) {
   const ctx = await requireOrg((await params).org);
-  if (ctx.role === 'member') notFound();
+  if (!isServicer(ctx.role)) notFound(); // D30: borrowers and any non-servicer role
   const asOf = viewDate((await searchParams).asOf);
   const base = `/o/${ctx.slug}/loans`;
   const access = await db.loanAccess.findMany({ where: { orgId: ctx.orgId }, orderBy: { createdAt: 'asc' }, select: { loanId: true } });
