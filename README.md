@@ -18,7 +18,7 @@ Needs Node 22+, Python 3 (the fixture oracle, stdlib only) and a local Postgres 
 |---|---|
 | `npm run db:setup` | creates `loanbook` and `loanbook_test`, writes `.env.local` and `.env.test`, migrates both |
 | `npm test` | vitest against the local test database |
-| `npm run ledger:verify` | proves the book balances; exits non-zero on any imbalance (placeholder until task 1.9) |
+| `npm run ledger:verify` | proves the book balances; exits non-zero on any imbalance, missing loan_id, dangling reversal or control-account mismatch |
 | `npm run fixtures:check` | regenerates the fixtures, re-derives them a second way, and fails on any diff |
 | `npm run lint` / `typecheck` | ESLint and `tsc` |
 | `npm run dev` | http://localhost:4700 |
