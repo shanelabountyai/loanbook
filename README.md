@@ -10,6 +10,26 @@ Small fixed-term installment loans ($500–$5,000) serviced on an append-only, d
 
 The foundation supplies sign-in, orgs and roles, the audit log, CI and the Playwright setup. Its layout, module removal and upgrade steps are in the template's own README. LoanBook's code lives in clone-owned paths only.
 
+### Row-level security on Neon (optional, `RLS_MODE=enforce`)
+
+`db:setup` gives you two roles locally: the owner (`DATABASE_URL` while RLS is off, `DATABASE_URL_SYSTEM`, `DIRECT_URL`) and
+`<name>_app_rw` with `NOBYPASSRLS` (`DATABASE_URL_APP_RW`). To enforce locally, set `DATABASE_URL` to the app_rw URL and
+`RLS_MODE=enforce` together: app_rw with RLS off sees no org rows, because off mode sets no org. On Neon, the role the console creates is a `neon_superuser` with `BYPASSRLS`, so the app role is made
+in SQL, as the owner, on the branch:
+
+```sql
+CREATE ROLE app_rw LOGIN PASSWORD '<generate one>' NOBYPASSRLS NOSUPERUSER;
+GRANT USAGE ON SCHEMA public TO app_rw;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO app_rw;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO app_rw;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO app_rw;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE, SELECT ON SEQUENCES TO app_rw;
+```
+
+Then in Vercel: `DATABASE_URL` = app_rw through the pooler (`-pooler` host), `DATABASE_URL_SYSTEM` = the owner through the pooler,
+`DIRECT_URL` = the owner without the pooler, `RLS_MODE=enforce`. Run `npm run rls:policies` once for your own org-owned models and
+commit the migration; INV-30 fails until you do. The pooler accepts an SQL-created role (spike S4a ran through it).
+
 ## Commands
 
 Needs Node 22+, Python 3 (the fixture oracle, stdlib only) and a local Postgres 17.

@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import { inOrg, requireOrg } from '@/core/authz/guards';
 import { can, mayAssign } from '@/core/authz/permissions';
 import { now } from '@/core/clock';
-import { db } from '@/core/db';
+import { withOrg } from '@/core/db/rls';
 import { ActionForm } from '@/core/ui/action-form';
 import { Role } from '@/generated/prisma/enums';
 import { isServicer } from '../../loans/roles';
@@ -15,10 +15,10 @@ export default async function Members({ params }: { params: Promise<{ org: strin
   const ctx = await requireOrg((await params).org);
   if (!isServicer(ctx.role)) notFound(); // loanbook D29/D30: the lender's customer list, servicers (owner/admin) only
   const manage = can(ctx.role, 'members.manage');
-  const [members, invites] = await Promise.all([
-    db.membership.findMany({ where: inOrg(ctx), select: { userId: true, role: true, user: { select: { email: true } } }, orderBy: { createdAt: 'asc' } }),
-    manage ? db.invite.findMany({ where: { ...inOrg(ctx), acceptedAt: null, revokedAt: null, expiresAt: { gt: now() } }, orderBy: { createdAt: 'asc' } }) : [],
-  ]);
+  const [members, invites] = await withOrg(ctx, (tx) => Promise.all([
+    tx.membership.findMany({ where: inOrg(ctx), select: { userId: true, role: true, user: { select: { email: true } } }, orderBy: { createdAt: 'asc' } }),
+    manage ? tx.invite.findMany({ where: { ...inOrg(ctx), acceptedAt: null, revokedAt: null, expiresAt: { gt: now() } }, orderBy: { createdAt: 'asc' } }) : [],
+  ]), { atomic: false });
   const roles = Object.values(Role);
   const bind = <A extends unknown[], R>(fn: (slug: string, ...a: A) => R) => fn.bind(null, ctx.slug);
 
