@@ -86,7 +86,9 @@ async function seedSso(db: Parameters<Parameters<typeof asSystem>[0]>[0]): Promi
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const lines = await seedDemo();
   console.log(`Seeded demo accounts. Sign in at /demo (DEMO_MODE=1):\n  ${lines.join('\n  ')}`);
-  console.log(await seedDemoBook());
+  // D33: e2e seeds accounts only. The book runs book-wide accrual/status batches, which would charge fees on the
+  // loans e2e/loans.spec.ts seeds concurrently. Playwright sets TEST_WORKER_INDEX in each worker.
+  if (!process.env.TEST_WORKER_INDEX) console.log(await seedDemoBook());
   console.log(`TOTP secret for the (TOTP) accounts, for an authenticator app: ${DEMO_TOTP_SECRET}`);
   await db.$disconnect();
 }
