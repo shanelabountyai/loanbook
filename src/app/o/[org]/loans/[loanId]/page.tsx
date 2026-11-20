@@ -9,6 +9,8 @@ import { LedgerTable } from './LedgerTable';
 
 export const metadata = { title: 'Loan detail' };
 
+const ADJUST_MSG = /^(Fee waived\.|Loan written off\.|Refused: [a-z_]+)$/;
+
 // Servicer only: schedule against cash received, every ledger line, state as of the day.
 export default async function LoanDetailPage({ params, searchParams }: { params: Promise<{ org: string; loanId: string }>; searchParams: Promise<{ asOf?: string; msg?: string }> }) {
   const ctx = await requireOrg((await params).org);
@@ -22,6 +24,8 @@ export default async function LoanDetailPage({ params, searchParams }: { params:
   const reversed = d.ledger.filter((l) => l.reversesEntryId).map((l) => l.reversesEntryId!);
   const waivable = d.ledger.filter((l) => l.kind === 'late_fee' && !reversed.includes(l.entryId)).map((l) => l.entryId);
   const action = `/o/${ctx.slug}/loans/${loanId}/adjust`;
+  // `?msg=` is the adjust route's result; show only the shapes it sends, so a crafted link cannot put its own words here
+  const msg = typeof sp.msg === 'string' && ADJUST_MSG.test(sp.msg) ? sp.msg : null;
   const status = (r: { dueDate: string; paymentCents: number; coveredCents: number }) =>
     r.coveredCents >= r.paymentCents ? ['●', 'Paid', ''] : r.coveredCents > 0 ? ['◐', 'Partly paid', ''] : r.dueDate < asOf ? ['○', 'Missed', 'missed'] : ['·', 'Upcoming', 'muted'];
   return (
@@ -43,7 +47,7 @@ export default async function LoanDetailPage({ params, searchParams }: { params:
           <p>As of {asOf}: <strong>{d.status.state}</strong>, {d.status.dpd} days past due.</p>
           <p style={{ margin: 0 }}>Owed: principal <span className="n">{formatMoney(o.principal)}</span>, interest <span className="n">{formatMoney(o.interest)}</span>, fees <span className="n">{formatMoney(o.fees)}</span>.</p>
         </section>
-        {sp.msg && <p role="status" className="card" style={{ padding: '10px 16px', margin: 0 }}>{sp.msg}</p>}
+        {msg && <p role="status" className="card" style={{ padding: '10px 16px', margin: 0 }}>{msg}</p>}
         {d.status.state === 'default_recommended' && (
           <section className="card" style={{ padding: '14px 16px' }}>
             <h2>Write off</h2>
