@@ -4,6 +4,8 @@ import { EntryError } from '@/ledger/entry';
 import { waiveFee, writeOff } from '@/ledger/delinquency';
 import { requireLoan, viewDate, withLedger } from '../../access';
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 // Servicer-only POST from the loan page: waive a late fee (field `entryId`) or write the loan off (field `confirm`).
 // Posts dated today; the ledger functions do every refusal, this only maps them to a message on the page.
 export async function POST(req: Request, { params }: { params: Promise<{ org: string; loanId: string }> }) {
@@ -18,6 +20,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ org: st
   try {
     await withLedger(async (c) => {
       if (f.has('entryId')) {
+        // a malformed id names no entry: refuse it here, before Postgres's uuid cast turns it into a 500
+        if (!UUID.test(str('entryId'))) throw new EntryError('dangling_reversal');
         const { rowCount } = await c.query('SELECT 1 FROM "LedgerEntry" WHERE "id" = $1::uuid AND "loanId" = $2', [str('entryId'), loanId]);
         if (!rowCount) throw new EntryError('dangling_reversal'); // an entry of another loan is the same as no entry
         await waiveFee(c, { entryId: str('entryId'), date, reason: str('reason') });
